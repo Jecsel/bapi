@@ -1,0 +1,37 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: rails-doctor-api
+spec:
+  selector: 
+    matchLabels:
+      app: rails-6
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rails-6 
+    spec:
+      containers:
+      - name: rails-6 
+        image: registry.gitlab.com/ramelcabugos/doctor-portal-api:MASTER_507951777
+        args: ["bundle exec puma"]
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: biomark-config        
+      imagePullSecrets:
+      - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: doctor-api-service
+spec:
+  ports:
+    - port: 5588
+      targetPort: 5588
+      protocol: TCP
+  type: NodePort
+  selector:
+    app: rails-6 

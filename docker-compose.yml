@@ -1,0 +1,39 @@
+version: '3.2'
+volumes:
+    mysql-data:
+        driver: local
+services:
+    db:
+        image: mysql:5.7
+        restart: always
+        environment:
+            MYSQL_ROOT_PASSWORD: 123123
+        volumes:
+        - "mysql-data:/var/lib/mysql"
+        ports:
+        - "3306:3306"
+    api:
+        build: .
+        depends_on:
+        - redis
+        - db
+        command: bundle exec rails s -b '0.0.0.0'
+        environment:
+        - RAILS_ENV=development
+        - DB_HOST=db
+        - DB_PASSWORD=123123
+        - DB_PORT=3306
+        - DB_NAME=biomark_booking
+        - DB_TEST=biomark_booking
+        # - AWS_ACCESS_KEY_ID=AKIAJN4XIZL37BQF4GWQ
+        # - AWS_SECRET_ACCESS_KEY=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
+        # - AWS_REGION=ap-southeast-1
+        # - BIOMARK_STATIC_ASSETS=https://assets.biomarking.com
+        - APP_ENV=RAMEL_LOCAL
+        volumes:
+        - .:/app
+        ports:
+        - "4000:3000"
+        depends_on:
+        - db
+  
