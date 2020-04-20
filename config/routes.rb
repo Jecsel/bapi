@@ -12,7 +12,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resource :schedule, only:[:create] do 
+    resources :schedule, only:[:create] do 
       collection do 
         
       end
