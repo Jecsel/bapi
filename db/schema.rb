@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_20_065011) do
+ActiveRecord::Schema.define(version: 2020_04_20_151512) do
 
   create_table "locations", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
@@ -19,6 +19,30 @@ ActiveRecord::Schema.define(version: 2020_04_20_065011) do
     t.string "latitude"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "location_id"
+    t.date "schedule_date"
+    t.integer "allocation_per_slot"
+    t.integer "minute_interval"
+    t.time "morning_start_time"
+    t.time "morning_end_time"
+    t.time "afternoon_start_time"
+    t.time "afternoon_end_time"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["location_id"], name: "index_schedules_on_location_id"
+  end
+
+  create_table "slots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "schedule_id"
+    t.time "slot_time"
+    t.boolean "status"
+    t.integer "allocations"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["schedule_id"], name: "index_slots_on_schedule_id"
   end
 
   create_table "user_groups", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

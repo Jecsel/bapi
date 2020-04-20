@@ -2,6 +2,10 @@ class V1::LocationController < ApplicationController
   
   before_action :must_be_authenticated
   
+  def schedules 
+    @schedules = Schedule.where("location_id = ?",params[:location_id])
+  end
+
   def show
     @location = Location.find params[:id]
   end
