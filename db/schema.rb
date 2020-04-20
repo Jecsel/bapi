@@ -22,6 +22,7 @@ ActiveRecord::Schema.define(version: 2020_04_20_151512) do
   end
 
   create_table "schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "location_id"
     t.date "schedule_date"
     t.integer "allocation_per_slot"
     t.integer "minute_interval"
@@ -31,6 +32,7 @@ ActiveRecord::Schema.define(version: 2020_04_20_151512) do
     t.time "afternoon_end_time"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["location_id"], name: "index_schedules_on_location_id"
   end
 
   create_table "slots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

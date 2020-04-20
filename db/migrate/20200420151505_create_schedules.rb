@@ -1,6 +1,7 @@
 class CreateSchedules < ActiveRecord::Migration[6.0]
   def change
     create_table :schedules do |t|
+      t.belongs_to :location, index:true
       t.date :schedule_date
       t.integer :allocation_per_slot
       t.integer :minute_interval

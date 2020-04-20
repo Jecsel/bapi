@@ -25,6 +25,7 @@ class Scheduler
         ActiveRecord::Base.transaction do
             dates.each do |_date|
                 sched = Schedule.create(
+                    location_id: location_id,
                     schedule_date:_date, 
                     allocation_per_slot:allocation_per_slot,
                     minute_interval: minutes_interval,
