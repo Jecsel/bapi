@@ -2,6 +2,9 @@ class V1::LocationController < ApplicationController
   
   before_action :must_be_authenticated
   
+  def show
+    @location = Location.find params[:id]
+  end
   def destroy 
     Location.delete params[:id]
     render json: {message: :deleted}    
