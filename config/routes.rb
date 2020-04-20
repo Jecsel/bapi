@@ -12,7 +12,12 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :location, only:[:create, :index, :update, :destroy] do 
+    resources :schedule, only:[:create] do 
+      collection do 
+        
+      end
+    end
+    resources :location, only:[:create, :index, :update, :destroy, :show] do 
       collection do 
 
       end
