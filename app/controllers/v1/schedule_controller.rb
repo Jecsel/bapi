@@ -2,12 +2,12 @@ class V1::ScheduleController < ApplicationController
     before_action :must_be_authenticated
 
     def create
-        begin
+        # begin
             c = Scheduler.new schedule_params 
             render json: {message: :generated, status:true}
-        rescue=>ex
-            render json: {message:ex,status:false}
-        end
+        # rescue=>ex
+        #     render json: {message:ex,status:false}
+        # end
         
     end
 
