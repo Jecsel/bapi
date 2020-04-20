@@ -1,24 +1,24 @@
-stages:
-  - build
+# stages:
+#   - build
 
-variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
-  # DOCKER_HOST: tcp://localhost:2375/
-  # KUBECONFIG: /etc/deploy/config
-  # DOCKER_DRIVER: overlay2
+# variables:
+#   DOCKER_DRIVER: overlay2
+#   DOCKER_TLS_CERTDIR: ""
+#   # DOCKER_HOST: tcp://localhost:2375/
+#   # KUBECONFIG: /etc/deploy/config
+#   # DOCKER_DRIVER: overlay2
 
-build:
-  image: docker:latest
-  stage: build
-  services:
-  - docker:dind
-  before_script:
-   - docker version
-   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
-  script:
-    - docker build -t doctor-portal-api .
-    - docker tag doctor-portal-api:latest registry.gitlab.com/ramelcabugos/doctor-portal-api:MASTER_${CI_JOB_ID}
-    - docker push registry.gitlab.com/ramelcabugos/doctor-portal-api:MASTER_${CI_JOB_ID}
-  only:
-    - master
+# build:
+#   image: docker:latest
+#   stage: build
+#   services:
+#   - docker:dind
+#   before_script:
+#    - docker version
+#    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
+#   script:
+#     - docker build -t doctor-portal-api .
+#     - docker tag doctor-portal-api:latest registry.gitlab.com/ramelcabugos/doctor-portal-api:MASTER_${CI_JOB_ID}
+#     - docker push registry.gitlab.com/ramelcabugos/doctor-portal-api:MASTER_${CI_JOB_ID}
+#   only:
+#     - master
