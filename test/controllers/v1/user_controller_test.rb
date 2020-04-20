@@ -1,7 +1,9 @@
 require 'test_helper'
 
 class V1::UserControllerTest < ActionDispatch::IntegrationTest
-  # test "the truth" do
-  #   assert true
-  # end
+  test "should get index" do
+    get v1_user_index_url
+    assert_response :success
+  end
+
 end
