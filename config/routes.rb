@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+
   get "ping", to:"application#ping"
 
   namespace :v1, defaults: { format: :json } do
@@ -8,6 +9,12 @@ Rails.application.routes.draw do
         post 'sign_in'
         post 'authenticate'
         post 'sign_out'
+      end
+    end
+
+    resources :location, only:[:create, :index, :update, :destroy] do 
+      collection do 
+
       end
     end
   end
