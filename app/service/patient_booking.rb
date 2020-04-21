@@ -5,6 +5,7 @@ class PatientBooking
                     :patient,
                     :covid_price,
                     :payment
+                    :slot
 
     def initialize booking_params
         @covid_price    = 1 #for sample payment
@@ -13,15 +14,26 @@ class PatientBooking
         @schedule_id    = booking_params[:schedule][:id] 
         @patient        = booking_params[:patient]
         
-        #TODO VALIDATION
+        validate_request
 
         generate_patient_record
     end
 
     private 
-
+    def validate_request
+        @slot = Slot.find slot_id
+        if @slot.allocations == 0 || @slot.status == false
+            raise "Slot is no longer available"
+        end
+    end
     def generate_patient_record
         ActiveRecord::Base.transaction do
+            _allocations = @slot.allocations
+            if _allocations > 1
+                @slot.update allocations: _allocations - 1
+            else
+                @slot.update allocations: 0,status:false
+            end
             _patient = Patient.create({ 
                 fullname: patient[:full_name],
                 id_number: patient[:id_number],
