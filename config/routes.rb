@@ -17,7 +17,7 @@ Rails.application.routes.draw do
         
       end
     end
-    resources :clinic, only:[:create, :update, :destroy, :show] do 
+    resources :clinic, only:[:create, :index, :update, :destroy, :show] do 
       collection do 
       end
     end
