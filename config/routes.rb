@@ -7,7 +7,7 @@ Rails.application.routes.draw do
   namespace :v1, defaults: { format: :json } do
     namespace :booking do 
       resources :location, only:[:index] do 
-
+        get 'schedules', to:"location#schedules"
       end
     end
   end
