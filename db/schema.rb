@@ -10,7 +10,23 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_21_040012) do
+ActiveRecord::Schema.define(version: 2020_04_21_064906) do
+
+  create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "patient_id"
+    t.bigint "location_id"
+    t.bigint "slot_id"
+    t.bigint "schedule_id"
+    t.bigint "clinic_id"
+    t.string "amount"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["clinic_id"], name: "index_bookings_on_clinic_id"
+    t.index ["location_id"], name: "index_bookings_on_location_id"
+    t.index ["patient_id"], name: "index_bookings_on_patient_id"
+    t.index ["schedule_id"], name: "index_bookings_on_schedule_id"
+    t.index ["slot_id"], name: "index_bookings_on_slot_id"
+  end
 
   create_table "clinics", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
@@ -25,6 +41,19 @@ ActiveRecord::Schema.define(version: 2020_04_21_040012) do
     t.text "address"
     t.string "longitude"
     t.string "latitude"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "patients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "fullname"
+    t.string "id_number"
+    t.integer "gender_id"
+    t.date "date_of_birth"
+    t.string "contact_number"
+    t.string "email_address"
+    t.boolean "q1"
+    t.boolean "q2"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
