@@ -8,6 +8,7 @@ Rails.application.routes.draw do
     namespace :guest do 
       resources :location, only:[:index] do 
         get 'schedules', to:"location#schedules"
+        get 'find_schedules/:scheduled_id', to:"location#find_schedules"
       end
       resources :booking, only:[:create] do 
         

@@ -1,7 +1,6 @@
 json.extract! @loc, :id, :name, :address
-json.today_schedule do 
-    json.status @today_schedule.any?
-    json.extract! @today_schedule.last, :id, :schedule_date if @today_schedule.any?
-    json.slots @today_schedule.last.slots.group_by(&:meridian) if @today_schedule.any?
+json.active_slot do 
+    json.status @schedules.any?
+    json.data @schedules.first.slots.group_by(&:meridian) if @schedules.any?
 end
-json.future_schedules @future_schedules, :id, :schedule_date
+json.schedules @schedules, :id, :schedule_date
