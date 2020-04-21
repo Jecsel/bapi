@@ -8,13 +8,8 @@ class V1::UserController < ApplicationController
       if user.valid_password? user_params[:password]
         user.user_token = Generator.new().generate_alpha_numeric
         user.save
-
-        token = {
-          user_id: user.id,
-          secret: user.user_token
-        }
         
-        bearer_token = encode token
+        bearer_token = encode({user_id: user.id,secret: user.user_token})
         render json: {token: bearer_token}
       else
         invalid_account
