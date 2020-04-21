@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_21_015719) do
+ActiveRecord::Schema.define(version: 2020_04_21_040012) do
 
   create_table "clinics", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
@@ -50,6 +50,7 @@ ActiveRecord::Schema.define(version: 2020_04_21_015719) do
     t.integer "allocations"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "meridian"
     t.index ["schedule_id"], name: "index_slots_on_schedule_id"
   end
 
