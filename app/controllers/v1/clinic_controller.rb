@@ -1,8 +1,12 @@
 class V1::ClinicController < ApplicationController
     
+    def index
+        @clinics = Clinic.all
+    end
+    
     def create
-        Clinic.create clinic_params
-        render json:{message: :created}
+        clinic = Clinic.create clinic_params
+        render json:{data:clinic,message: :created}
     end
     def destroy 
     end
