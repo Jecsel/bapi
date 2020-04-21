@@ -4,7 +4,11 @@ class V1::Booking::LocationController < ApplicationController
     def schedules
         today = Date.today
         @loc = Location.find params[:location_id]
-        @_schedules = @loc.schedules.where("schedule_date >= ?",today)
+        @today_schedule = @loc.schedules.where("schedule_date = ?",today)
+        @future_schedules = @loc.schedules.where("schedule_date >= ?",today)
+        p "---"
+        p @today_schedule
+        p "---"
     end
     def index
         @locations = Location.all
