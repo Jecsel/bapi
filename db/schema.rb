@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_21_064906) do
+ActiveRecord::Schema.define(version: 2020_04_21_100802) do
 
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "patient_id"
@@ -18,6 +18,7 @@ ActiveRecord::Schema.define(version: 2020_04_21_064906) do
     t.bigint "slot_id"
     t.bigint "schedule_id"
     t.bigint "clinic_id"
+    t.string "reference_code"
     t.string "amount"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -56,6 +57,30 @@ ActiveRecord::Schema.define(version: 2020_04_21_064906) do
     t.boolean "q2"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "payments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "patient_id"
+    t.bigint "booking_id"
+    t.string "merchant_code"
+    t.string "payment_id"
+    t.string "ref_no"
+    t.string "amount"
+    t.string "currency"
+    t.text "prod_desc"
+    t.string "username"
+    t.string "user_email"
+    t.string "user_contact"
+    t.string "remark"
+    t.string "lang"
+    t.string "signature_type"
+    t.string "signature"
+    t.integer "payment_status"
+    t.integer "payment_type"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["booking_id"], name: "index_payments_on_booking_id"
+    t.index ["patient_id"], name: "index_payments_on_patient_id"
   end
 
   create_table "schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
