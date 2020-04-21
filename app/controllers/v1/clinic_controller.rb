@@ -1,7 +1,7 @@
 class V1::ClinicController < ApplicationController
     
     def create
-        Clinic.create clinics_params
+        Clinic.create clinic_params
         render json:{message: :created}
     end
     def destroy 
