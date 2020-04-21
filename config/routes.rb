@@ -19,6 +19,11 @@ Rails.application.routes.draw do
 
   #ADMIN
   namespace :v1, defaults: { format: :json } do
+    resources :booking, only:[:index] do 
+      collection do 
+        
+      end
+    end
     resources :user, only: [] do
       collection do
         post 'sign_in'
