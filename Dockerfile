@@ -1,4 +1,4 @@
-FROM registry.gitlab.com/biomark/biomark-booking-api:master_base
+FROM ramelcabugos/biomark-booking-api:latest
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 ADD Gemfile* $APP_HOME/

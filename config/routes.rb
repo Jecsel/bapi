@@ -23,6 +23,10 @@ Rails.application.routes.draw do
     end
     resources :location, only:[:create, :index, :update, :destroy, :show] do 
       get 'schedules' #, to:"location#schedules"
+      get 'location_clinics'
+      collection do
+        post 'add_location_clinic'
+      end
     end
   end
 
