@@ -1,4 +1,4 @@
-class V1::Booking::LocationController < ApplicationController
+class V1::Guest::LocationController < ApplicationController
 
 
     def schedules
