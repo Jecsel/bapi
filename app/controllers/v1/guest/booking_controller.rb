@@ -1,0 +1,29 @@
+class V1::Guest::BookingController < ApplicationController
+    
+    def create
+        PatientBooking.new booking_params
+        render json: booking_params    
+    end
+    
+    private
+    def booking_params
+        params
+            .require(:booking)
+            .permit(
+                :location=>[:id],
+                :slot=>[:id],
+                :schedule=>[:id],
+                :patient=>[
+                    :fullname,
+                    :id_number,
+                    :gender_id,
+                    :date_of_birth,
+                    :contact_number,
+                    :email_address,
+                    :q1,
+                    :q2,
+                    :clinic_id,
+                ]
+            )
+    end
+end

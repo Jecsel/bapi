@@ -53,7 +53,8 @@ class Scheduler
                     schedule_id:id,
                     slot_time:"#{start}:#{(a * minutes_interval).to_s.rjust(2,"0")} #{n}".to_time,
                     status:true,
-                    allocations: allocation_per_slot
+                    allocations: allocation_per_slot,
+                    meridian: n
                 }
             end
             start+=1
