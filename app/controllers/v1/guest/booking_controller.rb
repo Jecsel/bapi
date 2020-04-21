@@ -1,8 +1,13 @@
 class V1::Guest::BookingController < ApplicationController
     
     def create
-        PatientBooking.new booking_params
-        render json: booking_params    
+        begin
+            data = PatientBooking.new booking_params    
+            render json: {status:true, data:data.payment}
+            sleep 2
+        rescue => ex
+            render json: {message:ex,status:false}
+        end
     end
     
     private
@@ -14,7 +19,7 @@ class V1::Guest::BookingController < ApplicationController
                 :slot=>[:id],
                 :schedule=>[:id],
                 :patient=>[
-                    :fullname,
+                    :full_name,
                     :id_number,
                     :gender_id,
                     :date_of_birth,
