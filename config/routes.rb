@@ -3,6 +3,17 @@ Rails.application.routes.draw do
 
   get "ping", to:"application#ping"
 
+  #BOOKING
+  namespace :v1, defaults: { format: :json } do
+    namespace :booking do 
+      resources :location, only:[:index] do 
+
+      end
+    end
+  end
+
+
+  #ADMIN
   namespace :v1, defaults: { format: :json } do
     resources :user, only: [] do
       collection do
