@@ -1,5 +1,8 @@
 class V1::Guest::BookingController < ApplicationController
     
+    def payment_confirmation
+        @data = params
+    end
     def create
         begin
             data = PatientBooking.new booking_params    

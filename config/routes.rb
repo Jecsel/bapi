@@ -4,14 +4,16 @@ Rails.application.routes.draw do
   get "ping", to:"application#ping"
 
   #BOOKING
-  namespace :v1, defaults: { format: :json } do
+  namespace :v1 do
     namespace :guest do 
       resources :location, only:[:index] do 
         get 'schedules', to:"location#schedules"
         get 'find_schedules/:scheduled_id', to:"location#find_schedules"
       end
-      resources :booking, only:[:create] do 
-        
+      resources :booking, only:[:create, :index] do 
+        collection do
+          post 'payment_confirmation', to:'booking#payment_confirmation'
+        end
       end
     end
   end
