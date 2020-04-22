@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-
+  root :to => 'home#index'
 
   get "ping", to:"application#ping"
 
@@ -9,6 +9,12 @@ Rails.application.routes.draw do
       resources :location, only:[:index] do 
         get 'schedules', to:"location#schedules"
         get 'find_schedules/:scheduled_id', to:"location#find_schedules"
+      end
+      resources :payment, only:[] do 
+        collection do
+          post 'status', to:'payment#status'
+          post 'confirmation', to:'payment#confirmation'
+        end
       end
       resources :booking, only:[:create, :index] do 
         collection do
