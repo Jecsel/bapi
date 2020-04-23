@@ -1,0 +1,1 @@
+json.array! @clinics, :id, :name

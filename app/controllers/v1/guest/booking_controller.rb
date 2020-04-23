@@ -1,11 +1,9 @@
 class V1::Guest::BookingController < ApplicationController
     
-    def payment_confirmation
-        @data = params
-    end
     def create
         begin
             data = PatientBooking.new booking_params    
+            BookingMailer.itinerary(data.payment).deliver_later
             render json: {status:true, data:data.payment}
             sleep 2
         rescue => ex

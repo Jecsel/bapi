@@ -22,9 +22,9 @@ class PatientBooking
     private 
     def validate_request
         @slot = Slot.find slot_id
-        if @slot.allocations == 0 || @slot.status == false
-            raise "Slot is no longer available"
-        end
+        # if @slot.allocations == 0 || @slot.status == false
+        #     raise "Slot is no longer available"
+        # end
     end
     def generate_patient_record
         ActiveRecord::Base.transaction do
