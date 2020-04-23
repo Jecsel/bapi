@@ -4,6 +4,10 @@ class V1::ScheduleController < ApplicationController
     def index
         
     end
+    def show
+        @schedule = Schedule.find params[:id]
+        # render json: @schedule
+    end
     def create
         begin
             Scheduler.new schedule_params 

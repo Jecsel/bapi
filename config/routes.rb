@@ -41,7 +41,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :schedule, only:[:create] do 
+    resources :schedule, only:[:create, :show] do 
       collection do 
         
       end
