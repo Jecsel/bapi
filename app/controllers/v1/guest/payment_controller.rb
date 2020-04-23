@@ -1,7 +1,8 @@
 class V1::Guest::PaymentController < ApplicationController
     
     def confirmation
-        @data = params
+        render json: :accepted,status:200
+        # @data = params
     end
     
     def status
