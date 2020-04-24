@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user_group: one
+  service: one
+  service_policy: one
+  status: false
+
+two:
+  user_group: two
+  service: two
+  service_policy: two
+  status: false

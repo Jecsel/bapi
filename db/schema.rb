@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_21_100802) do
+ActiveRecord::Schema.define(version: 2020_04_23_142057) do
 
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "patient_id"
@@ -92,6 +92,25 @@ ActiveRecord::Schema.define(version: 2020_04_21_100802) do
     t.index ["patient_id"], name: "index_payments_on_patient_id"
   end
 
+  create_table "profiles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.string "contact"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "role_policies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "user_group_id", null: false
+    t.bigint "service_id", null: false
+    t.bigint "service_policy_id", null: false
+    t.boolean "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["service_id"], name: "index_role_policies_on_service_id"
+    t.index ["service_policy_id"], name: "index_role_policies_on_service_policy_id"
+    t.index ["user_group_id"], name: "index_role_policies_on_user_group_id"
+  end
+
   create_table "schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "location_id"
     t.date "schedule_date"
@@ -104,6 +123,24 @@ ActiveRecord::Schema.define(version: 2020_04_21_100802) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["location_id"], name: "index_schedules_on_location_id"
+  end
+
+  create_table "service_policies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "service_id", null: false
+    t.string "name"
+    t.boolean "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["service_id"], name: "index_service_policies_on_service_id"
+  end
+
+  create_table "services", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.boolean "status"
+    t.string "resource_path"
+    t.string "resource_icon"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "slots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -123,6 +160,16 @@ ActiveRecord::Schema.define(version: 2020_04_21_100802) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "user_roles", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "user_group_id", null: false
+    t.boolean "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["user_group_id"], name: "index_user_roles_on_user_group_id"
+    t.index ["user_id"], name: "index_user_roles_on_user_id"
+  end
+
   create_table "users", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "username"
     t.string "password"
@@ -132,4 +179,10 @@ ActiveRecord::Schema.define(version: 2020_04_21_100802) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "role_policies", "service_policies"
+  add_foreign_key "role_policies", "services"
+  add_foreign_key "role_policies", "user_groups"
+  add_foreign_key "service_policies", "services"
+  add_foreign_key "user_roles", "user_groups"
+  add_foreign_key "user_roles", "users"
 end
