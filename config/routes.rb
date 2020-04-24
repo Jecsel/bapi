@@ -14,6 +14,7 @@ Rails.application.routes.draw do
       resources :payment, only:[] do 
         collection do
           post 'status', to:'payment#status'
+          get 'status', to:'payment#status'
           post 'confirmation', to:'payment#confirmation'
         end
       end

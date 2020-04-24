@@ -1,4 +1,72 @@
+<!DOCTYPE html>
 <html>
-    <h1>PAYMENT STATUS</h1>
-    <p><%=@data%></p>
+<head>
+	<title>Payment Status</title>
+	<meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<style type="text/css">
+		body{
+			height: 100vh;
+			background-image: linear-gradient(-180deg,#eee 0,#fefefe 50%,#fff 100%);
+			font-family: verdana;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 100vw;
+			padding:0;
+			margin:0;
+		}
+		.mContainer{
+			margin: 0 10px;
+			width:400px;
+			height: 200px;
+			background: #fff;
+            border: 1px solid #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+		}
+		@media only screen
+ 
+		and (min-device-width: 375px)
+		 
+		and (max-device-width: 667px)
+		 
+		and (-webkit-min-device-pixel-ratio: 2)
+		 
+		and (orientation: portrait) {
+		 	.mContainer{
+				width: 100% ;
+			}
+		}
+	</style>
+
+</head>
+<body>
+	<div class="mContainer">
+        <% if @data[:Status] == "1" ||  @data[:Status] == 1 %>
+            <div>
+                <h2 style="text-align:center;color:green">Payment Succesful </h2>
+                <p style="text-align:center">Thank you</p>
+                <script>
+                    window.localStorage.clear();
+                    window.location.replace("https://my.biomarking.com");
+                </script>
+            </div>
+        <% else %>
+             <div>
+                <h2 style="text-align:center;color:red">Payment Failed </h2>
+                <script>
+                    function redirect(){
+                        window.location.replace("https://my.biomarking.com/#/booking-confirmation");
+                    }
+                </script>
+                <center>
+                    <button onclick="redirect()">TRY AGAIN</button>
+                </center>
+                
+            </div>
+        <% end %>
+	</div>
+</body>
 </html>
