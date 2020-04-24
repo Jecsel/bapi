@@ -20,8 +20,14 @@ class V1::UserController < ApplicationController
   end
 
   def authenticate
+    if !@current_user.user_role.nil?
+      @policies = @current_user.user_role.user_group.role_policies.group_by(&:service_id)
+    else
+      render json:{message: "User has no policies"}
+    end
+    
     #return admin user information here
-    render json: {message: :accepted}
+    # render json: {message: :accepted}
   end
 
   def sign_out
