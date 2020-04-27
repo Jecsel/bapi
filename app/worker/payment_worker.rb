@@ -29,6 +29,9 @@ class PaymentWorker
 
     def generate_system_signature
         __code = "#{ENV["MERCHANT_KEY"]}#{ENV["MERCHANT_CODE"]},#{payment_id}#{payment.ref_no}#{payment.amount.gsub('.', "")}#{payment.currency}1"
+        p "------"
+        p __code
+        p "------"
         return Digest::SHA256.hexdigest __code
     end
 end

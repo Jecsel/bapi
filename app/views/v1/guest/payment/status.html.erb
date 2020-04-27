@@ -49,8 +49,11 @@
                 <h2 style="text-align:center;color:green">Payment Succesful </h2>
                 <p style="text-align:center">Thank you</p>
                 <script>
-                    window.localStorage.clear();
+				setTimeout(function(){
+					window.localStorage.clear();
                     window.location.replace("https://my.biomarking.com");
+				},3000);
+                    
                 </script>
             </div>
         <% else %>
@@ -64,7 +67,6 @@
                 <center>
                     <button onclick="redirect()">TRY AGAIN</button>
                 </center>
-                
             </div>
         <% end %>
 	</div>
