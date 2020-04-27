@@ -3,6 +3,7 @@ class V1::Guest::BookingController < ApplicationController
     def create
         begin
             data = PatientBooking.new booking_params    
+            SlotWorker.perform_in(1.hour, data.booking_id )
             BookingMailer.itinerary(data.payment).deliver_later
             render json: {status:true, data:data.payment}
             sleep 2
