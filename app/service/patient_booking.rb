@@ -64,6 +64,8 @@ class PatientBooking
         pay.patient_id = booking.id
         pay.merchant_code = ENV["MERCHANT_CODE"]
         pay.payment_id= 2
+        pay.payment_status = 0
+        pay.payment_type = 0
         pay.ref_no = booking.reference_code
         pay.amount = "1"
         pay.currency = "MYR"

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_23_142057) do
+ActiveRecord::Schema.define(version: 2020_04_27_053855) do
 
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "patient_id"
@@ -66,6 +66,20 @@ ActiveRecord::Schema.define(version: 2020_04_23_142057) do
     t.boolean "q2"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "payment_histories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "payment_id"
+    t.string "trans_id"
+    t.string "auth_code"
+    t.string "signature"
+    t.string "ccname"
+    t.string "ccno"
+    t.string "s_bankname"
+    t.string "s_country"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["payment_id"], name: "index_payment_histories_on_payment_id"
   end
 
   create_table "payments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sys-log'
+  
   root :to => 'home#index'
 
   get "ping", to:"application#ping"
