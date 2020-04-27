@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: booking-api
-        image: registry.gitlab.com/biomark/biomark-booking-api:MASTER_520469442
+        image: registry.gitlab.com/biomark/biomark-booking-api:MASTER_527583045
         args: ["bundle exec rails db:migrate && bundle exec puma"]
         imagePullPolicy: Always
         envFrom:
@@ -24,6 +24,32 @@ spec:
       imagePullSecrets:
       - name: regcred
 ---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: biomark-booking-sidekiq
+  namespace: biomark-internal
+spec:
+  selector: 
+    matchLabels:
+      app: booking-sidekiq
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: booking-sidekiq
+    spec:
+      containers:
+      - name: booking-sidekiq
+        image: registry.gitlab.com/biomark/biomark-booking-api:MASTER_527583045
+        args: ["bundle exec sidekiq"]
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: biomark-booking-config        
+      imagePullSecrets:
+      - name: regcred
+---      
 apiVersion: v1
 kind: Service
 metadata:
