@@ -67,7 +67,7 @@ class PatientBooking
         pay.payment_status = 0
         pay.payment_type = 0
         pay.ref_no = booking.reference_code
-        pay.amount = "1"
+        pay.amount = covid_price
         pay.currency = "MYR"
         pay.prod_desc = "Payment for COVID-19 Testing"
         pay.username = booking.patient.fullname
