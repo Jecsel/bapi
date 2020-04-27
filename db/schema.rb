@@ -77,6 +77,7 @@ ActiveRecord::Schema.define(version: 2020_04_27_053855) do
     t.string "ccno"
     t.string "s_bankname"
     t.string "s_country"
+    t.string "amount"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["payment_id"], name: "index_payment_histories_on_payment_id"

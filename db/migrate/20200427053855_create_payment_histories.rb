@@ -9,6 +9,7 @@ class CreatePaymentHistories < ActiveRecord::Migration[6.0]
       t.string :ccno        #CCNo
       t.string :s_bankname  #S_bankname
       t.string :s_country   #S_country
+      t.string :amount
       t.timestamps
     end
   end
