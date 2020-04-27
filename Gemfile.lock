@@ -56,43 +56,13 @@ GEM
       minitest (~> 5.1)
       tzinfo (~> 1.1)
       zeitwerk (~> 2.2)
-    aes_key_wrap (1.0.1)
-    aws-eventstream (1.0.3)
-    aws-partitions (1.290.0)
-    aws-sdk-cognitoidentityprovider (1.34.0)
-      aws-sdk-core (~> 3, >= 3.71.0)
-      aws-sigv4 (~> 1.1)
-    aws-sdk-core (3.92.0)
-      aws-eventstream (~> 1.0, >= 1.0.2)
-      aws-partitions (~> 1, >= 1.239.0)
-      aws-sigv4 (~> 1.1)
-      jmespath (~> 1.0)
-    aws-sdk-kms (1.30.0)
-      aws-sdk-core (~> 3, >= 3.71.0)
-      aws-sigv4 (~> 1.1)
-    aws-sdk-s3 (1.43.0)
-      aws-sdk-core (~> 3, >= 3.56.0)
-      aws-sdk-kms (~> 1)
-      aws-sigv4 (~> 1.1)
-    aws-sdk-sns (1.17.0)
-      aws-sdk-core (~> 3, >= 3.56.0)
-      aws-sigv4 (~> 1.1)
-    aws-sigv4 (1.1.1)
-      aws-eventstream (~> 1.0, >= 1.0.2)
-    bcrypt (3.1.13)
-    bindata (2.4.6)
     bootsnap (1.4.6)
       msgpack (~> 1.0)
     builder (3.2.4)
     byebug (11.1.1)
     concurrent-ruby (1.1.6)
+    connection_pool (2.2.2)
     crass (1.0.6)
-    devise (4.7.1)
-      bcrypt (~> 3.0)
-      orm_adapter (~> 0.1)
-      railties (>= 4.1.0)
-      responders
-      warden (~> 1.2.3)
     erubi (1.9.0)
     ffi (1.12.2)
     globalid (0.4.2)
@@ -101,11 +71,6 @@ GEM
       concurrent-ruby (~> 1.0)
     jbuilder (2.10.0)
       activesupport (>= 5.0.0)
-    jmespath (1.4.0)
-    json-jwt (1.11.0)
-      activesupport (>= 4.2)
-      aes_key_wrap
-      bindata
     jwt (2.2.1)
     kaminari (1.2.0)
       activesupport (>= 4.1.0)
@@ -140,13 +105,14 @@ GEM
     nio4r (2.5.2)
     nokogiri (1.10.9)
       mini_portile2 (~> 2.4.0)
-    orm_adapter (0.5.0)
     polyglot (0.3.5)
     puma (4.3.3)
       nio4r (~> 2.0)
     rack (2.2.2)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
+    rack-protection (2.0.8.1)
+      rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (6.0.2.2)
@@ -179,12 +145,15 @@ GEM
     rb-fsevent (0.10.3)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    responders (3.0.0)
-      actionpack (>= 5.0)
-      railties (>= 5.0)
+    redis (4.1.3)
     ruby_dep (1.5.0)
     search_cop (1.1.0)
       treetop
+    sidekiq (6.0.7)
+      connection_pool (>= 2.2.2)
+      rack (~> 2.0)
+      rack-protection (>= 2.0.0)
+      redis (>= 4.1.0)
     spring (2.1.0)
     spring-watcher-listen (2.0.1)
       listen (>= 2.7, < 4.0)
@@ -202,8 +171,6 @@ GEM
       polyglot (~> 0.3)
     tzinfo (1.2.6)
       thread_safe (~> 0.1)
-    warden (1.2.8)
-      rack (>= 2.0.6)
     websocket-driver (0.7.1)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.4)
@@ -213,14 +180,9 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  aws-sdk-cognitoidentityprovider (~> 1.3)
-  aws-sdk-s3 (~> 1.43.0)
-  aws-sdk-sns (~> 1.17.0)
   bootsnap (>= 1.4.2)
   byebug
-  devise
   jbuilder (~> 2.7)
-  json-jwt
   jwt
   kaminari
   listen (>= 3.0.5, < 3.2)
@@ -229,6 +191,7 @@ DEPENDENCIES
   rack-cors
   rails (~> 6.0.2, >= 6.0.2.2)
   search_cop
+  sidekiq
   spring
   spring-watcher-listen (~> 2.0.0)
 
