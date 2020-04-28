@@ -30,13 +30,18 @@ Rails.application.routes.draw do
   namespace :v1, defaults: { format: :json } do
     resources :booking, only:[:index] do 
       collection do 
-        
+        post 'paginate'
+        post 'search'
+        post 'filter_status'
+        post 'filter_date'
+        post 'filter_booking'
       end
     end
-    resources :user, only: [] do
+    resources :user, only: [:index] do
       collection do
         post 'sign_in'
         post 'authenticate'
+        post 'get_policies'
         post 'sign_out'
       end
     end
