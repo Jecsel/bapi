@@ -20,6 +20,7 @@ class V1::Guest::PaymentController < ApplicationController
     
     def status
         @data = params
+        @booking = Booking.where("reference_code = ?",payment_params[:RefNo]).last
     end
     
     private
