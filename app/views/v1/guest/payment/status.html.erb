@@ -59,7 +59,7 @@
 				<p>Name: <%=@booking.patient.fullname%></p>
 				<p>ID Number: <%=@booking.patient.id_number%></p>
 				<p>Gender: <%=@booking.patient.gender_id%></p>
-				<p>Date of Birth: <%=@booking.patient.date_of_birth%></p>
+				<p>Date of Birth: <%=@booking.patient.date_of_birth.strftime("%b %d, %Y")%></p>
 				<p>Contact: <%=@booking.patient.contact_number%></p>
 				<p>Email: <%=@booking.patient.email_address%></p>
 				<p>Clinic: <%=@booking.clinic.name%></p>
