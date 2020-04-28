@@ -7,7 +7,7 @@ class SlotWorker
         #IF BOOKING STILL UNPAID RELEASE SLOT
         if booking.payment.payment_status == 0
             _allocation = booking.slot.allocations + 1
-            slot.update status:0,allocations:_allocation;
+            booking.slot.update status:0,allocations:_allocation;
         end
     end
 end
