@@ -68,7 +68,7 @@
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
               <td class="h2">
-                Hi @booking.username,
+                Hi <%=@booking.payment.username%>,
               </td>
             </tr>
             <tr>
@@ -100,7 +100,7 @@ Date: <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slo
 Name: <%=@booking.patient.fullname%>
 ID Number: <%=@booking.patient.id_number%>
 Gender: <%=@booking.patient.gender_id%>
-Date of Birth: <%=@booking.patient.date_of_birth.strftime("%b %d, %Y")%>
+Date of Birth: <%=@booking.patient.date_of_birth.to_date.strftime("%b %d, %Y") unless @booking.patient.date_of_birth.blank?%>
 Contact: <%=@booking.patient.contact_number%>
 Email: <%=@booking.patient.email_address%>
 Clinic: <%=@booking.clinic.name%>
