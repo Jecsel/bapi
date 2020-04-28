@@ -33,7 +33,7 @@
 
     		$stateProvider
     			.state("home",{
-		            url:"/",
+		            url:"/:ref_code",
 		            template:"<booking></booking>",
 				})
 				.state("home.booking-locations",{
@@ -152,11 +152,18 @@
         .module("BiomarkBooking")
         .controller("bookingController",bookingController);
 
-        bookingController.$inject = ["bookingService"];
+        bookingController.$inject = ["bookingService","$state"];
 
-        function bookingController( bookingService ){
+        function bookingController( bookingService, $state ){
             
             var vm = this;
+            vm.$onInit = function(){
+                vm.booking = bookingService.get_booking_data();
+                vm.booking.referal_code = $state.params.ref_code;
+                bookingService.data = vm.booking;
+                bookingService.save();
+            }
+            
             
         }
 })();
@@ -643,8 +650,10 @@
                     return false;
                 }
                 vm.today = new Date();
+                if(!vm.booking.patient){
+                    vm.booking.patient = {};
+                }
                 vm.booking.patient.date_of_birth = {date: vm.today};
-                vm.booking = bookingService.get_booking_data();
                 Http
                     .get("v1/guest/location/"+vm.booking.location.id+"/clinics")
                     .then(function(res){
@@ -1537,6 +1546,45 @@
 
     angular
         .module("BiomarkBooking")
+        .component("dashboardSettings",{
+            controller:"dashboardSettingController",
+            templateUrl:"/admin/dashboard/settings/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+
+    angular
+        .module("BiomarkBooking")
+        .controller("dashboardSettingController",dashboardSettingController);
+
+        dashboardSettingController.$inject = ["Http"];
+
+        function dashboardSettingController(Http){
+            var vm = this;
+            vm.setting = {};
+            vm.update = function(new_value,type){
+                Http
+                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
+                    .then(function(res){
+                        alert("updated");
+                    });
+            }
+            vm.$onInit = function(){
+                Http
+                    .get("v1/setting")
+                    .then(function(res){
+                        vm.setting = res.data;
+                    });
+            }
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("dashboardLocations",{
             controller:"dashboardLocationsController",
             templateUrl:"/admin/dashboard/locations/view.html"
@@ -1625,56 +1673,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("dashboardSettings",{
-            controller:"dashboardSettingController",
-            templateUrl:"/admin/dashboard/settings/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardSettingController",dashboardSettingController);
-
-        dashboardSettingController.$inject = ["Http"];
-
-        function dashboardSettingController(Http){
-            var vm = this;
-            vm.setting = {};
-            vm.update = function(new_value,type){
-                Http
-                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
-                    .then(function(res){
-                        alert("updated");
-                    });
-            }
-            vm.$onInit = function(){
-                Http
-                    .get("v1/setting")
-                    .then(function(res){
-                        vm.setting = res.data;
-                    });
-            }
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("dashboardSidemenu",{
-            // controller:"adminDashboardController",
-            templateUrl:"/admin/dashboard/sidemenu/view.html"
-        })
-})();
-
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("dashboardUsers",{
             controller:"dashboardUsersController",
             templateUrl:"/admin/dashboard/users/view.html"
@@ -1693,6 +1691,89 @@
             var vm = this;
         
 
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("dashboardSidemenu",{
+            // controller:"adminDashboardController",
+            templateUrl:"/admin/dashboard/sidemenu/view.html"
+        })
+})();
+
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("locationSchedules",{
+            controller:"locationSchedulesController",
+            templateUrl:"/admin/dashboard/locations/schedules/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("locationSchedulesController",locationSchedulesController);
+
+        locationSchedulesController.$inject = ["Http","$state"];
+
+        function locationSchedulesController(Http, $state){
+
+            var vm = this;
+            vm.schedule_modal = false;
+            vm.openSchedule = function(a){
+                a.close_schedule_modal = close_schedule_modal;
+                vm.schedule_data = a;
+                vm.schedule_modal = true;
+            }
+            function close_schedule_modal(){
+                vm.schedule_modal = false;
+            }
+            vm.generator = {
+                date_from:"2020-04-21",
+                date_to:"2020-04-30",
+                allocation_per_slot:1,
+                minutes_interval:10,
+                morning:{
+                    start:7,
+                    end:11
+                },
+                afternoon:{
+                    start:1,
+                    end:5
+                }
+            }
+            vm.showGenerator = function(){
+                vm.generator_modal = true;
+            }
+            vm.cancel = function(){
+                vm.generator_modal = false;           
+            }
+            vm.generate = function(data){
+                //inject location id
+                data.location_id = $state.params.id;
+                Http    
+                    .post("v1/schedule",{schedule:data})
+                    .then(function(res){
+                        vm.generator_modal = false;
+                        vm.generator = {};
+                    });    
+            }
+            vm.$onInit = function(){
+                Http
+                    .get("v1/location/"+$state.params.id+"/schedules")
+                    .then(function(res){
+                        console.log(res.data);
+                        vm.schedules = res.data;
+                    });
+            }
+            
         }
 })();
 (function(){
@@ -1784,78 +1865,6 @@
 
         function locationUsersController(){
             var vm = this;
-            
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("locationSchedules",{
-            controller:"locationSchedulesController",
-            templateUrl:"/admin/dashboard/locations/schedules/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("locationSchedulesController",locationSchedulesController);
-
-        locationSchedulesController.$inject = ["Http","$state"];
-
-        function locationSchedulesController(Http, $state){
-
-            var vm = this;
-            vm.schedule_modal = false;
-            vm.openSchedule = function(a){
-                a.close_schedule_modal = close_schedule_modal;
-                vm.schedule_data = a;
-                vm.schedule_modal = true;
-            }
-            function close_schedule_modal(){
-                vm.schedule_modal = false;
-            }
-            vm.generator = {
-                date_from:"2020-04-21",
-                date_to:"2020-04-30",
-                allocation_per_slot:1,
-                minutes_interval:10,
-                morning:{
-                    start:7,
-                    end:11
-                },
-                afternoon:{
-                    start:1,
-                    end:5
-                }
-            }
-            vm.showGenerator = function(){
-                vm.generator_modal = true;
-            }
-            vm.cancel = function(){
-                vm.generator_modal = false;           
-            }
-            vm.generate = function(data){
-                //inject location id
-                data.location_id = $state.params.id;
-                Http    
-                    .post("v1/schedule",{schedule:data})
-                    .then(function(res){
-                        vm.generator_modal = false;
-                        vm.generator = {};
-                    });    
-            }
-            vm.$onInit = function(){
-                Http
-                    .get("v1/location/"+$state.params.id+"/schedules")
-                    .then(function(res){
-                        console.log(res.data);
-                        vm.schedules = res.data;
-                    });
-            }
             
         }
 })();
