@@ -8,7 +8,7 @@ class PatientBooking
                     :slot
 
     def initialize booking_params
-        @covid_price    = 1.00 
+        @covid_price    = Setting.last.covid_price
         @location_id    = booking_params[:location][:id]
         @slot_id        = booking_params[:slot][:id]
         @schedule_id    = booking_params[:schedule][:id] 

@@ -32,6 +32,11 @@ Rails.application.routes.draw do
 
   #ADMIN
   namespace :v1, defaults: { format: :json } do
+    resources :setting, only:[:index] do 
+      collection do 
+        patch 'update'
+      end
+    end
     resources :booking, only:[:index] do 
       collection do 
         
