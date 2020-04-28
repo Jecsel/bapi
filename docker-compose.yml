@@ -3,6 +3,10 @@ volumes:
     mysql-data:
         driver: local
 services:
+    redis:
+        image: redis:5.0.9-alpine
+        ports:
+          - "6379:6379"
     db:
         image: mysql:5.7
         restart: always
@@ -12,24 +16,24 @@ services:
         - "mysql-data:/var/lib/mysql"
         ports:
         - "3306:3306"
+    sidekiq:
+        build: .
+        depends_on:
+        - redis
+        - db
+        env_file:
+        - .env   
+        volumes:
+        - .:/app
+        command: bundle exec sidekiq
     api:
         build: .
         depends_on:
         - redis
         - db
         command: bundle exec rails s -b '0.0.0.0'
-        environment:
-        - RAILS_ENV=development
-        - DB_HOST=db
-        - DB_PASSWORD=123123
-        - DB_PORT=3306
-        - DB_NAME=biomark_booking
-        - DB_TEST=biomark_booking
-        - SMTP_HOST=email-smtp.us-east-1.amazonaws.com
-        - SMTP_PORT=587
-        - SMTP_USERNAME=AKIAUHITDVNA6BHJP5FM
-        - SMTP_PASSWORD=BJVc/o90GFrN9Pb5qeO4J9rIGKoJP8E14xqGbjBoQ+f6
-        - APP_ENV=RAMEL_LOCAL
+        env_file:
+        - .env
         volumes:
         - .:/app
         ports:

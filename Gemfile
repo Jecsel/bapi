@@ -13,11 +13,7 @@ gem 'rack-cors'
 gem 'kaminari'
 gem 'jwt'
 gem 'search_cop'
-# gem 'devise'
-#aws dependencies
-# gem 'aws-sdk-s3','~> 1.43.0'
-# gem 'aws-sdk-cognitoidentityprovider', '~> 1.3'
-# gem 'aws-sdk-sns','~> 1.17.0'
+gem 'sidekiq'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console

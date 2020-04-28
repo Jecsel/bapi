@@ -1,4 +1,7 @@
 Rails.application.routes.draw do
+  require 'sidekiq/web'
+  mount Sidekiq::Web => '/sys-log'
+  
   root :to => 'home#index'
 
   get "ping", to:"application#ping"
@@ -14,6 +17,7 @@ Rails.application.routes.draw do
       resources :payment, only:[] do 
         collection do
           post 'status', to:'payment#status'
+          get 'status', to:'payment#status'
           post 'confirmation', to:'payment#confirmation'
         end
       end
@@ -28,6 +32,11 @@ Rails.application.routes.draw do
 
   #ADMIN
   namespace :v1, defaults: { format: :json } do
+    resources :setting, only:[:index] do 
+      collection do 
+        patch 'update'
+      end
+    end
     resources :booking, only:[:index] do 
       collection do 
         post 'paginate'

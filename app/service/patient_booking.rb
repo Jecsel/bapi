@@ -8,7 +8,7 @@ class PatientBooking
                     :slot
 
     def initialize booking_params
-        @covid_price    = 1 #for sample payment
+        @covid_price    = Setting.last.covid_price
         @location_id    = booking_params[:location][:id]
         @slot_id        = booking_params[:slot][:id]
         @schedule_id    = booking_params[:schedule][:id] 
@@ -64,8 +64,10 @@ class PatientBooking
         pay.patient_id = booking.id
         pay.merchant_code = ENV["MERCHANT_CODE"]
         pay.payment_id= 2
+        pay.payment_status = 0
+        pay.payment_type = 0
         pay.ref_no = booking.reference_code
-        pay.amount = "1"
+        pay.amount = covid_price
         pay.currency = "MYR"
         pay.prod_desc = "Payment for COVID-19 Testing"
         pay.username = booking.patient.fullname
