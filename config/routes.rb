@@ -37,15 +37,23 @@ Rails.application.routes.draw do
         patch 'update'
       end
     end
-    resources :booking, only:[:index] do 
+    resources :booking, only:[:index, :show] do 
       collection do 
-        
+        post 'cancel_booking'
+        post 'mark_no_show'
+        post 'mark_as_completed'
+        post 'paginate'
+        post 'search'
+        post 'filter_status'
+        post 'filter_date'
+        post 'filter_booking'
       end
     end
-    resources :user, only: [] do
+    resources :user, only: [:index] do
       collection do
         post 'sign_in'
         post 'authenticate'
+        post 'get_policies'
         post 'sign_out'
       end
     end

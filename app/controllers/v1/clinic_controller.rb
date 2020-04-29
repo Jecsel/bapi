@@ -1,4 +1,5 @@
 class V1::ClinicController < ApplicationController
+    before_action :must_be_authenticated
     
     def index
         @clinics = Clinic.all
