@@ -25,5 +25,9 @@ class Booking < ApplicationRecord
 
     def self.get_status status_index
         joins(:payment).where("payments.payment_status = ?",status_index)
-      end
+    end
+
+    def self.get_site location_id
+        self.where(location_id: location_id)
+    end
 end
