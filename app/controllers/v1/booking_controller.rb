@@ -30,8 +30,33 @@ class V1::BookingController < ApplicationController
         render json:{payment_status: 'completed'}
     end
 
+    def edit_booking
+        booking = Booking.find params[:past_booking_details][:id]
+        booking.schedule.update(schedule_date: params[:new_booking_details][:schedule][:schedule_date])
+
+        # Update old slod to be available
+        old_slot = Slot.find params[:past_booking_details][:slot][:id]
+        old_slot.increment!(:allocations, 1)
+        old_slot.update(status: true)
+
+        # Update new slot, add allocation and modify status
+        new_slot = Slot.find params[:new_booking_details][:slot][:id]
+        new_slot.decrement!(:allocations, 1)
+        if new_slot[:allocations] == 0
+            new_slot.update(status: false)
+        end
+        booking.update(slot_id: new_slot.id)
+
+        render json: {schedule: booking.schedule, slot: booking.slot}
+    end
+
     def paginate
-        @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page])
+        if params[:location_id] != 0
+            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(params[:page])
+        else
+            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page])
+        end
+        
         # if params[:search_start_date] && params[:search_end_date]
         #     @bookings = Booking.joins(:schedule)
         #     .search(params[:query])
@@ -64,7 +89,11 @@ class V1::BookingController < ApplicationController
     end
 
     def filter_booking
-        @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1)
+        if params[:location_id] != 0
+            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(1)
+        else
+            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1)
+        end
         # if params[:search_start_date] && params[:search_end_date]
         #     @bookings = Booking.joins(:schedule)
         #     .search(params[:query])
