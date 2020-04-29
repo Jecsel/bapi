@@ -8,6 +8,3 @@ class BookingMailer < ApplicationMailer
             subject: "Booking Confirmation")
     end
 end
-
-
-``
