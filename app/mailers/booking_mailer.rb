@@ -4,7 +4,7 @@ class BookingMailer < ApplicationMailer
         # attachments['itinerary.pdf'] = File.read("#{Rails.root}/tmp/itinerary.pdf")
         mail(
             to: @booking.payment.user_email, 
-            bcc: "ramel.cabug-os@biomarking.com",
+            cc: ["ramel.cabug-os@biomarking.com"],
             subject: "Booking Confirmation")
     end
 end
