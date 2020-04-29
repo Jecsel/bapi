@@ -2,6 +2,7 @@ class User < ApplicationRecord
     before_create :encrypt_password
 
     has_one :user_role
+    has_many :role_policies, through: :user_role
 
     def valid_password? password
         self.password === Digest::MD5.hexdigest(password)[0..19]

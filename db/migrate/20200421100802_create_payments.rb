@@ -16,7 +16,7 @@ class CreatePayments < ActiveRecord::Migration[6.0]
       t.string :lang
       t.string :signature_type
       t.string :signature
-      t.integer :payment_status
+      t.integer :payment_status, :default =>  0
       t.integer :payment_type
       t.timestamps
     end
