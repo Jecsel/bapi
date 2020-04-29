@@ -1,6 +1,6 @@
 class V1::UserController < ApplicationController
   
-  before_action :must_be_authenticated, only:[:authenticate, :get_policies]
+  before_action :must_be_authenticated, only:[:authenticate, :get_policies, :index]
 
   def sign_in
     user = User.find_by_username user_params[:username]
@@ -25,7 +25,6 @@ class V1::UserController < ApplicationController
   end
 
   def get_policies
-    p @current_user
     if !@current_user.user_role.nil?
       @policies = @current_user.user_role.user_group.role_policies.group_by(&:service_id)
     else
@@ -35,7 +34,7 @@ class V1::UserController < ApplicationController
 
   def index
     if is_permitted?(1,1)
-      @user = User.page(1)
+      @user = User.all
     else
       render json: :forbidden, status:403
     end

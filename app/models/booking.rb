@@ -7,6 +7,7 @@ class Booking < ApplicationRecord
     belongs_to :location
     belongs_to :slot
     belongs_to :schedule
+    belongs_to :clinic
     private
 
     search_scope :search do
