@@ -5,9 +5,9 @@ class SlotWorker
         booking = Booking.find booking_id
 
         #IF BOOKING STILL UNPAID RELEASE SLOT
-        if booking.payment.status == 0
+        if booking.payment.payment_status == 0
             _allocation = booking.slot.allocations + 1
-            slot.update status:0,allocations:_allocation;
+            booking.slot.update status:0,allocations:_allocation;
         end
     end
 end

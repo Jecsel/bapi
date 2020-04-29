@@ -4,7 +4,7 @@ class V1::Guest::BookingController < ApplicationController
         begin
             data = PatientBooking.new booking_params    
             SlotWorker.perform_in(1.hour, data.payment.booking_id )
-            BookingMailer.itinerary(data.payment).deliver_later
+            # BookingMailer.itinerary(data.payment.booking_id).deliver_later
             render json: {status:true, data:data.payment}
             sleep 2
         rescue => ex

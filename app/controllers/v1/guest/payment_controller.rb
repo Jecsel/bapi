@@ -19,11 +19,12 @@ class V1::Guest::PaymentController < ApplicationController
     end
     
     def status
-        @data = params
+        @data = payment_params
+        @booking = Booking.where("reference_code = ?",payment_params[:RefNo]).last
     end
     
     private
     def payment_params
-        params.permit(:RefNo, :TransId, :AuthCode, :Signature, :CCName, :CCNo, :S_bankname, :S_country, :PaymentId, :Amount)
+        params.permit(:RefNo, :TransId, :AuthCode, :Signature, :CCName, :CCNo, :S_bankname, :S_country, :PaymentId, :Amount, :Status)
     end
 end

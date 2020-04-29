@@ -18,8 +18,8 @@
 		}
 		.mContainer{
 			margin: 0 10px;
-			width:400px;
-			height: 200px;
+			width:500px;
+			min-height: 200px;
 			background: #fff;
             border: 1px solid #ccc;
             display: flex;
@@ -37,7 +37,12 @@
 		and (orientation: portrait) {
 		 	.mContainer{
 				width: 100% ;
+				margin:0 20px;
 			}
+		}
+		p{
+			padding:3px;
+			margin:0;
 		}
 	</style>
 
@@ -45,20 +50,38 @@
 <body>
 	<div class="mContainer">
         <% if @data[:Status] == "1" ||  @data[:Status] == 1 %>
-            <div>
-                <h2 style="text-align:center;color:green">Payment Succesful </h2>
-                <p style="text-align:center">Thank you</p>
+            <div style="padding:20px;font-size:14px">
+                <h3 style="text-align:center;color:green">Your booking has been confirmed!</h3>
+				<hr>
+                <p>Booking Reference: <b><%=@booking.reference_code%></b></p>
+				<p>Location: <%=@booking.location.name%></p>
+				<p>Date: <%=@booking.schedule.schedule_date.to_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.strftime("%H:%M %p")%></p>
+				<p>Name: <%=@booking.patient.fullname%></p>
+				<p>ID Number: <%=@booking.patient.id_number%></p>
+				<p>Gender: <%=@booking.patient.gender_id%></p>
+				<p>Date of Birth: <%=@booking.patient.date_of_birth.to_date.strftime("%b %d, %Y") unless @booking.patient.date_of_birth.blank?%></p>
+				<p>Contact: <%=@booking.patient.contact_number%></p>
+				<p>Email: <%=@booking.patient.email_address%></p>
+				<p>Clinic: <%=@booking.clinic.name%></p>
+				<p>Amount: MYR <%=@booking.amount%></p>
+				<div style="font-size:12px">
+					<ul>
+						<li>A confirmation email has been sent. </li>
+						<li>If you cannot find the confirmation email, please check your spam folder, or call us at 1800 22 6843.</li>
+						<li>You are required to show your confirmation email when you arrive at the testing location. Please bring your ID and show up to your appointment time promptly.</li>
+						<li>For any clarification, please do not hesitate to contact our call centre at 1800 22 6843 for further assistance.</li>
+					<ul>
+				</div>
                 <script>
 				setTimeout(function(){
 					window.localStorage.clear();
                     window.location.replace("https://my.biomarking.com");
-				},3000);
-                    
+				},6000); 
                 </script>
             </div>
         <% else %>
              <div>
-                <h2 style="text-align:center;color:red">Payment Failed </h2>
+                <h4 style="text-align:center;color:red">Payment Failed </h2>
                 <script>
                     function redirect(){
                         window.location.replace("https://my.biomarking.com/#/booking-confirmation");

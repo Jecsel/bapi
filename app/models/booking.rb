@@ -6,6 +6,7 @@ class Booking < ApplicationRecord
     belongs_to :patient
     belongs_to :location
     belongs_to :slot
+    belongs_to :clinic
     belongs_to :schedule
     belongs_to :clinic
     private
