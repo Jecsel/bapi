@@ -17,6 +17,7 @@ class V1::Guest::BookingController < ApplicationController
         params
             .require(:booking)
             .permit(
+                :referral_code,
                 :location=>[:id],
                 :slot=>[:id],
                 :schedule=>[:id],

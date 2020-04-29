@@ -4,6 +4,7 @@ class PatientBooking
                     :schedule_id,
                     :patient,
                     :covid_price,
+                    :referral_code,
                     :payment
                     :slot
 
@@ -13,7 +14,7 @@ class PatientBooking
         @slot_id        = booking_params[:slot][:id]
         @schedule_id    = booking_params[:schedule][:id] 
         @patient        = booking_params[:patient]
-        
+        @referral_code  = booking_params[:referral_code]
         validate_request
 
         generate_patient_record
@@ -47,7 +48,11 @@ class PatientBooking
             generate_guest_booking _patient
         end
     end
-
+    def process_referral
+        return nil if referral_code.blank?
+        refs = Referral.where("code = ?",referral_code)
+        return refs.any? ? refs.last.id : nil
+    end
     def generate_guest_booking _patient
         booking = _patient.bookings.create({
             location_id: location_id,
@@ -55,6 +60,7 @@ class PatientBooking
             schedule_id: schedule_id,
             clinic_id: patient[:clinic_id],
             amount: covid_price,
+            referral_id: process_referral
         })
         generate_payment_info booking
     end
