@@ -655,54 +655,65 @@
         bookingCalendarController.$inject = ["bookingService","$state","Http"];
 
         function bookingCalendarController( bookingService, $state, Http){
+            var has_allocation,counter;
             var vm = this;
             vm.is_selected = false;
             vm.scheduleSelected = function(sched){
+                if(sched.id == vm.booking.schedule.id) return false;
                 vm.booking.schedule = sched;
                 delete vm.booking.slot;
                 Http
                     .get("v1/guest/location/"+vm.booking.location.id+"/find_schedules/"+vm.booking.schedule.id)
                     .then(function(res){
                         vm.location.active_slot = res.data.active_slot;
+                        slot_mapper();
                     });
             }
             vm.slotSelected = function(slot){
-                console.log(slot.status);
-                vm.is_selected = slot.status;
                 if(slot.status) vm.booking.slot = slot;
             }
             vm.continue = function(){
-                if(vm.booking.slot){
-                    vm.booking.booking_calendar_state = true;
-                    bookingService.data = vm.booking;
-                    bookingService.save();
-                    $state.go("home.booking-profile");
-                }else{
+                if(!vm.booking.slot){
                     alert("Please select slot");
+                    return false;
                 }
+                vm.booking.booking_calendar_state = true;
+                bookingService.data = vm.booking;
+                bookingService.save();
+                $state.go("home.booking-profile");
             }
             vm.$onInit = function(){
                 vm.booking = bookingService.get_booking_data();
-                if(!vm.booking.location_state){
-                    $state.go("home.booking-locations");
-                    return false;
-                }
-                if(!vm.booking.location.id){
+                if(!vm.booking.location_state || !vm.booking.location.id){
                     $state.go("home.booking-locations");
                     return false;
                 }
                 vm.locations = bookingService.locations;
-                vm.booking.txn = new Date().valueOf();
                 Http
                     .get("v1/guest/location/"+vm.booking.location.id+"/schedules")
                     .then(function(res){
                         vm.location = res.data;
-                        //initialize selection
                         vm.booking.schedule = {id:vm.location.schedules[0].id, schedule_date:vm.location.schedules[0].schedule_date}
+                        slot_mapper();
                     });
             }
-            
-            var id = 0;
+            function slot_mapper(){
+                has_allocation = false;
+                //try to auto select morning schedules
+                auto_assign_slot("AM");
+                //if morning is full try to allocate afternoon
+                if(!has_allocation) auto_assign_slot("PM");
+            }
+            function auto_assign_slot(meridian){
+                counter = 0;
+                do{
+                    if(vm.location.active_slot.data[meridian][counter].status){
+                        vm.booking.slot = vm.location.active_slot.data[meridian][counter];
+                        has_allocation = true;
+                    };
+                    counter++;
+                }while(!has_allocation  && counter < vm.location.active_slot.data[meridian].length)
+            }
         }
 })();
 (function(){
@@ -1082,45 +1093,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("dashboardSettings",{
-            controller:"dashboardSettingController",
-            templateUrl:"/admin/dashboard/settings/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardSettingController",dashboardSettingController);
-
-        dashboardSettingController.$inject = ["Http"];
-
-        function dashboardSettingController(Http){
-            var vm = this;
-            vm.setting = {};
-            vm.update = function(new_value,type){
-                Http
-                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
-                    .then(function(res){
-                        alert("updated");
-                    });
-            }
-            vm.$onInit = function(){
-                Http
-                    .get("v1/setting")
-                    .then(function(res){
-                        vm.setting = res.data;
-                    });
-            }
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("dashboardLocations",{
             controller:"dashboardLocationsController",
             templateUrl:"/admin/dashboard/locations/view.html"
@@ -1203,6 +1175,45 @@
 		}])
 
 	
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("dashboardSettings",{
+            controller:"dashboardSettingController",
+            templateUrl:"/admin/dashboard/settings/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+
+    angular
+        .module("BiomarkBooking")
+        .controller("dashboardSettingController",dashboardSettingController);
+
+        dashboardSettingController.$inject = ["Http"];
+
+        function dashboardSettingController(Http){
+            var vm = this;
+            vm.setting = {};
+            vm.update = function(new_value,type){
+                Http
+                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
+                    .then(function(res){
+                        alert("updated");
+                    });
+            }
+            vm.$onInit = function(){
+                Http
+                    .get("v1/setting")
+                    .then(function(res){
+                        vm.setting = res.data;
+                    });
+            }
+        }
 })();
 (function(){
     "use strict";
