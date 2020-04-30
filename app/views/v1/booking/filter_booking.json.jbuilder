@@ -7,7 +7,7 @@ json.bookings @bookings do |booking|
     json.payment_status booking.payment.payment_status
     json.id_number booking.patient.id_number
 end
-json.csv_export_data @bookings do |booking|
+json.csv_export_data @@booking_export do |booking|
     json.id booking.id
     json.booking_date booking.schedule.schedule_date
     json.booking_time booking.slot.slot_time.utc.strftime("%I:%M%p")
