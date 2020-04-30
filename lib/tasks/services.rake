@@ -43,25 +43,29 @@ namespace :services do
                 name:"Users",
                 status: true, 
                 resource_path: "admin.dashboard.users",
-                resource_icon: "fas fa-users"
+                resource_icon: "fas fa-users",
+                resource_order: 4,
             },
             {
-                name:"Locations",
+                name:"Test Sites",
                 status: true, 
                 resource_path: "admin.dashboard.locations",
-                resource_icon: "fas fa-search-location"
+                resource_icon: "fas fa-search-location",
+                resource_order: 2,
             },
             {
                 name:"Clinics",
                 status: true, 
                 resource_path: "admin.dashboard.clinics",
-                resource_icon: "fas fa-clinic-medical"
+                resource_icon: "fas fa-clinic-medical",
+                resource_order: 3,
             },
             {
                 name:"Bookings",
                 status: true, 
                 resource_path: "admin.dashboard.bookings",
-                resource_icon: "fas fa-calendar-check"
+                resource_icon: "fas fa-calendar-check",
+                resource_order: 1,
             },
         ]
         Service.create _services

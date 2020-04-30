@@ -57,6 +57,7 @@ class V1::BookingController < ApplicationController
             @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
         else
             @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page])
+            @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
         end
         
         # if params[:search_start_date] && params[:search_end_date]
@@ -96,6 +97,7 @@ class V1::BookingController < ApplicationController
             @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
         else
             @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1)
+            @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
         end
         # if params[:search_start_date] && params[:search_end_date]
         #     @bookings = Booking.joins(:schedule)
