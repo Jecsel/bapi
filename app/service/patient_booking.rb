@@ -48,11 +48,7 @@ class PatientBooking
             generate_guest_booking _patient
         end
     end
-    def process_referral
-        return nil if referral_code.blank?
-        refs = Referral.where("code = ?",referral_code)
-        return refs.any? ? refs.last.id : nil
-    end
+    
     def generate_guest_booking _patient
         booking = _patient.bookings.create({
             location_id: location_id,
@@ -60,7 +56,7 @@ class PatientBooking
             schedule_id: schedule_id,
             clinic_id: patient[:clinic_id],
             amount: covid_price,
-            referral_id: process_referral
+            referral_code: referral_code
         })
         generate_payment_info booking
     end
