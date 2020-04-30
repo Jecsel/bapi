@@ -29,10 +29,10 @@ class Scheduler
                     schedule_date:_date, 
                     allocation_per_slot:allocation_per_slot,
                     minute_interval: minutes_interval,
-                    morning_start_time: "#{morning[:start]}:00 AM".to_time,
-                    morning_end_time: "#{morning[:end]}:00 AM".to_time,
-                    afternoon_start_time: "#{afternoon[:start]}:00 PM".to_time,
-                    afternoon_end_time: "#{afternoon[:end]}:00 PM".to_time)
+                    morning_start_time: "#{morning[:start]}:00".to_time,
+                    morning_end_time: "#{morning[:end]}:00".to_time,
+                    afternoon_start_time: "#{afternoon[:start]}:00".to_time,
+                    afternoon_end_time: "#{afternoon[:end]}:00".to_time)
                 generate_slot sched
             end
         end
@@ -51,7 +51,7 @@ class Scheduler
             ( 60 / minutes_interval ).floor.times do |a|
                 payload << {
                     schedule_id:id,
-                    slot_time:"#{start}:#{(a * minutes_interval).to_s.rjust(2,"0")} #{n}".to_time,
+                    slot_time:"#{start}:#{(a * minutes_interval).to_s.rjust(2,"0")}".to_time,
                     status:true,
                     allocations: allocation_per_slot,
                     meridian: n
