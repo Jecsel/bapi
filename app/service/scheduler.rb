@@ -39,13 +39,13 @@ class Scheduler
     end
 
     def generate_slot sched
-        morning     = time_calculator sched.id,@morning[:start].to_i , @morning[:end].to_i
-        afternoon   = time_calculator sched.id,@afternoon[:start].to_i,@afternoon[:end].to_i
+        morning     = time_calculator sched.id,@morning[:start].to_i , @morning[:end].to_i, "AM"
+        afternoon   = time_calculator sched.id,@afternoon[:start].to_i,@afternoon[:end].to_i, "PM"
         Slot.create morning
         Slot.create afternoon
     end
 
-    def time_calculator id,start , _end
+    def time_calculator id,start , _end, n
         payload = []
         while start < _end
             ( 60 / minutes_interval ).floor.times do |a|
