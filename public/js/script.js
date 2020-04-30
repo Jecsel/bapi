@@ -183,12 +183,12 @@
                 {
                     question:"What does the test involve?",
                     status_faq:false,
-                    desc:"1. A swab will be taken from your nose and throat or you may be required to provide a sputum sample. 2. Your samples will be analysed at our laboratory for the specific genes of the Covid-19 virus. 3.Your test result will be ready in 24-48 hours. 4.A doctor (which can be of your choosing) will review your result and advise you on next steps. 5.The testing process will take around 5 minutes."
+                    desc:"<p>1. A swab will be taken from your nose and throat or you may be required to provide a sputum sample.</p> <p>2. Your samples will be analysed at our laboratory for the specific genes of the Covid-19 virus.</p> <p>3.Your test result will be ready in 24-48 hours.</br> <p>4.A doctor (which can be of your choosing) will review your result and advise you on next steps.</p><p>5.The testing process will take around 5 minutes.</p>"
                 },
                 {
                     question:"What are the qualifications of your laboratories?",
                     status_faq:false,
-                    desc:"Your test will be performed at RT-PCR lab approved by the Ministry of Health at one of our labs. Each lab is MS ISO 15189 accredited, the gold standard for pathology laboratories around the world. Eligibility & Booking"
+                    desc:"Your test will be performed at RT-PCR lab approved by the Ministry of Health at one of our labs. Each lab is MS ISO 15189 accredited, the gold standard for pathology laboratories around the world."
                 },
                 {
                     question:"Am I eligible to take the Covid-19 test?",
@@ -198,7 +198,7 @@
                 {
                     question:"Are walk-ins accepted?",
                     status_faq:false,
-                    desc:"No. We provide Drive-Thru screening services by appointments only"
+                    desc:"No. We provide Drive-Thru screening services by appointments only."
                 },
                 {
                     question:"I’ve booked my appointment but would like to change the time?",
@@ -213,8 +213,23 @@
                 {
                     question:"Where can I get a drive-through COVID-19  test near me?",
                     status_faq:false,
-                    desc:"You can find the list of Covid-19 Drive through location here. (link to https://my.biomarking.com )"
-                }
+                    desc:"You can find the list of Covid-19 Drive through location <a href='https://my.biomarking.com'>here</a>."
+                },
+                {
+                    question:"Do I need to make advance payment?",
+                    status_faq:false,
+                    desc:"Yes, advance payment is required prior to conducting the COVID-19 Drive-Thru Screening Services."
+                },
+                {
+                    question:"What payment methods are accepted?",
+                    status_faq:false,
+                    desc:"We accept a variety of online payment methods via ipay88 (local internet banking and credit/debit cards). ipay88 is a regulated payment service provider under Malaysia Payment System Act offering local internet banking service."
+                },
+                {
+                    question:"Can I claim my insurance?",
+                    status_faq:false,
+                    desc:"You are advised to check with your respective insurance providers for information on coverage and compensation."
+                },
             ];
             // vm.$onInit = function(){
             //     vm.booking = bookingService.get_booking_data();
@@ -226,6 +241,10 @@
                 for(var i=0; i < vm.frequent.length; i++){
                      i == indx ? !vm.frequent[i].status_faq ? vm.frequent[i].status_faq = true : vm.frequent[i].status_faq = false : vm.frequent[i].status_faq = false;
                 }
+            }
+            vm.scroll_to = function(){
+                var elmnt = document.getElementById("frequent_id");
+                elmnt.scrollIntoView();
             }
             
         }
@@ -367,7 +386,6 @@
 				$http.defaults.headers.common['x-access-token'] = $sessionStorage.access_token  || 0;
 				return $http.delete(host+path+".json");
 			}
-			
 			this.get = function(path){
 				$http.defaults.headers.common['x-session-token'] = $sessionStorage.access_token  || 0;
 				return $http.get(host+path+".json");
@@ -487,55 +505,6 @@
 
 })();
 (function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("adminLogin",{
-            controller:"adminLoginController",
-            templateUrl:"/admin/login/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("adminLoginController",adminLoginController);
-
-        adminLoginController.$inject = ["Http","$state"];
-
-        function adminLoginController( Http, $state ){
-            var vm = this;
-            vm.state = false;
-            function error(err){
-                alert(err.data.message);
-            }
-            function success(res){
-                Http.set_token(res.data.token);
-                $state.go("admin.dashboard");
-            }
-            vm.credential = {
-                username:"tearhear18",
-                password:"123123123"
-            }
-            vm.signIn = function(credential){
-                Http
-                    .post("v1/user/sign_in",{credential:credential})
-                    .then(success,error);
-            }
-            vm.$onInit = function(){
-                Http
-                    .post("v1/user/authenticate")
-                    .then(function(){
-                        $state.go("admin.dashboard")
-                    },function(){
-                        vm.state = true;
-                    })
-            }
-        }
-})();
-(function(){
 
     angular
         .module("BiomarkBooking")
@@ -640,6 +609,55 @@
 
     angular
         .module("BiomarkBooking")
+        .component("adminLogin",{
+            controller:"adminLoginController",
+            templateUrl:"/admin/login/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("adminLoginController",adminLoginController);
+
+        adminLoginController.$inject = ["Http","$state"];
+
+        function adminLoginController( Http, $state ){
+            var vm = this;
+            vm.state = false;
+            function error(err){
+                alert(err.data.message);
+            }
+            function success(res){
+                Http.set_token(res.data.token);
+                $state.go("admin.dashboard");
+            }
+            vm.credential = {
+                username:"tearhear18",
+                password:"123123123"
+            }
+            vm.signIn = function(credential){
+                Http
+                    .post("v1/user/sign_in",{credential:credential})
+                    .then(success,error);
+            }
+            vm.$onInit = function(){
+                Http
+                    .post("v1/user/authenticate")
+                    .then(function(){
+                        $state.go("admin.dashboard")
+                    },function(){
+                        vm.state = true;
+                    })
+            }
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("bookingCalendar",{
             controller:"bookingCalendarController",
             templateUrl:"/booking/booking-calendar/view.html"
@@ -666,6 +684,7 @@
                     .get("v1/guest/location/"+vm.booking.location.id+"/find_schedules/"+vm.booking.schedule.id)
                     .then(function(res){
                         vm.location.active_slot = res.data.active_slot;
+                        vm.location.has_available_slot = res.data.has_available_slot;
                         slot_mapper();
                     });
             }
