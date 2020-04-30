@@ -4,6 +4,7 @@ class V1::BookingController < ApplicationController
     def index
         #Default get confirmed filter, get first page, get current datetime as search_start_date 
         @bookings = Booking.get_status(1).page(1)
+        @booking_export = Booking.get_status(1)
         @locations = Location.all
         @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ?",4)
     end
@@ -53,6 +54,7 @@ class V1::BookingController < ApplicationController
     def paginate
         if params[:location_id] != 0
             @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(params[:page])
+            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
         else
             @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page])
         end
@@ -91,6 +93,7 @@ class V1::BookingController < ApplicationController
     def filter_booking
         if params[:location_id] != 0
             @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(1)
+            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
         else
             @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1)
         end
