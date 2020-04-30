@@ -1,21 +1,24 @@
 class V1::LocationController < ApplicationController
   
   before_action :must_be_authenticated
-  
+  before_action :get_location, only:[:add_clinic, :clinics, :schedules]
+
   def schedules 
-    @schedules = Schedule.where("location_id = ?",params[:location_id])
+    today = Date.today
+    @schedules = Schedule.where("location_id = ? && schedule_date > ?",params[:location_id], today)
   end
 
-  def location_clinics
-    @location_clinics = LocationClinic.where("location_id = ?",params[:location_id])
+  def clinics
+    @clinics = @location.clinics
   end
 
-  def add_location_clinic
-    if !LocationClinic.exists?(location_id: location_clinic_params[:location_id], clinic_id: location_clinic_params[:clinic_id])
-      data = LocationClinic.create location_clinic_params
-      render json: {data:{clinic_id: data.clinic.id, clinic_name: data.clinic.name},message: :success}
+  def add_clinic
+    clinic = @location.location_clinics.where("clinic_id = ?",params[:clinic_id])
+    if clinic.any?
+      render json: {message: "Clinic already associated with this location"},status:406 
     else
-      render json: {message: "Clinic already associated with this location"}
+      @location.location_clinics.create clinic_id:params[:clinic_id]
+      render json: Clinic.find(params[:clinic_id])
     end
   end
 
@@ -41,11 +44,10 @@ class V1::LocationController < ApplicationController
     render json: {message: params}
   end
   private 
+  def get_location
+    @location = Location.find params[:location_id]
+  end
   def location_params
     params.require(:location).permit(:name, :address, :longitude, :latitude)
-  end
-
-  def location_clinic_params
-    params.require(:location).permit(:location_id, :clinic_id)
   end
 end

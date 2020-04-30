@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2020_04_30_053300) do
-=======
-ActiveRecord::Schema.define(version: 2020_04_30_023222) do
->>>>>>> a731120b19f77a8a42af86729c81eaa51b9d30e9
 
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "patient_id"
@@ -111,7 +107,7 @@ ActiveRecord::Schema.define(version: 2020_04_30_023222) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status", default: 0
+    t.integer "payment_status"
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

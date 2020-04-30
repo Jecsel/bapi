@@ -60,6 +60,8 @@ Rails.application.routes.draw do
     end
 
     resources :schedule, only:[:create, :show] do 
+      get 'slot/:slot_id', to:"schedule#slot"
+      post 'close_slot/:slot_id', to:"schedule#close_slot"
       collection do 
         
       end
@@ -69,11 +71,9 @@ Rails.application.routes.draw do
       end
     end
     resources :location, only:[:create, :index, :update, :destroy, :show] do 
-      get 'schedules' #, to:"location#schedules"
-      get 'location_clinics'
-      collection do
-        post 'add_location_clinic'
-      end
+      get 'schedules'
+      get 'clinics'
+      post 'add_clinic', to:"location#add_clinic"
     end
   end
 

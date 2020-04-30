@@ -1,12 +1,21 @@
 class V1::ScheduleController < ApplicationController
     before_action :must_be_authenticated
 
-    def index
-        
+    def close_slot
+        _schedule = Schedule.find params[:schedule_id]
+        slot = _schedule.slots.find params[:slot_id]
+        slot.update status:false
+        render json: :closed
+    end
+    def slot
+        _schedule = Schedule.find params[:schedule_id]
+        @_slot = _schedule.slots.find params[:slot_id]
+        @_bookings = @_slot.bookings
+    end
+    def index 
     end
     def show
         @schedule = Schedule.find params[:id]
-        # render json: @schedule
     end
     def create
         begin
