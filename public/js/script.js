@@ -163,14 +163,47 @@
         function bookingController( bookingService, $state ){
             
             var vm = this;
-
             vm.frequent= [
-                {question:"How do we test for Covid-19?"},
-                {question:"What does the test involve?"},
-                {question:"Is this certified by the Ministry of Health?"},
-                {question:"What are the qualifications of your laboratories?"},
-                {question:"I've booked my appointment but would like to change the time?"},
-                {question:"What do I bring to the test?"}
+                {
+                    question:"How do we test for Covid-19?",
+                    status_faq:false,
+                    desc:"We use a technique called Reverse Transcription Polymerase Chain Reaction or RT-PCR. The Ministry of Health Malaysia has recommended to test patients who have symptoms of COVID-19 using this technique. It is currently the 'gold standard' for Covid-19 testing. This test looks at the specific genetic material of the COVID-19 virus to determine whether it is present or not."
+                },
+                {
+                    question:"What does the test involve?",
+                    status_faq:false,
+                    desc:"1. A swab will be taken from your nose and throat or you may be required to provide a sputum sample. 2. Your samples will be analysed at our laboratory for the specific genes of the Covid-19 virus. 3.Your test result will be ready in 24-48 hours. 4.A doctor (which can be of your choosing) will review your result and advise you on next steps. 5.The testing process will take around 5 minutes."
+                },
+                {
+                    question:"What are the qualifications of your laboratories?",
+                    status_faq:false,
+                    desc:"Your test will be performed at RT-PCR lab approved by the Ministry of Health at one of our labs. Each lab is MS ISO 15189 accredited, the gold standard for pathology laboratories around the world. Eligibility & Booking"
+                },
+                {
+                    question:"Am I eligible to take the Covid-19 test?",
+                    status_faq:false,
+                    desc:"All individuals without symptoms who wishes to screen for COVID-19 are eligible. Individuals with symptoms, but no history of travelling overseas and no history of contact with known case of COVID-19 are eligible."
+                },
+                {
+                    question:"Are walk-ins accepted?",
+                    status_faq:false,
+                    desc:"No. We provide Drive-Thru screening services by appointments only"
+                },
+                {
+                    question:"I’ve booked my appointment but would like to change the time?",
+                    status_faq:false,
+                    desc:"Please contact our call centre at 1800 22 6843."
+                },
+                {
+                    question:"What do I bring to the test?",
+                    status_faq:false,
+                    desc:"Please bring your IC card or passport  and your booking confirmation email."
+                },
+                {
+                    question:"Where can I get a drive-through COVID-19  test near me?",
+                    status_faq:false,
+                    desc:"You can find the list of Covid-19 Drive through location here. (link to https://my.biomarking.com )"
+                }
             ];
             vm.$onInit = function(){
                 vm.booking = bookingService.get_booking_data();
@@ -178,7 +211,11 @@
                 bookingService.data = vm.booking;
                 bookingService.save();
             }
-            
+            vm.show_faq = function(indx){         
+                for(var i=0; i < vm.frequent.length; i++){
+                     i == indx ? !vm.frequent[i].status_faq ? vm.frequent[i].status_faq = true : vm.frequent[i].status_faq = false : vm.frequent[i].status_faq = false;
+                }
+            }
             
         }
 })();
@@ -701,80 +738,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("bookingProfile",{
-            controller:"bookingProfileController",
-            templateUrl:"/booking/booking-profile/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("bookingProfileController",bookingProfileController);
-
-        bookingProfileController.$inject = ["bookingService","$state","Http"];
-
-        function bookingProfileController( bookingService , $state , Http){
-            var vm = this;
-            //refactored code
-            vm.$onInit = function(){
-                vm.booking = bookingService.get_booking_data();
-                if(!vm.booking.booking_calendar_state || !vm.booking.slot.id){
-                    $state.go("home.booking-calendar");
-                    return false;
-                }
-                if(!vm.booking.patient) vm.booking.patient = {date_of_birth:new Date()};
-                
-                Http.get("v1/guest/location/"+vm.booking.location.id+"/clinics").then(function(res){
-                    vm.clinics = res.data;
-                });
-            }
-            vm.continue = function(){
-                if(validate()){
-                    vm.booking.profile_state = true;
-                    bookingService.data = vm.booking;
-                    bookingService.save();
-                    $state.go("home.booking-review");
-                }
-            }
-            //simplified validation
-            function validate(){
-                if(!vm.booking.patient.full_name){
-                    alert("Please fill up your fullname");
-                    return false;
-                }
-                if(!vm.booking.patient.id_number){
-                    alert("Please fill up your ID number");
-                    return false;
-                }
-                if(!vm.booking.patient.gender_id){
-                    alert("Please Select Gender");
-                    return false;
-                }
-                if(!vm.booking.patient.contact_number){
-                    alert("Please fill up your contact number");
-                    return false;
-                }
-                if(vm.booking.patient.q1 == undefined || vm.booking.patient.q2 == undefined){
-                    alert("Please answer all survey");
-                    return false;
-                }
-                if(!vm.booking.patient.clinic_id){
-                    alert("Please select clinic");
-                    return false;
-                }
-                return true
-            }
-        }
-
-
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("bookingConfirmation",{
             controller:"bookingConfirmationController",
             templateUrl:"/booking/booking-confirmation/view.html"
@@ -854,6 +817,132 @@
             }
             
         }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("bookingProfile",{
+            controller:"bookingProfileController",
+            templateUrl:"/booking/booking-profile/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("bookingProfileController",bookingProfileController);
+
+        bookingProfileController.$inject = ["bookingService","$state","Http"];
+
+        function bookingProfileController( bookingService , $state , Http){
+            var vm = this;
+            //refactored code
+            vm.$onInit = function(){
+                vm.booking = bookingService.get_booking_data();
+                if(!vm.booking.booking_calendar_state || !vm.booking.slot.id){
+                    $state.go("home.booking-calendar");
+                    return false;
+                }
+                if(!vm.booking.patient) vm.booking.patient = {date_of_birth:new Date()};
+                
+                Http.get("v1/guest/location/"+vm.booking.location.id+"/clinics").then(function(res){
+                    vm.clinics = res.data;
+                });
+            }
+            vm.continue = function(){
+                if(validate()){
+                    vm.booking.profile_state = true;
+                    bookingService.data = vm.booking;
+                    bookingService.save();
+                    $state.go("home.booking-review");
+                }
+            }
+            //simplified validation
+            function validate(){
+                if(!vm.booking.patient.full_name){
+                    alert("Please fill up your fullname");
+                    return false;
+                }
+                if(!vm.booking.patient.id_number){
+                    alert("Please fill up your ID number");
+                    return false;
+                }
+                if(!vm.booking.patient.gender_id){
+                    alert("Please Select Gender");
+                    return false;
+                }
+                if(!vm.booking.patient.contact_number){
+                    alert("Please fill up your contact number");
+                    return false;
+                }
+                if(vm.booking.patient.q1 == undefined || vm.booking.patient.q2 == undefined){
+                    alert("Please answer all survey");
+                    return false;
+                }
+                if(!vm.booking.patient.clinic_id){
+                    alert("Please select clinic");
+                    return false;
+                }
+                return true
+            }
+        }
+
+
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("dashboardClinics",{
+            controller:"dashboardClinicController",
+            templateUrl:"/admin/dashboard/clinics/view.html"
+        })
+})();
+(function () {
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("dashboardClinicController", dashboardClinicController);
+
+    dashboardClinicController.$inject = ["Http"];
+
+    function dashboardClinicController(Http) {
+        var vm = this;
+        vm.clinic_modal = false;
+
+        vm.cancel = function () {
+            vm.clinic_modal = false;
+        }
+        vm.openModal = function () {
+            vm.clinic_modal = true;
+        }
+        vm.addClinic = function (data, mode) {
+            if (mode == "add") {
+                Http
+                    .post("v1/clinic", { clinic: data })
+                    .then(function (res) {
+                        vm.clinics.push(res.data.data);
+                        vm.clinic = {};
+                        vm.clinic_modal = false;
+                    });
+                //add clinic
+            } else {
+                //update clinic
+            }
+        }
+        vm.$onInit = function () {
+            Http
+                .get("v1/clinic")
+                .then(function (res) {
+                    vm.clinics = res.data;
+                })
+        }
+    }
 })();
 (function(){
     "use strict";
@@ -976,97 +1065,6 @@
 		}])
 
 	
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("dashboardClinics",{
-            controller:"dashboardClinicController",
-            templateUrl:"/admin/dashboard/clinics/view.html"
-        })
-})();
-(function () {
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardClinicController", dashboardClinicController);
-
-    dashboardClinicController.$inject = ["Http"];
-
-    function dashboardClinicController(Http) {
-        var vm = this;
-        vm.clinic_modal = false;
-
-        vm.cancel = function () {
-            vm.clinic_modal = false;
-        }
-        vm.openModal = function () {
-            vm.clinic_modal = true;
-        }
-        vm.addClinic = function (data, mode) {
-            if (mode == "add") {
-                Http
-                    .post("v1/clinic", { clinic: data })
-                    .then(function (res) {
-                        vm.clinics.push(res.data.data);
-                        vm.clinic = {};
-                        vm.clinic_modal = false;
-                    });
-                //add clinic
-            } else {
-                //update clinic
-            }
-        }
-        vm.$onInit = function () {
-            Http
-                .get("v1/clinic")
-                .then(function (res) {
-                    vm.clinics = res.data;
-                })
-        }
-    }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("dashboardSettings",{
-            controller:"dashboardSettingController",
-            templateUrl:"/admin/dashboard/settings/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardSettingController",dashboardSettingController);
-
-        dashboardSettingController.$inject = ["Http"];
-
-        function dashboardSettingController(Http){
-            var vm = this;
-            vm.setting = {};
-            vm.update = function(new_value,type){
-                Http
-                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
-                    .then(function(res){
-                        alert("updated");
-                    });
-            }
-            vm.$onInit = function(){
-                Http
-                    .get("v1/setting")
-                    .then(function(res){
-                        vm.setting = res.data;
-                    });
-            }
-        }
 })();
 (function(){
     "use strict";
@@ -1198,6 +1196,45 @@
 
 
     }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("dashboardSettings",{
+            controller:"dashboardSettingController",
+            templateUrl:"/admin/dashboard/settings/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+
+    angular
+        .module("BiomarkBooking")
+        .controller("dashboardSettingController",dashboardSettingController);
+
+        dashboardSettingController.$inject = ["Http"];
+
+        function dashboardSettingController(Http){
+            var vm = this;
+            vm.setting = {};
+            vm.update = function(new_value,type){
+                Http
+                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
+                    .then(function(res){
+                        alert("updated");
+                    });
+            }
+            vm.$onInit = function(){
+                Http
+                    .get("v1/setting")
+                    .then(function(res){
+                        vm.setting = res.data;
+                    });
+            }
+        }
 })();
 (function(){
     "use strict";
