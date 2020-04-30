@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_30_020529) do
+ActiveRecord::Schema.define(version: 2020_04_30_023222) do
 
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "patient_id"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 2020_04_30_020529) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "referral_id"
+    t.string "referral_code"
     t.index ["clinic_id"], name: "index_bookings_on_clinic_id"
     t.index ["location_id"], name: "index_bookings_on_location_id"
     t.index ["patient_id"], name: "index_bookings_on_patient_id"
