@@ -45,7 +45,7 @@ class Scheduler
         Slot.create afternoon
     end
 
-    def time_calculator id,start , _end, n
+    def time_calculator id,start , _end
         payload = []
         while start < _end
             ( 60 / minutes_interval ).floor.times do |a|
