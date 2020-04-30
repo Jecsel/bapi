@@ -1,1 +1,1 @@
-json.array! @clinics, :id , :name, :code
+json.array! @clinics, :id , :name, :email_address, :contact_number, :contact_person, :address, :billing_code, :status
