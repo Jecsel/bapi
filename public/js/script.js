@@ -17,6 +17,61 @@
 		}])
 		
 })();
+
+
+( function(){
+
+	"use strict";
+
+	angular
+        .module('BiomarkBooking')
+        .directive('onlyAlphabets', function() {
+            return {
+              require: 'ngModel',
+              link: function (scope, element, attr, ngModelCtrl) {
+                function fromUser(text) {
+                  var transformedInput = text.replace(/[^A-Za-z ]+/g, '');
+                  if(transformedInput !== text) {
+                      ngModelCtrl.$setViewValue(transformedInput);
+                      ngModelCtrl.$render();
+                  }
+                  return transformedInput;
+                }
+                ngModelCtrl.$parsers.push(fromUser);
+              }
+            };
+          });
+})();
+
+
+
+
+
+
+( function(){
+
+	"use strict";
+
+	angular
+        .module('BiomarkBooking')
+        .directive('onlyNumbers', function() {
+            return {
+              require: 'ngModel',
+              link: function (scope, element, attr, ngModelCtrl) {
+                function fromUser(text) {
+                  var transformedInput = text.replace(/[^A-Za-z0-9]/g, '');
+                  if(transformedInput !== text) {
+                      ngModelCtrl.$setViewValue(transformedInput);
+                      ngModelCtrl.$render();
+                  }
+                  return transformedInput;
+                }
+                ngModelCtrl.$parsers.push(fromUser);
+              }
+            };
+          });
+})();
+
 ( function(){
 
 	"use strict";
@@ -183,7 +238,7 @@
                 {
                     question:"What does the test involve?",
                     status_faq:false,
-                    desc:"<p>1. A swab will be taken from your nose and throat or you may be required to provide a sputum sample.</p> <p>2. Your samples will be analysed at our laboratory for the specific genes of the Covid-19 virus.</p> <p>3.Your test result will be ready in 24-48 hours.</br> <p>4.A doctor (which can be of your choosing) will review your result and advise you on next steps.</p><p>5.The testing process will take around 5 minutes.</p>"
+                    desc:"<div>1. A swab will be taken from your nose and throat or you may be required to provide a sputum sample.</div> <div>2. Your samples will be analysed at our laboratory for the specific genes of the Covid-19 virus.</div> <div>3.Your test result will be ready in 24-48 hours.</div> <div>4.A doctor (which can be of your choosing) will review your result and advise you on next steps.</div><div>5.The testing process will take around 5 minutes.</div>"
                 },
                 {
                     question:"What are the qualifications of your laboratories?",
@@ -709,6 +764,9 @@
                     .then(function(res){
                         vm.location = res.data;
                         vm.booking.schedule = {id:vm.location.schedules[0].id, schedule_date:vm.location.schedules[0].schedule_date}
+                        if(vm.location.schedules.length > 0){
+                            vm.location.has_available_slot = vm.location.schedules[0].has_available_slot
+                        }
                         slot_mapper();
                     });
             }
@@ -821,80 +879,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("bookingProfile",{
-            controller:"bookingProfileController",
-            templateUrl:"/booking/booking-profile/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("bookingProfileController",bookingProfileController);
-
-        bookingProfileController.$inject = ["bookingService","$state","Http"];
-
-        function bookingProfileController( bookingService , $state , Http){
-            var vm = this;
-            //refactored code
-            vm.$onInit = function(){
-                vm.booking = bookingService.get_booking_data();
-                if(!vm.booking.booking_calendar_state || !vm.booking.slot.id){
-                    $state.go("home.booking-calendar");
-                    return false;
-                }
-                if(!vm.booking.patient) vm.booking.patient = {date_of_birth:new Date()};
-                
-                Http.get("v1/guest/location/"+vm.booking.location.id+"/clinics").then(function(res){
-                    vm.clinics = res.data;
-                });
-            }
-            vm.continue = function(){
-                if(validate()){
-                    vm.booking.profile_state = true;
-                    bookingService.data = vm.booking;
-                    bookingService.save();
-                    $state.go("home.booking-review");
-                }
-            }
-            //simplified validation
-            function validate(){
-                if(!vm.booking.patient.full_name){
-                    alert("Please fill up your fullname");
-                    return false;
-                }
-                if(!vm.booking.patient.id_number){
-                    alert("Please fill up your ID number");
-                    return false;
-                }
-                if(!vm.booking.patient.gender_id){
-                    alert("Please Select Gender");
-                    return false;
-                }
-                if(!vm.booking.patient.contact_number){
-                    alert("Please fill up your contact number");
-                    return false;
-                }
-                if(vm.booking.patient.q1 == undefined || vm.booking.patient.q2 == undefined){
-                    alert("Please answer all survey");
-                    return false;
-                }
-                if(!vm.booking.patient.clinic_id){
-                    alert("Please select clinic");
-                    return false;
-                }
-                return true
-            }
-        }
-
-
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("bookingReview",{
             controller:"bookingReviewController",
             templateUrl:"/booking/booking-review/view.html"
@@ -928,6 +912,83 @@
             }
             
         }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("bookingProfile",{
+            controller:"bookingProfileController",
+            templateUrl:"/booking/booking-profile/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("bookingProfileController",bookingProfileController);
+
+        bookingProfileController.$inject = ["bookingService","$state","Http"];
+
+        function bookingProfileController( bookingService , $state , Http){ 
+            var vm = this;
+            //refactored code
+            vm.$onInit = function(){
+                vm.booking = bookingService.get_booking_data();
+                if(!vm.booking.booking_calendar_state || !vm.booking.slot.id){
+                    $state.go("home.booking-calendar");
+                    return false;
+                }
+      
+                if(!vm.booking.patient) vm.booking.patient = {date_of_birth:new Date()};
+                
+                Http.get("v1/guest/location/"+vm.booking.location.id+"/clinics").then(function(res){
+                    vm.clinics = res.data;
+                });
+            }
+            vm.continue = function(){
+                if(validate()){
+                    vm.booking.profile_state = true;
+                    bookingService.data = vm.booking;
+                    bookingService.save();
+                    $state.go("home.booking-review");
+                }
+            }
+
+         
+            //simplified validation
+            function validate(){
+                if(!vm.booking.patient.full_name){
+                    alert("Please enter your full name.");
+                    return false;
+                }
+                if(!vm.booking.patient.id_number){
+                    alert("Please enter a valid IC / Passport number.");
+                    return false;
+                }
+                if(!vm.booking.patient.gender_id){
+                    alert("Please Select Gender");
+                    return false;
+                }
+                if(!vm.booking.patient.contact_number){
+                    alert("Please fill up your contact number");
+                    return false;
+                }
+                if(vm.booking.patient.q1 == undefined || vm.booking.patient.q2 == undefined){
+                    alert("Please answer all survey");
+                    return false;
+                }
+                if(!vm.booking.patient.clinic_id){
+                    alert("Please select clinic");
+                    return false;
+                }
+                return true
+            }
+        }
+
+
 })();
 (function(){
     "use strict";
@@ -1114,45 +1175,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("dashboardSettings",{
-            controller:"dashboardSettingController",
-            templateUrl:"/admin/dashboard/settings/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardSettingController",dashboardSettingController);
-
-        dashboardSettingController.$inject = ["Http"];
-
-        function dashboardSettingController(Http){
-            var vm = this;
-            vm.setting = {};
-            vm.update = function(new_value,type){
-                Http
-                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
-                    .then(function(res){
-                        alert("updated");
-                    });
-            }
-            vm.$onInit = function(){
-                Http
-                    .get("v1/setting")
-                    .then(function(res){
-                        vm.setting = res.data;
-                    });
-            }
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("dashboardLocations",{
             controller:"dashboardLocationsController",
             templateUrl:"/admin/dashboard/locations/view.html"
@@ -1235,6 +1257,45 @@
 		}])
 
 	
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("dashboardSettings",{
+            controller:"dashboardSettingController",
+            templateUrl:"/admin/dashboard/settings/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+
+    angular
+        .module("BiomarkBooking")
+        .controller("dashboardSettingController",dashboardSettingController);
+
+        dashboardSettingController.$inject = ["Http"];
+
+        function dashboardSettingController(Http){
+            var vm = this;
+            vm.setting = {};
+            vm.update = function(new_value,type){
+                Http
+                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
+                    .then(function(res){
+                        alert("updated");
+                    });
+            }
+            vm.$onInit = function(){
+                Http
+                    .get("v1/setting")
+                    .then(function(res){
+                        vm.setting = res.data;
+                    });
+            }
+        }
 })();
 (function(){
     "use strict";
