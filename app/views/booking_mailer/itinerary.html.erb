@@ -52,7 +52,7 @@
           <td>
     <![endif]-->     
     <table bgcolor="#ffffff" class="content" align="center" cellpadding="0" cellspacing="0" border="0">
-      <tr>
+      <!-- <tr>
         <td>
           <table width="100%" align="left" border="0" cellpadding="0" cellspacing="0">  
             <tr>
@@ -63,7 +63,7 @@
           </table>
          
         </td>
-      </tr>
+      </tr> -->
       <tr>
         <td class="innerpadding borderbottom">
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -74,7 +74,7 @@
             </tr>
             <tr>
               <td class="bodycopy">
-                Your booking is confirmed.
+                Your COVID-19 Drive-Through test appointment has been confirmed. 
               </td>
             </tr>
           </table>
@@ -88,25 +88,79 @@
               <tr>
                 <td>
           <![endif]-->
-          <table border="0" cellpadding="0" cellspacing="0" style="width: 100%; max-width: 380px;">  
+          <table border="0" cellpadding="0" cellspacing="0" style="width: 100%">  
             <tr>
               <td>
                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                   <tr>
-                    <td class="bodycopy" align="left">
-<pre style="font-size:13px">
+                    <td class="bodycopy" align="left" style="font-size: 13px">
+
+Booking details:
+<br>
 Booking Reference: <%=@booking.reference_code%>
-Location: <%=@booking.location.name%>
-Date: <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.strftime("%H:%M %p")%>
-Name: <%=@booking.patient.fullname%>
-ID Number: <%=@booking.patient.id_number%>
-Gender: <%=@booking.patient.gender_id%>
-Date of Birth: <%=@booking.patient.date_of_birth.to_date.strftime("%b %d, %Y") unless @booking.patient.date_of_birth.blank?%>
-Contact: <%=@booking.patient.contact_number%>
-Email: <%=@booking.patient.email_address%>
-Clinic: <%=@booking.clinic.name%>
-Amount: MYR <%=@booking.amount%>
-</pre>
+<br>
+Full Name: <%=@booking.patient.fullname%>
+<br>
+IC / Passport Number: <%=@booking.patient.id_number%>
+<br>
+Contact Number: <%=@booking.patient.contact_number%>
+<br>
+Price: RM<%=@booking.amount%> (Paid)
+<br>
+<br>
+Appointment Time:  <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.strftime("%H:%M %p")%>
+<br>
+Testing Location:
+<br>
+<%=@booking.location.name%>
+<br>
+<%=@booking.location.address%>
+<br>
+<br>
+Referred Clinic:
+<br>
+<%=@booking.clinic.name%>
+<br>
+<%=@booking.clinic.address%>
+<br>
+<%=@booking.clinic.contact_number%>
+<br>
+<br>
+You are required to show your confirmation email when you arrive at the testing location. Please bring your ID and show up to your appointment time promptly.
+
+  <div>
+    <b>Important Information: Drive Thru – DO and DON'T</b>
+    <br>
+    <br>
+    <b>DO</b>
+    <ul>
+    <li>Ensure your appointment date is correct</li>
+    <li>Come early</li>
+    <li>Bring your identification card or passport and confirmation email</li>
+    <li>Stay calm</li>
+    <li>Wear a face mask if you are not well</li>
+    <li>Have light meals before coming</li>
+    <li>Do keep your windows up</li>
+    <li>Listen and follow the Instruction of the staff</li>
+    <li>Follow the instruction of the signboards</li>
+    <li>Exit the building immediately once done</li>
+  </ul>
+  
+  <b>DON'T</b>
+  <ul>
+    <li>Don't come WITHOUT an appointment.</li>
+    <li>Do not have heavy meals</li>
+    <li>Do not get down from your car</li>
+  </ul>
+  <br>
+  <br>
+  <i><b>Note : All results will be communicated back to your requesting doctor via email and hardcopy.</b></i>
+  <br>
+  For any clarification, please do not hesitate to contact our call centre at 1800 22 6843 for further assistance.
+  <br>
+  IMPORTANT: This is a system-generated email. Please DO NOT reply to this email.
+  <br>
+</div>
                     </td>
                   </tr>
                 </table>

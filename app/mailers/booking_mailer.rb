@@ -5,6 +5,6 @@ class BookingMailer < ApplicationMailer
         mail(
             to: @booking.payment.user_email, 
             cc: ["ramel.cabug-os@biomarking.com"],
-            subject: "Booking Confirmation")
+            subject: "COVID-19 Drive-Through Booking Confirmation  | REF: #{@booking.reference_code}")
     end
 end
