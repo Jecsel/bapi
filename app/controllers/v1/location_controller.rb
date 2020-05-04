@@ -48,6 +48,6 @@ class V1::LocationController < ApplicationController
     @location = Location.find params[:location_id]
   end
   def location_params
-    params.require(:location).permit(:name, :address, :longitude, :latitude)
+    params.require(:location).permit(:name, :address, :longitude, :latitude, :code)
   end
 end
