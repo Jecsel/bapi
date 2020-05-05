@@ -7,4 +7,5 @@ class BookingMailer < ApplicationMailer
             cc: ["ramel.cabug-os@biomarking.com"],
             subject: "COVID-19 Drive-Through Booking Confirmation  | REF: #{@booking.reference_code}")
     end
+    # finance.drvtCV@gribbles.com.my, callcentre@gribbles.com.my, alan@gribbles.com.my
 end

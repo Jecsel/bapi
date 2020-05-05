@@ -298,10 +298,15 @@
                 }
             }
             vm.scroll_to = function(){
+                console.log("clicking");
                 var elmnt = document.getElementById("frequent_id");
                 elmnt.scrollIntoView();
             }
-            
+            vm.sm_scroll_to = function(){
+                console.log("clicking");
+                var elmnt = document.getElementById("sm_frequent_id");
+                elmnt.scrollIntoView();
+            }
         }
 })();
 ( function(){
@@ -709,6 +714,45 @@
 
     angular
         .module("BiomarkBooking")
+        .component("bookingLocations",{
+            controller:"bookingLocationController",
+            templateUrl:"/booking/booking-locations/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("bookingLocationController", bookingLocationController);
+
+        bookingLocationController.$inject = ["bookingService","$state","Http"];
+
+        function bookingLocationController(bookingService, $state, Http){
+            var vm = this;
+
+            vm.$onInit = function(){
+                Http
+                    .get("v1/guest/location")
+                    .then(function(res){
+                        vm.locations = res.data;
+                    });
+            }
+            vm.locationClicked = function( loc ){
+                vm.booking = bookingService.get_booking_data();
+                vm.booking.location_state = true;
+                vm.booking.location = loc;
+                bookingService.data = vm.booking;
+                bookingService.save();
+                $state.go("home.booking-calendar");
+            }
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("bookingCalendar",{
             controller:"bookingCalendarController",
             templateUrl:"/booking/booking-calendar/view.html"
@@ -840,45 +884,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("bookingLocations",{
-            controller:"bookingLocationController",
-            templateUrl:"/booking/booking-locations/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("bookingLocationController", bookingLocationController);
-
-        bookingLocationController.$inject = ["bookingService","$state","Http"];
-
-        function bookingLocationController(bookingService, $state, Http){
-            var vm = this;
-
-            vm.$onInit = function(){
-                Http
-                    .get("v1/guest/location")
-                    .then(function(res){
-                        vm.locations = res.data;
-                    });
-            }
-            vm.locationClicked = function( loc ){
-                vm.booking = bookingService.get_booking_data();
-                vm.booking.location_state = true;
-                vm.booking.location = loc;
-                bookingService.data = vm.booking;
-                bookingService.save();
-                $state.go("home.booking-calendar");
-            }
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("bookingProfile",{
             controller:"bookingProfileController",
             templateUrl:"/booking/booking-profile/view.html"
@@ -895,6 +900,8 @@
 
         function bookingProfileController( bookingService , $state , Http){ 
             var vm = this;
+            vm.today = new Date();
+            
             //refactored code
             vm.$onInit = function(){
                 vm.booking = bookingService.get_booking_data();
@@ -910,15 +917,21 @@
                 });
             }
             vm.continue = function(){
+
                 if(validate()){
                     vm.booking.profile_state = true;
+                    angular.forEach(vm.clinics, function(value, key){
+                      
+                        if(value.id == vm.booking.patient.clinic_id)
+                           vm.booking.patient.clinic_name = value.name;
+                     });
+                  
                     bookingService.data = vm.booking;
                     bookingService.save();
                     $state.go("home.booking-review");
                 }
             }
 
-         
             //simplified validation
             function validate(){
                 if(!vm.booking.patient.full_name){
@@ -937,6 +950,12 @@
                     alert("Please fill up your contact number");
                     return false;
                 }
+
+                if(!vm.booking.patient.email_address){
+                    alert("Please fill up your email address");
+                    return false;
+                }
+            
                 if(vm.booking.patient.q1 == undefined || vm.booking.patient.q2 == undefined){
                     alert("Please answer all survey");
                     return false;
@@ -945,11 +964,15 @@
                     alert("Please select clinic");
                     return false;
                 }
+
+                if(vm.booking.patient.terms == undefined || !vm.booking.patient.terms){
+                    alert("Please accept terms and conditions");
+                    return false;
+                }
+            
                 return true
             }
         }
-
-
 })();
 (function(){
     "use strict";
@@ -974,7 +997,10 @@
             var vm = this;
 
             vm.continue = function(){
-                $state.go("home.booking-confirmation")
+                if(validate()){
+                    $state.go("home.booking-confirmation")
+                }
+              
             }
             vm.$onInit = function(){
                 vm.booking = bookingService.get_booking_data();
@@ -986,6 +1012,14 @@
                     $state.go("home.booking-profile");
                     return false;
                 }
+            }
+
+            function validate(){
+                if(vm.booking.patient.terms == undefined || !vm.booking.patient.terms){
+                    alert("Please accept terms and conditions");
+                    return false;
+                }
+                return true;
             }
             
         }
@@ -1302,41 +1336,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("dashboardUsers",{
-            controller:"dashboardUsersController",
-            templateUrl:"/admin/dashboard/users/view.html"
-        })
-})();
-(function () {
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardUsersController", dashboardUsersController);
-
-    dashboardUsersController.$inject = ["Http", "$state"];
-
-    function dashboardUsersController(Http, $state) {
-        var vm = this;
-
-        vm.$onInit = function () {
-            Http
-                .get("v1/user")
-                .then(
-                    function (res) {
-                        vm.user_list = res.data.users
-                    },
-                    function (err) {
-
-                    })
-        }
-    }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("dashboardSidemenu",{
             controller:"dashboardSideMenuController",
             templateUrl:"/admin/dashboard/sidemenu/view.html",
@@ -1385,75 +1384,35 @@
 
     angular
         .module("BiomarkBooking")
-        .component("bookingRescheduleCalendar",{
-            controller:"bookingRescheduleCalendarController",
-            templateUrl:"/admin/dashboard/bookings/booking-reschedule-calendar/view.html",
-            bindings:{
-                locationId: "=",
-                closeModal:"=",
-                bookingDetails: "="
-            }
+        .component("dashboardUsers",{
+            controller:"dashboardUsersController",
+            templateUrl:"/admin/dashboard/users/view.html"
         })
 })();
-(function(){
+(function () {
     "use strict";
 
     angular
         .module("BiomarkBooking")
-        .controller("bookingRescheduleCalendarController",bookingRescheduleCalendarController);
+        .controller("dashboardUsersController", dashboardUsersController);
 
-        bookingRescheduleCalendarController.$inject = ["$state","Http"];
+    dashboardUsersController.$inject = ["Http", "$state"];
 
-        function bookingRescheduleCalendarController( $state, Http){
-            var vm = this;
-            vm.is_selected = false;
-            vm.scheduleSelected = function(sched){
-                vm.booking.schedule = sched;
-                delete vm.booking.slot;
-                Http
-                    .get("v1/guest/location/"+vm.booking.location.id+"/find_schedules/"+vm.booking.schedule.id)
-                    .then(function(res){
-                        vm.location.active_slot = res.data.active_slot;
-                    });
-            }
-            vm.slotSelected = function(slot){
-                if(slot.status){
-                    vm.booking.slot = slot;
-                }else if(slot.id == vm.bookingDetails.slot.id) {
-                    vm.booking.slot = slot;
-                }
-            }
-            vm.continue = function(){
-                if(vm.booking.slot){
-                    Http
-                        .post("v1/booking/edit_booking",{past_booking_details: vm.bookingDetails, new_booking_details: vm.booking})
-                        .then(
-                        function(res){
-                            vm.bookingDetails.schedule = res.data.schedule;
-                            vm.bookingDetails.slot = res.data.slot;
-                            vm.closeModal()
-                        },
-                        function(err){
-                            console.log(err)
-                        });
-                    
-                }else{  
-                    alert("Please select slot");
-                }
-            }
-            vm.$onInit = function(){
-                vm.booking = { // Prefill selected time
-                    slot: vm.bookingDetails.slot
-                }
-                Http
-                    .get("v1/guest/location/"+vm.locationId+"/schedules")
-                    .then(function(res){
-                        vm.location = res.data;
-                        //initialize selection
-                        vm.booking.schedule = {id:vm.location.schedules[0].id, schedule_date:vm.location.schedules[0].schedule_date}
-                    });
-            }
+    function dashboardUsersController(Http, $state) {
+        var vm = this;
+
+        vm.$onInit = function () {
+            Http
+                .get("v1/user")
+                .then(
+                    function (res) {
+                        vm.user_list = res.data.users
+                    },
+                    function (err) {
+
+                    })
         }
+    }
 })();
 (function () {
     "use strict";
@@ -1533,6 +1492,81 @@
                 });
         }
     }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("bookingRescheduleCalendar",{
+            controller:"bookingRescheduleCalendarController",
+            templateUrl:"/admin/dashboard/bookings/booking-reschedule-calendar/view.html",
+            bindings:{
+                locationId: "=",
+                closeModal:"=",
+                bookingDetails: "="
+            }
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("bookingRescheduleCalendarController",bookingRescheduleCalendarController);
+
+        bookingRescheduleCalendarController.$inject = ["$state","Http"];
+
+        function bookingRescheduleCalendarController( $state, Http){
+            var vm = this;
+            vm.is_selected = false;
+            vm.scheduleSelected = function(sched){
+                vm.booking.schedule = sched;
+                delete vm.booking.slot;
+                Http
+                    .get("v1/guest/location/"+vm.booking.location.id+"/find_schedules/"+vm.booking.schedule.id)
+                    .then(function(res){
+                        vm.location.active_slot = res.data.active_slot;
+                    });
+            }
+            vm.slotSelected = function(slot){
+                if(slot.status){
+                    vm.booking.slot = slot;
+                }else if(slot.id == vm.bookingDetails.slot.id) {
+                    vm.booking.slot = slot;
+                }
+            }
+            vm.continue = function(){
+                if(vm.booking.slot){
+                    Http
+                        .post("v1/booking/edit_booking",{past_booking_details: vm.bookingDetails, new_booking_details: vm.booking})
+                        .then(
+                        function(res){
+                            vm.bookingDetails.schedule = res.data.schedule;
+                            vm.bookingDetails.slot = res.data.slot;
+                            vm.closeModal()
+                        },
+                        function(err){
+                            console.log(err)
+                        });
+                    
+                }else{  
+                    alert("Please select slot");
+                }
+            }
+            vm.$onInit = function(){
+                vm.booking = { // Prefill selected time
+                    slot: vm.bookingDetails.slot
+                }
+                Http
+                    .get("v1/guest/location/"+vm.locationId+"/schedules")
+                    .then(function(res){
+                        vm.location = res.data;
+                        //initialize selection
+                        vm.booking.schedule = {id:vm.location.schedules[0].id, schedule_date:vm.location.schedules[0].schedule_date}
+                    });
+            }
+        }
 })();
 (function(){
     "use strict";
