@@ -1,7 +1,7 @@
 class V1::Guest::LocationController < ApplicationController
 
     def clinics 
-        loc = Location.find params[:location_id]
+        loc = Location.active.find params[:location_id]
         @clinics = loc.clinics
     end
 
@@ -20,7 +20,7 @@ class V1::Guest::LocationController < ApplicationController
     end
     
     def index
-        @locations = Location.all
+        @locations = Location.active.all
     end
 
 end
