@@ -21,8 +21,10 @@ json.csv_export_data @booking_export do |booking|
     json.q1 booking.patient.q1 ? "Y": "N"
     json.q2 booking.patient.q2 ? "Y": "N"
     json.test_site booking.location.name
+    json.test_site_code booking.location.code
     json.clinic_name booking.clinic.name
     json.clinic_code booking.clinic.code
+    json.billing_code booking.clinic.billing_code
     json.price Setting.last.covid_price
     json.payment_date booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.created_at : "N/A"
     json.payment_status booking.payment.payment_status

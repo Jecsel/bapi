@@ -26,12 +26,12 @@ class V1::LocationController < ApplicationController
     @location = Location.find params[:id]
   end
   def destroy 
-    Location.delete params[:id]
-    render json: {message: :deleted}    
+    Location.find(params[:id]).update(status: false)
+    render json: {message: :deleted}
   end 
 
   def index
-    @locations = Location.all
+    @locations = Location.active.all
   end
   
   def create
@@ -48,6 +48,6 @@ class V1::LocationController < ApplicationController
     @location = Location.find params[:location_id]
   end
   def location_params
-    params.require(:location).permit(:name, :address, :longitude, :latitude)
+    params.require(:location).permit(:name, :address, :longitude, :latitude, :code)
   end
 end

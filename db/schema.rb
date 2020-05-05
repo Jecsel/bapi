@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_04_30_053300) do
+ActiveRecord::Schema.define(version: 2020_05_05_023600) do
 
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "patient_id"
@@ -61,6 +61,8 @@ ActiveRecord::Schema.define(version: 2020_04_30_053300) do
     t.string "latitude"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "code"
+    t.boolean "status", default: true
   end
 
   create_table "patients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -107,7 +109,7 @@ ActiveRecord::Schema.define(version: 2020_04_30_053300) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status"
+    t.integer "payment_status", default: 0
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
