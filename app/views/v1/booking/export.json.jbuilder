@@ -1,13 +1,4 @@
-json.bookings @bookings do |booking|
-    json.extract! booking, :id, :reference_code
-    json.location_name booking.location.name
-    json.time booking.slot.slot_time
-    json.date booking.schedule.schedule_date
-    json.name booking.patient.fullname
-    json.payment_status booking.payment.payment_status
-    json.id_number booking.patient.id_number
-end
-json.csv_export_data @booking_export do |booking|
+json.array! @bookings do |booking|
     json.id booking.id
     json.booking_date booking.schedule.schedule_date
     json.booking_time booking.slot.slot_time.utc.strftime("%I:%M%p")
@@ -29,6 +20,3 @@ json.csv_export_data @booking_export do |booking|
     json.payment_date booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.created_at : "N/A"
     json.payment_status booking.payment.payment_status
 end
-json.counts @bookings.count
-json.total_pages @bookings.total_pages
-json.total_count @bookings.total_count

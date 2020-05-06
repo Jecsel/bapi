@@ -14,22 +14,23 @@ class Booking < ApplicationRecord
     search_scope :search do
         attributes :id, :reference_code
         attributes patient: ["patient.id_number", "patient.fullname"]
-        attributes location: ["location.name"]
     end
 
     def self.search_filter( filter_params )
-        _sql = get_location(filter_params[:location_id]).payment_status(filter_params[:status])
+        _sql =  get_location(filter_params[:location_id]).payment_status(filter_params[:status])
+                
         if filter_params[:booking_date_start].present? && filter_params[:booking_date_end].present?
-            return _sql.where(schedules:{schedule_date:[filter_params[:booking_date_start]..filter_params[:booking_date_end]]}) 
+            return _sql.where(schedules:{schedule_date:[filter_params[:booking_date_start]..filter_params[:booking_date_end]]})
         end
         if filter_params[:booking_date_start].present? && filter_params[:booking_date_end].nil?
-            return _sql.where("schedules.schedule_date > ?",filter_params[:booking_date_start]) 
+            return _sql.where("schedules.schedule_date > ?",filter_params[:booking_date_start])
         end
         if filter_params[:booking_date_start].nil? && filter_params[:booking_date_end].present?
             return _sql.where("schedules.schedule_date < ?",filter_params[:booking_date_end]) 
         end
         return _sql
     end
+    
     def self.get_location id 
         return where(location_id: id) if id != 0
         return self
