@@ -9,6 +9,7 @@ namespace :services do
 
         create_super_admin_policies
         create_admin_policies
+        create_bookings_only_policies
     end
 
     def clean_up
@@ -31,6 +32,9 @@ namespace :services do
             },
             {
                 name:"Admin"
+            },
+            {
+                name:"BookingsOnly"
             }
         ]
         UserGroup.create _groups
@@ -44,29 +48,43 @@ namespace :services do
                 status: true, 
                 resource_path: "admin.dashboard.users",
                 resource_icon: "fas fa-users",
-                resource_order: 4,
+                resource_order: 5,
             },
             {
                 name:"Test Sites",
                 status: true, 
                 resource_path: "admin.dashboard.locations",
                 resource_icon: "fas fa-search-location",
-                resource_order: 2,
+                resource_order: 3,
             },
             {
                 name:"Clinics",
                 status: true, 
                 resource_path: "admin.dashboard.clinics",
                 resource_icon: "fas fa-clinic-medical",
-                resource_order: 3,
+                resource_order: 4,
             },
             {
                 name:"Bookings",
                 status: true, 
                 resource_path: "admin.dashboard.bookings",
                 resource_icon: "fas fa-calendar-check",
+                resource_order: 2,
+            },
+            {
+                name:"Dashboard",
+                status: true, 
+                resource_path: "admin.dashboard",
+                resource_icon: "fas fa-tachometer-alt",
                 resource_order: 1,
             },
+            {
+                name:"Settings",
+                status: true, 
+                resource_path: "admin.dashboard.settings",
+                resource_icon: "fas fa-cog",
+                resource_order: 6,
+            }
         ]
         Service.create _services
         p 'Services created'
@@ -108,6 +126,16 @@ namespace :services do
             {
                 service_id: 4, #Booking service
                 name: "Export csv policy", #service_policy_id 7
+                status: true
+            },
+            {
+                service_id: 5, #Dashboard service
+                name: "View Dashboard", #service_policy_id 8
+                status: true
+            },
+            {
+                service_id: 6, #Settings service
+                name: "View settings", #service_policy_id 9
                 status: true
             }
         ]
@@ -159,6 +187,18 @@ namespace :services do
                 service_id: 4, #Booking service
                 service_policy_id: 7, #Export csv
                 status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 5, #Booking service
+                service_policy_id: 8, #Export csv
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 6, #Booking service
+                service_policy_id: 9, #Export csv
+                status: true
             }
         ]
         RolePolicy.create _role_policies
@@ -203,10 +243,36 @@ namespace :services do
                 service_id: 4, #Booking service
                 service_policy_id: 7, #Export csv
                 status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 5, #Booking service
+                service_policy_id: 8, #Export csv
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 6, #Booking service
+                service_policy_id: 9, #Export csv
+                status: true
             }
         ]
         RolePolicy.create _role_policies
         p 'Super admin policies created'
+    end
+
+    def create_bookings_only_policies
+        _user_group_id = 3
+        _role_policies = [
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Bookings service
+                service_policy_id: 6, #View booking module
+                status: true
+            },
+        ]
+        RolePolicy.create _role_policies
+        p 'Bookings only policies created'
     end
 
 
