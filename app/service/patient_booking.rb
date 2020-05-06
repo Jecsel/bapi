@@ -1,4 +1,4 @@
-class PatientBooking
+    class PatientBooking
     attr_accessor   :location_id,
                     :slot_id,
                     :schedule_id,
