@@ -23,10 +23,10 @@ class Booking < ApplicationRecord
             return _sql.where(schedules:{schedule_date:[filter_params[:booking_date_start]..filter_params[:booking_date_end]]})
         end
         if filter_params[:booking_date_start].present? && filter_params[:booking_date_end].nil?
-            return _sql.where("schedules.schedule_date > ?",filter_params[:booking_date_start])
+            return _sql.where("schedules.schedule_date >= ?",filter_params[:booking_date_start])
         end
         if filter_params[:booking_date_start].nil? && filter_params[:booking_date_end].present?
-            return _sql.where("schedules.schedule_date < ?",filter_params[:booking_date_end]) 
+            return _sql.where("schedules.schedule_date <= ?",filter_params[:booking_date_end]) 
         end
         return _sql
     end
