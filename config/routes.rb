@@ -39,6 +39,8 @@ Rails.application.routes.draw do
     end
     resources :booking, only:[:index, :show] do 
       collection do 
+        post 'filter'
+        
         post 'cancel_booking'
         post 'mark_no_show'
         post 'mark_as_completed'
