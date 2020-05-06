@@ -1,7 +1,7 @@
 json.array! @bookings do |booking|
     json.id booking.id
     json.booking_date booking.schedule.schedule_date
-    json.booking_time booking.slot.slot_time.utc.strftime("%I:%M%p")
+    json.booking_time booking.slot.slot_time.utc.strftime("%I:%M%p") +' - '+(booking.slot.slot_time + booking.schedule.minute_interval * 60).utc.strftime("%I:%M%p")
     json.reference_number booking.reference_code
     json.fullname booking.patient.fullname
     json.id_number booking.patient.id_number
