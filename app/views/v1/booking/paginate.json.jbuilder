@@ -2,6 +2,7 @@ json.bookings @bookings do |booking|
     json.extract! booking, :id, :reference_code
     json.location_name booking.location.name
     json.time booking.slot.slot_time
+    json.interval booking.schedule.minute_interval
     json.date booking.schedule.schedule_date
     json.name booking.patient.fullname
     json.payment_status booking.payment.payment_status

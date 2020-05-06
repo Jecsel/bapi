@@ -8,7 +8,9 @@ json.booking_details do
     json.clinic_code @booking.clinic.code
     json.billing_code @booking.clinic.billing_code
     json.slot @booking.slot
+    json.time_add @booking.slot.slot_time + (@booking.schedule.minute_interval*60)
     json.schedule @booking.schedule
+    json.location @booking.location
 end
 json.patient_details do 
     json.extract! @booking.patient, :fullname, :id_number, :date_of_birth, :contact_number, :email_address

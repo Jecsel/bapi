@@ -3,7 +3,7 @@ class V1::BookingController < ApplicationController
     
     def index
         #Default get confirmed filter, get first page, get current datetime as search_start_date 
-        @bookings = Booking.get_status(1).page(1)
+        @bookings = Booking.get_status(1).page(1).sort_by_datetime
         @booking_export = Booking.get_status(1)
         @locations = Location.all
         @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ?",4)
@@ -33,7 +33,7 @@ class V1::BookingController < ApplicationController
 
     def edit_booking
         booking = Booking.find params[:past_booking_details][:id]
-        booking.schedule.update(schedule_date: params[:new_booking_details][:schedule][:schedule_date])
+        booking.update(schedule_id: params[:new_booking_details][:schedule][:id])
 
         # Update old slod to be available
         old_slot = Slot.find params[:past_booking_details][:slot][:id]
@@ -53,11 +53,11 @@ class V1::BookingController < ApplicationController
 
     def paginate
         if params[:location_id] != 0
-            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(params[:page])
-            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
+            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(params[:page]).sort_by_datetime
+            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).sort_by_datetime
         else
-            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page])
-            @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
+            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page]).sort_by_datetime
+            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).sort_by_datetime
         end
         
         # if params[:search_start_date] && params[:search_end_date]
@@ -93,11 +93,11 @@ class V1::BookingController < ApplicationController
 
     def filter_booking
         if params[:location_id] != 0
-            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(1)
-            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
+            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(1).sort_by_datetime
+            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).sort_by_datetime
         else
-            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1)
-            @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
+            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1).sort_by_datetime
+            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).sort_by_datetime
         end
         # if params[:search_start_date] && params[:search_end_date]
         #     @bookings = Booking.joins(:schedule)
