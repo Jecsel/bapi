@@ -39,15 +39,17 @@ Rails.application.routes.draw do
     end
     resources :booking, only:[:index, :show] do 
       collection do 
+        get  'search/:search_str', to:"booking#search"
+        post 'filter'
+        post 'export'
         post 'cancel_booking'
         post 'mark_no_show'
         post 'mark_as_completed'
         post 'edit_booking'
-        post 'paginate'
-        post 'search'
-        post 'filter_status'
-        post 'filter_date'
-        post 'filter_booking'
+        # post 'paginate'
+        # post 'filter_status'
+        # post 'filter_date'
+        # post 'filter_booking'
       end
     end
     resources :user, only: [:index] do

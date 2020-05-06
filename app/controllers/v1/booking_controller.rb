@@ -1,10 +1,15 @@
 class V1::BookingController < ApplicationController
     before_action :must_be_authenticated
     
+    def export 
+        @bookings = data_search
+    end
+
+    def filter 
+        @bookings = data_search.page(filter_params[:page])
+    end
+
     def index
-        #Default get confirmed filter, get first page, get current datetime as search_start_date 
-        @bookings = Booking.get_status(1).page(1).sort_by_datetime
-        @booking_export = Booking.get_status(1)
         @locations = Location.all
         @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ?",4)
     end
@@ -51,82 +56,39 @@ class V1::BookingController < ApplicationController
         render json: {schedule: booking.schedule, slot: booking.slot}
     end
 
-    def paginate
-        if params[:location_id] != 0
-            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(params[:page]).sort_by_datetime
-            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).sort_by_datetime
-        else
-            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page]).sort_by_datetime
-            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).sort_by_datetime
-        end
+    # def paginate
+    #     if params[:location_id] != 0
+    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(params[:page])
+    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
+    #     else
+    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page])
+    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
+    #     end
         
-        # if params[:search_start_date] && params[:search_end_date]
-        #     @bookings = Booking.joins(:schedule)
-        #     .search(params[:query])
-        #     .where("schedules.schedule_date >= ?" ,params[:search_end_date].to_datetime.beginning_of_day..params[:search_start_date].to_datetime.beginning_of_day)
-        #     .joins(:slot).where("slots.slot_time >= ?", params[:search_start_date].to_datetime.utc.strftime("%H%M%S%N")..params[:search_end_date].strftime("%H%M%S%N"))
-        #     .get_status(params[:status_index])
-        #     .page(params[:page]) 
-        # elsif params[:search_start_date]
-        #     @bookings = Booking
-        #     .joins(:schedule)
-        #     .joins(:slot)
-        #     .search(params[:query])
-        #     .where("schedules.schedule_date >= ? AND slots.slot_time <= ?" ,Time.zone.parse(params[:search_start_date]).beginning_of_day,Time.zone.parse(params[:search_start_date]).strftime("%H%M%S%N"))
-        #     .get_status(params[:status_index])
-        #     .page(params[:page]) 
-        #     # @bookings = Booking.joins(:schedule).joins(:slot).where("schedules.schedule_date >= ? AND slots.slot_time.strftime("%H%M%S%N") <= ?" ,Time.zone.parse("2020-04-28T15:35:00.000Z").beginning_of_day,Time.zone.parse("2020-04-28T15:35:00.000Z").strftime("%H%M%S%N")).get_status(1).page(1) 
-        # elsif params[:search_end_date]
-        #     @bookings = Booking.joins(:schedule)
-        #     .search(params[:query])
-        #     .where("schedules.schedule_date <= ?" ,params[:search_end_date].to_datetime.beginning_of_day)
-        #     .joins(:slot).where("slots.slot_time <= ?",params[:search_end_date].to_datetime.utc.strftime("%H%M%S%N"))
-        #     .get_status(params[:status_index])
-        #     .page(params[:page]) 
-        # else
-        #     @bookings = Booking.search(params[:query])
-        #     .search(params[:query])
-        #     .get_status(params[:status_index])
-        #     .page(params[:page]) 
-        # end 
-    end
+        
+    # end
 
-    def filter_booking
-        if params[:location_id] != 0
-            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(1).sort_by_datetime
-            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).sort_by_datetime
-        else
-            @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1).sort_by_datetime
-            @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).sort_by_datetime
-        end
-        # if params[:search_start_date] && params[:search_end_date]
-        #     @bookings = Booking.joins(:schedule)
-        #     .search(params[:query])
-        #     .where("schedules.schedule_date >= ?" ,params[:search_end_date].to_datetime.beginning_of_day..params[:search_start_date].to_datetime.beginning_of_day)
-        #     .joins(:slot).where("slots.slot_time >= ?", params[:search_start_date].to_datetime.utc.strftime("%H%M%S%N")..params[:search_end_date].strftime("%H%M%S%N"))
-        #     .get_status(params[:status_index])
-        #     .page(1) 
-        # elsif params[:search_start_date]
-        #     @bookings = Booking
-        #     .joins(:schedule)
-        #     .joins(:slot)
-        #     .search(params[:query])
-        #     .where("schedules.schedule_date >= ? AND slots.slot_time <= ?" ,Time.zone.parse(params[:search_start_date]).beginning_of_day,Time.zone.parse(params[:search_start_date]).strftime("%H:%M"))
-        #     .get_status(params[:status_index])
-        #     .page(1) 
-        #     @bookings = Booking.joins(:schedule, :slot).where("schedules.schedule_date >= ? AND slots.slot_time <= ?" ,Time.zone.parse("2020-04-29T12:00:00.000Z").beginning_of_day,Time.zone.parse("2020-04-29T12:00:00.000Z").strftime("%H%M%S%N")).get_status(1).page(1) 
-        # elsif params[:search_end_date]
-        #     @bookings = Booking.joins(:schedule)
-        #     .search(params[:query])
-        #     .where("schedules.schedule_date <= ?" ,params[:search_end_date].to_datetime.beginning_of_day)
-        #     .joins(:slot).where("slots.slot_time <= ?",params[:search_end_date].to_datetime.utc.strftime("%H%M%S%N"))
-        #     .get_status(params[:status_index])
-        #     .page(1) 
-        # else
-        #     @bookings = Booking.search(params[:query])
-        #     .search(params[:query])
-        #     .get_status(params[:status_index])
-        #     .page(1) 
-        # end 
+    # def filter_booking
+    #     if params[:location_id] != 0
+    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(1)
+    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
+    #     else
+    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1)
+    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
+    #     end
+       
+    # end
+
+    private 
+    def data_search
+        Booking
+            .joins(:schedule,:payment)
+            .search_filter(filter_params)
+            .search(filter_params[:search_string])
+    end
+    def filter_params
+        params
+            .require(:filter)
+            .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string)
     end
 end

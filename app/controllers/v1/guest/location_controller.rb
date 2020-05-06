@@ -7,20 +7,22 @@ class V1::Guest::LocationController < ApplicationController
 
     def find_schedules
         booking_date_range = Setting.last.booking_date_range
-        today = Date.today
         @loc = Location.find params[:location_id]
-        @schedules = @loc.schedules.where("id = ? && schedule_date > ?",params[:scheduled_id],today).order(schedule_date: :asc).limit(booking_date_range)
+        @schedules = @loc.schedules.where("id = ? && schedule_date > ?",params[:scheduled_id],cut_off_time).order(schedule_date: :asc).limit(booking_date_range)
     end
 
     def schedules
         booking_date_range = Setting.last.booking_date_range
-        today = Date.today
         @loc = Location.find params[:location_id]
-        @schedules = @loc.schedules.where("schedule_date > ?",today).order(schedule_date: :asc).limit(booking_date_range)
+        @schedules = @loc.schedules.where("schedule_date > ?",cut_off_time).order(schedule_date: :asc).limit(booking_date_range)
     end
     
     def index
         @locations = Location.active.all
     end
-
+    private
+    def cut_off_time
+        today = DateTime.now.in_time_zone
+        return today < today.beginning_of_day + 17.hours ? today : today + 1.day
+    end
 end
