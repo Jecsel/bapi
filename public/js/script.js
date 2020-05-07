@@ -504,51 +504,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("adminLogin",{
-            controller:"adminLoginController",
-            templateUrl:"/admin/login/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("adminLoginController",adminLoginController);
-
-        adminLoginController.$inject = ["Http","$state"];
-
-        function adminLoginController( Http, $state ){
-            var vm = this;
-            vm.state = false;
-            function error(err){
-                alert(err.data.message);
-            }
-            function success(res){
-                Http.set_token(res.data.token);
-                $state.go("admin.dashboard");
-            }
-            vm.signIn = function(credential){
-                Http
-                    .post("v1/user/sign_in",{credential:credential})
-                    .then(success,error);
-            }
-            vm.$onInit = function(){
-                Http
-                    .post("v1/user/authenticate")
-                    .then(function(){
-                        $state.go("admin.dashboard")
-                    },function(){
-                        vm.state = true;
-                    })
-            }
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("adminDashboard",{
             controller:"adminDashboardController",
             templateUrl:"/admin/dashboard/view.html"
@@ -625,6 +580,51 @@
             return f;
 		}
 
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("adminLogin",{
+            controller:"adminLoginController",
+            templateUrl:"/admin/login/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("adminLoginController",adminLoginController);
+
+        adminLoginController.$inject = ["Http","$state"];
+
+        function adminLoginController( Http, $state ){
+            var vm = this;
+            vm.state = false;
+            function error(err){
+                alert(err.data.message);
+            }
+            function success(res){
+                Http.set_token(res.data.token);
+                $state.go("admin.dashboard");
+            }
+            vm.signIn = function(credential){
+                Http
+                    .post("v1/user/sign_in",{credential:credential})
+                    .then(success,error);
+            }
+            vm.$onInit = function(){
+                Http
+                    .post("v1/user/authenticate")
+                    .then(function(){
+                        $state.go("admin.dashboard")
+                    },function(){
+                        vm.state = true;
+                    })
+            }
+        }
 })();
 (function(){
 
@@ -1197,6 +1197,58 @@
 
     angular
         .module("BiomarkBooking")
+        .component("dashboardClinics",{
+            controller:"dashboardClinicController",
+            templateUrl:"/admin/dashboard/clinics/view.html"
+        })
+})();
+(function () {
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("dashboardClinicController", dashboardClinicController);
+
+    dashboardClinicController.$inject = ["Http"];
+
+    function dashboardClinicController(Http) {
+        var vm = this;
+        vm.clinic_modal = false;
+
+        vm.cancel = function () {
+            vm.clinic_modal = false;
+        }
+        vm.openModal = function () {
+            vm.clinic_modal = true;
+        }
+        vm.addClinic = function (data, mode) {
+            if (mode == "add") {
+                Http
+                    .post("v1/clinic", { clinic: data })
+                    .then(function (res) {
+                        vm.clinics.push(res.data.data);
+                        vm.clinic = {};
+                        vm.clinic_modal = false;
+                    });
+                //add clinic
+            } else {
+                //update clinic
+            }
+        }
+        vm.$onInit = function () {
+            Http
+                .get("v1/clinic")
+                .then(function (res) {
+                    vm.clinics = res.data;
+                })
+        }
+    }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("dashboardBookings",{
             controller:"dashboardBookingsController",
             templateUrl:"/admin/dashboard/bookings/view.html"
@@ -1214,9 +1266,18 @@
     function dashboardBookingsController(Http, Dashboard, $state, CSV, $document, $timeout) {
         var vm = this;
         
-        
         vm.timezone     = moment().format('ZZ');
         vm.filename     = "booking-export.csv";
+
+        vm.search = function(){
+            vm.is_ready = false;
+            validate_filter();
+            Http.post("v1/booking/filter",{filter:vm.filter}).then(function( res ){
+                vm.data = res.data;
+                vm.pagination_config.total_pages = vm.data.total_pages;
+                vm.is_ready = true;
+            });
+        }
 
         function getBuildCsvOptions() {
             var options = {
@@ -1271,16 +1332,7 @@
         }
         vm.filterChanged = vm.search;
         vm.searchFor = vm.search;
-        
-        vm.search = function(){
-            vm.is_ready = false;
-            validate_filter();
-            Http.post("v1/booking/filter",{filter:vm.filter}).then(function( res ){
-                vm.data = res.data;
-                vm.pagination_config.total_pages = vm.data.total_pages;
-                vm.is_ready = true;
-            });
-        }
+
         function fixDateFormat(date){
             return moment(date).format('YYYY-MM-DD');
         }
@@ -1549,6 +1601,45 @@
 
     angular
         .module("BiomarkBooking")
+        .component("dashboardSettings",{
+            controller:"dashboardSettingController",
+            templateUrl:"/admin/dashboard/settings/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+
+    angular
+        .module("BiomarkBooking")
+        .controller("dashboardSettingController",dashboardSettingController);
+
+        dashboardSettingController.$inject = ["Http"];
+
+        function dashboardSettingController(Http){
+            var vm = this;
+            vm.setting = {};
+            vm.update = function(new_value,type){
+                Http
+                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
+                    .then(function(res){
+                        alert("updated");
+                    });
+            }
+            vm.$onInit = function(){
+                Http
+                    .get("v1/setting")
+                    .then(function(res){
+                        vm.setting = res.data;
+                    });
+            }
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("dashboardLocations",{
             controller:"dashboardLocationsController",
             templateUrl:"/admin/dashboard/locations/view.html"
@@ -1631,97 +1722,6 @@
 		}])
 
 	
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("dashboardClinics",{
-            controller:"dashboardClinicController",
-            templateUrl:"/admin/dashboard/clinics/view.html"
-        })
-})();
-(function () {
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardClinicController", dashboardClinicController);
-
-    dashboardClinicController.$inject = ["Http"];
-
-    function dashboardClinicController(Http) {
-        var vm = this;
-        vm.clinic_modal = false;
-
-        vm.cancel = function () {
-            vm.clinic_modal = false;
-        }
-        vm.openModal = function () {
-            vm.clinic_modal = true;
-        }
-        vm.addClinic = function (data, mode) {
-            if (mode == "add") {
-                Http
-                    .post("v1/clinic", { clinic: data })
-                    .then(function (res) {
-                        vm.clinics.push(res.data.data);
-                        vm.clinic = {};
-                        vm.clinic_modal = false;
-                    });
-                //add clinic
-            } else {
-                //update clinic
-            }
-        }
-        vm.$onInit = function () {
-            Http
-                .get("v1/clinic")
-                .then(function (res) {
-                    vm.clinics = res.data;
-                })
-        }
-    }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("dashboardSettings",{
-            controller:"dashboardSettingController",
-            templateUrl:"/admin/dashboard/settings/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardSettingController",dashboardSettingController);
-
-        dashboardSettingController.$inject = ["Http"];
-
-        function dashboardSettingController(Http){
-            var vm = this;
-            vm.setting = {};
-            vm.update = function(new_value,type){
-                Http
-                    .patch("v1/setting/update",{setting:{new_value:new_value,type:type}})
-                    .then(function(res){
-                        alert("updated");
-                    });
-            }
-            vm.$onInit = function(){
-                Http
-                    .get("v1/setting")
-                    .then(function(res){
-                        vm.setting = res.data;
-                    });
-            }
-        }
 })();
 (function(){
     "use strict";
@@ -2078,6 +2078,30 @@
 
     angular
         .module("BiomarkBooking")
+        .component("locationUsers",{
+            controller:"locationUsersController",
+            templateUrl:"/admin/dashboard/locations/users/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("locationUsersController",locationUsersController);
+
+        locationUsersController.$inject = [];
+
+        function locationUsersController(){
+            var vm = this;
+            
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("locationView",{
             controller:"locationsController",
             templateUrl:"/admin/dashboard/locations/view/view.html"
@@ -2121,30 +2145,6 @@
                     vm.location = res.data;
                 });
             }
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("locationUsers",{
-            controller:"locationUsersController",
-            templateUrl:"/admin/dashboard/locations/users/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("locationUsersController",locationUsersController);
-
-        locationUsersController.$inject = [];
-
-        function locationUsersController(){
-            var vm = this;
-            
         }
 })();
 (function(){
