@@ -53,7 +53,7 @@ class V1::BookingController < ApplicationController
         end
         booking.update(slot_id: new_slot.id)
 
-        render json: {schedule: booking.schedule, slot: booking.slot}
+        render json: {schedule: booking.schedule, slot: booking.slot, slot_time: booking.slot.slot_time.utc.strftime("%I:%M%p") + " - " + (booking.slot.slot_time + booking.schedule.minute_interval*60).utc.strftime("%I:%M%p")}
     end
 
     # def paginate
