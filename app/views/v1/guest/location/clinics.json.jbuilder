@@ -1,1 +1,1 @@
-json.array! @clinics, :id, :name
+json.array! @clinics, :id, :name, :address
