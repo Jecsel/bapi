@@ -7,8 +7,8 @@ json.booking_details do
     json.clinic_name @booking.clinic.name
     json.clinic_code @booking.clinic.code
     json.billing_code @booking.clinic.billing_code
+    json.slot_time @booking.slot.slot_time.utc.strftime("%I:%M%p") + " - " + (@booking.slot.slot_time + @booking.schedule.minute_interval*60).utc.strftime("%I:%M%p")
     json.slot @booking.slot
-    json.time_add @booking.slot.slot_time + (@booking.schedule.minute_interval*60)
     json.schedule @booking.schedule
     json.location @booking.location
 end
