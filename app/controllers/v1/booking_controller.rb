@@ -38,7 +38,7 @@ class V1::BookingController < ApplicationController
 
     def edit_booking
         booking = Booking.find params[:past_booking_details][:id]
-        booking.schedule.update(schedule_date: params[:new_booking_details][:schedule][:schedule_date])
+        booking.update(schedule_id: params[:new_booking_details][:schedule][:id])
 
         # Update old slod to be available
         old_slot = Slot.find params[:past_booking_details][:slot][:id]
