@@ -2,11 +2,11 @@ class V1::BookingController < ApplicationController
     before_action :must_be_authenticated
     
     def export 
-        @bookings = data_search
+        @bookings = data_search.sort_by_datetime
     end
 
     def filter 
-        @bookings = data_search.page(filter_params[:page])
+        @bookings = data_search.page(filter_params[:page]).sort_by_datetime
     end
 
     def index
