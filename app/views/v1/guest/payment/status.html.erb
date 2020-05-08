@@ -55,7 +55,7 @@
 				<hr>
                 <p>Booking Reference: <b><%=@booking.reference_code%></b></p>
 				<p>Location: <%=@booking.location.name%></p>
-				<p>Date: <%=@booking.schedule.schedule_date.to_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.strftime("%H:%M %p")%></p>
+				<p>Date: <%=@booking.schedule.schedule_date.to_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.utc.strftime("%H:%M %p")%></p>
 				<p>Name: <%=@booking.patient.fullname%></p>
 				<p>ID Number: <%=@booking.patient.id_number%></p>
 				<p>Gender: <%=@booking.patient.gender_id%></p>

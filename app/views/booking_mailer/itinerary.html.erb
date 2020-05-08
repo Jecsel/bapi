@@ -108,7 +108,7 @@ Contact Number: <%=@booking.patient.contact_number%>
 Price: RM<%=@booking.amount%> (Paid)
 <br>
 <br>
-Appointment Time:  <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.strftime("%H:%M %p")%>
+Appointment Time:  <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.utc.strftime("%H:%M %p")%>
 <br>
 Testing Location:
 <br>
