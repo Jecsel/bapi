@@ -80,132 +80,6 @@
 
     angular
         .module("BiomarkBooking")
-        .factory("bookingService",bookingService);
-
-        bookingService.$inject = ["$localStorage"];
-
-        function bookingService( $localStorage ){
-            var f = {};
-            f.data = {};
-            f.clear = function(){
-                $localStorage.booking = {};
-            }
-            f.save =  function(){
-                $localStorage.booking = f.data;
-            }
-            f.get_booking_data = function(){
-                return $localStorage.booking || {};
-            }
-            return f;
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("booking",{
-            controller:"bookingController",
-            templateUrl:"/booking/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("bookingController",bookingController);
-
-        bookingController.$inject = ["bookingService","$state"];
-
-        function bookingController( bookingService, $state ){
-            
-            var vm = this;
-            vm.frequent= [
-                {
-                    question:"How do we test for Covid-19?",
-                    status_faq:false,
-                    desc:"We use a technique called Reverse Transcription Polymerase Chain Reaction or RT-PCR. The Ministry of Health Malaysia has recommended to test patients who have symptoms of COVID-19 using this technique. It is currently the 'gold standard' for Covid-19 testing. This test looks at the specific genetic material of the COVID-19 virus to determine whether it is present or not."
-                },
-                {
-                    question:"What does the test involve?",
-                    status_faq:false,
-                    desc:"<div>1. A swab will be taken from your nose and throat or you may be required to provide a sputum sample.</div> <div>2. Your samples will be analysed at our laboratory for the specific genes of the Covid-19 virus.</div> <div>3.Your test result will be ready in 24-48 hours.</div> <div>4.A doctor (which can be of your choosing) will review your result and advise you on next steps.</div><div>5.The testing process will take around 5 minutes.</div>"
-                },
-                {
-                    question:"What are the qualifications of your laboratories?",
-                    status_faq:false,
-                    desc:"Your test will be performed at RT-PCR lab approved by the Ministry of Health at one of our labs. Each lab is MS ISO 15189 accredited, the gold standard for pathology laboratories around the world."
-                },
-                {
-                    question:"Am I eligible to take the Covid-19 test?",
-                    status_faq:false,
-                    desc:"All individuals without symptoms who wishes to screen for COVID-19 are eligible. Individuals with symptoms, but no history of travelling overseas and no history of contact with known case of COVID-19 are eligible."
-                },
-                {
-                    question:"Are walk-ins accepted?",
-                    status_faq:false,
-                    desc:"No. We provide Drive-Thru screening services by appointments only."
-                },
-                {
-                    question:"I’ve booked my appointment but would like to change the time?",
-                    status_faq:false,
-                    desc:"Please contact our call centre at 1800 22 6843."
-                },
-                {
-                    question:"What do I bring to the test?",
-                    status_faq:false,
-                    desc:"Please bring your IC card or passport  and your booking confirmation email."
-                },
-                {
-                    question:"Where can I get a drive-through COVID-19  test near me?",
-                    status_faq:false,
-                    desc:"You can find the list of Covid-19 Drive through location <a href='https://my.biomarking.com'>here</a>."
-                },
-                {
-                    question:"Do I need to make advance payment?",
-                    status_faq:false,
-                    desc:"Yes, advance payment is required prior to conducting the COVID-19 Drive-Thru Screening Services."
-                },
-                {
-                    question:"What payment methods are accepted?",
-                    status_faq:false,
-                    desc:"We accept a variety of online payment methods via ipay88 (local internet banking and credit/debit cards). ipay88 is a regulated payment service provider under Malaysia Payment System Act offering local internet banking service."
-                },
-                {
-                    question:"Can I claim my insurance?",
-                    status_faq:false,
-                    desc:"You are advised to check with your respective insurance providers for information on coverage and compensation."
-                },
-            ];
-            // vm.$onInit = function(){
-            //     vm.booking = bookingService.get_booking_data();
-            //     vm.booking.referral_code = $state.params.ref_code;
-            //     bookingService.data = vm.booking;
-            //     bookingService.save();
-            // }
-            vm.show_faq = function(indx){         
-                for(var i=0; i < vm.frequent.length; i++){
-                     i == indx ? !vm.frequent[i].status_faq ? vm.frequent[i].status_faq = true : vm.frequent[i].status_faq = false : vm.frequent[i].status_faq = false;
-                }
-            }
-            vm.scroll_to = function(){
-                console.log("clicking");
-                var elmnt = document.getElementById("frequent_id");
-                elmnt.scrollIntoView();
-            }
-            vm.sm_scroll_to = function(){
-                console.log("clicking");
-                var elmnt = document.getElementById("sm_frequent_id");
-                elmnt.scrollIntoView();
-            }
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("bookingAdmin",{
             templateUrl:"/admin/view.html"
         })
@@ -251,6 +125,132 @@
 		}])
 
 	
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .factory("bookingService",bookingService);
+
+        bookingService.$inject = ["$localStorage"];
+
+        function bookingService( $localStorage ){
+            var f = {};
+            f.data = {};
+            f.clear = function(){
+                $localStorage.booking = {};
+            }
+            f.save =  function(){
+                $localStorage.booking = f.data;
+            }
+            f.get_booking_data = function(){
+                return $localStorage.booking || {};
+            }
+            return f;
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("booking",{
+            controller:"bookingController",
+            templateUrl:"/booking/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("bookingController",bookingController);
+
+        bookingController.$inject = ["bookingService","$state", "$sce"];
+
+        function bookingController( bookingService, $state, $sce){
+            
+            var vm = this;
+            vm.frequent= [
+                {
+                    question:"How do we test for Covid-19?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("We use a technique called Reverse Transcription Polymerase Chain Reaction or RT-PCR. The Ministry of Health Malaysia has recommended to test patients who have symptoms of COVID-19 using this technique. It is currently the 'gold standard' for Covid-19 testing. This test looks at the specific genetic material of the COVID-19 virus to determine whether it is present or not.")
+                },
+                {
+                    question:"What does the test involve?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("<div>1. A swab will be taken from your nose and throat or you may be required to provide a sputum sample.</div> <div>2. Your samples will be analysed at our laboratory for the specific genes of the Covid-19 virus.</div> <div>3.Your test result will be ready in 24-48 hours.</div> <div>4.A doctor (which can be of your choosing) will review your result and advise you on next steps.</div><div>5.The testing process will take around 5 minutes.</div>")
+                },
+                {
+                    question:"What are the qualifications of your laboratories?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("Your test will be performed at RT-PCR lab approved by the Ministry of Health at one of our labs. Each lab is MS ISO 15189 accredited, the gold standard for pathology laboratories around the world.")
+                },
+                {
+                    question:"Am I eligible to take the Covid-19 test?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("All individuals without symptoms who wishes to screen for COVID-19 are eligible. Individuals with symptoms, but no history of travelling overseas and no history of contact with known case of COVID-19 are eligible.")
+                },
+                {
+                    question:"Are walk-ins accepted?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("No. We provide Drive-Thru screening services by appointments only.")
+                },
+                {
+                    question:"I’ve booked my appointment but would like to change the time?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("Please contact our call centre at 1800 22 6843.")
+                },
+                {
+                    question:"What do I bring to the test?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("Please bring your IC card or passport  and your booking confirmation email.")
+                },
+                {
+                    question:"Where can I get a drive-through COVID-19  test near me?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("You can find the list of Covid-19 Drive through location <a href='https://my.biomarking.com'>here</a>.")
+                },
+                {
+                    question:"Do I need to make advance payment?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("Yes, advance payment is required prior to conducting the COVID-19 Drive-Thru Screening Services.")
+                },
+                {
+                    question:"What payment methods are accepted?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("We accept a variety of online payment methods via ipay88 (local internet banking and credit/debit cards). ipay88 is a regulated payment service provider under Malaysia Payment System Act offering local internet banking service.")
+                },
+                {
+                    question:"Can I claim my insurance?",
+                    status_faq:false,
+                    desc:$sce.trustAsHtml("You are advised to check with your respective insurance providers for information on coverage and compensation.")
+                },
+            ];
+            // vm.$onInit = function(){
+            //     vm.booking = bookingService.get_booking_data();
+            //     vm.booking.referral_code = $state.params.ref_code;
+            //     bookingService.data = vm.booking;
+            //     bookingService.save();
+            // }
+            vm.show_faq = function(indx){         
+                for(var i=0; i < vm.frequent.length; i++){
+                     i == indx ? !vm.frequent[i].status_faq ? vm.frequent[i].status_faq = true : vm.frequent[i].status_faq = false : vm.frequent[i].status_faq = false;
+                }
+            }
+            vm.scroll_to = function(){
+                console.log("clicking");
+                var elmnt = document.getElementById("frequent_id");
+                elmnt.scrollIntoView();
+            }
+            vm.sm_scroll_to = function(){
+                console.log("clicking");
+                var elmnt = document.getElementById("sm_frequent_id");
+                elmnt.scrollIntoView();
+            }
+        }
 })();
 ( function(){
 
@@ -504,6 +504,232 @@
 
     angular
         .module("BiomarkBooking")
+        .component("adminDashboard",{
+            controller:"adminDashboardController",
+            templateUrl:"/admin/dashboard/view.html"
+        })
+})();
+(function () {
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("adminDashboardController", adminDashboardController);
+
+    adminDashboardController.$inject = ["Http", "$state", "$sessionStorage"];
+
+    function adminDashboardController(Http, $state, $sessionStorage) {
+        var vm = this;
+        vm.loading = true;
+
+        function error(err) {
+            alert("Invalid access")
+            $state.go("admin");
+        }
+        function success(res) {
+            //can contain admin information
+            vm.loading = false
+            if (res.data.message) {
+                alert("User has no policies. Contact admin for details")
+                $sessionStorage.access_token = 0;
+                $state.go("admin");
+                return false;
+            }
+
+            vm.services = res.data.policies;
+
+            //Redirect to first service if there is no dashboard service
+            if (vm.services.filter(x => x.service_name === "Dashboard") == "") $state.go(vm.services[0].service_path)
+        }
+        vm.$onInit = function () {
+            Http
+                .post("v1/user/get_policies")
+                .then(success, error);
+        }
+        vm.logout = function () {
+            $sessionStorage.access_token = 0;
+            $state.go("admin");
+        }
+
+    }
+})();
+( function(){
+	"use strict";
+
+
+	angular
+		.module("BiomarkBooking")
+		.factory("Dashboard", Dashboard);
+
+		Dashboard.$inject=[];
+
+
+		function Dashboard(){
+                
+            var f = {
+                data:{
+                    pagination: 1
+                },
+                init:init
+            }
+
+            function init(cb){
+                cb(f.data)
+            }
+
+            return f;
+		}
+
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("adminLogin",{
+            controller:"adminLoginController",
+            templateUrl:"/admin/login/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("adminLoginController",adminLoginController);
+
+        adminLoginController.$inject = ["Http","$state"];
+
+        function adminLoginController( Http, $state ){
+            var vm = this;
+            vm.state = false;
+            function error(err){
+                alert(err.data.message);
+            }
+            function success(res){
+                Http.set_token(res.data.token);
+                $state.go("admin.dashboard");
+            }
+            vm.signIn = function(credential){
+                Http
+                    .post("v1/user/sign_in",{credential:credential})
+                    .then(success,error);
+            }
+            vm.$onInit = function(){
+                Http
+                    .post("v1/user/authenticate")
+                    .then(function(){
+                        $state.go("admin.dashboard")
+                    },function(){
+                        vm.state = true;
+                    })
+            }
+        }
+})();
+(function(){
+
+    angular
+        .module("BiomarkBooking")
+        .component("pagination", {
+            bindings:{
+				config:"=",
+                paginate:"="
+			},
+            controller: "paginationController",
+            templateUrl: "/admin/pagination/view.html"
+        })
+})();
+(function(){
+    angular
+        .module("BiomarkBooking")
+        .controller("paginationController", paginationController)
+
+        paginationController.$inject = ["Dashboard"];
+
+        function paginationController(Dashboard){
+            var vm = this;
+			// vm.records = dataJson.records;
+            var local_configurations = {
+                item_per_page: 10,
+                padding_per_page: 4,
+            };
+            Dashboard.init(function(data){
+                vm.portal = data;     
+                // vm.patients = vm.data;
+            });
+            vm.$onInit = function () {
+                vm.pagination = angular.merge(local_configurations, vm.config);
+				// vm.portal.pagination = 1;
+				// vm.pagination.page_position = 1;
+                init();
+            }
+          
+            vm.btn_previous = false;
+            vm.btn_next = true;
+            vm.btn_dotdot = true;
+            vm.btn_last = true;
+            vm.page_elements = [];
+
+            function init(){
+                var last_show_page = vm.pagination.page_position + vm.pagination.padding_per_page-1;
+                
+				vm.btn_dotdot = (last_show_page >= vm.pagination.total_pages) ? false : true;
+				vm.btn_previous = (vm.pagination.page_position > 1 );
+				vm.btn_next = (vm.pagination.page_position != vm.pagination.total_pages );
+
+				if(last_show_page <= vm.pagination.total_pages){
+					vm.page_elements.length = 0;
+					if(vm.pagination.total_pages > vm.pagination.padding_per_page){
+						for( var i = 1;i <= vm.pagination.total_pages; i++ ){
+							if(i >= vm.pagination.page_position && i <= last_show_page){
+								vm.page_elements.push(i);
+							}
+						}
+
+					}else{
+						for(var i = 1;i <= vm.pagination.total_pages; i++ ){
+							vm.page_elements.push(i);
+						}
+					}
+				}else{
+					vm.page_elements.length = 0;
+					var partial_index = vm.pagination.total_pages - vm.pagination.padding_per_page +1;
+					for( var i = 1;i <= vm.pagination.total_pages; i++ ){
+						if(i >= partial_index && i <= vm.pagination.total_pages){
+							vm.page_elements.push(i);
+						}
+					}
+				}
+				
+				
+			}
+			
+			
+			vm.previous = function(){
+				vm.portal.pagination -=1;	
+				vm.pagination.page_position -=1;
+				vm.paginate( vm.portal.pagination );
+				init();
+			}
+			vm.next = function(){
+				vm.portal.pagination +=1;
+				vm.pagination.page_position +=1;
+				vm.paginate( vm.portal.pagination );
+				init();
+			}
+			vm.page_click = function( page ){
+				vm.portal.pagination = page;
+				vm.pagination.page_position = page;
+				vm.paginate( vm.portal.pagination );
+				init();
+            }
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("bookingCalendar",{
             controller:"bookingCalendarController",
             templateUrl:"/booking/booking-calendar/view.html"
@@ -530,7 +756,7 @@
                     .get("v1/guest/location/"+vm.booking.location.id+"/find_schedules/"+vm.booking.schedule.id)
                     .then(function(res){
                         vm.location.active_slot = res.data.active_slot;
-                        vm.location.has_available_slot = res.data.has_available_slot;
+                        vm.location.has_available_slot = vm.location.schedules[0].has_available_slot
                         slot_mapper();
                     });
             }
@@ -560,7 +786,7 @@
                         vm.location = res.data;
                         vm.booking.schedule = {id:vm.location.schedules[0].id, schedule_date:vm.location.schedules[0].schedule_date}
                         if(vm.location.schedules.length > 0){
-                            vm.location.has_available_slot = vm.location.schedules[0].has_available_slot
+                            vm.location.has_available_slot = vm.location.schedules[0].has_available_slot;
                         }
                         getSchedule(vm.location.schedules[0]); 
                     });
@@ -568,9 +794,9 @@
             function slot_mapper(){
                 has_allocation = false;
                 //try to auto select morning schedules
-                auto_assign_slot(0);
+                auto_assign_slot("AM");
                 //if morning is full try to allocate afternoon
-                if(!has_allocation) auto_assign_slot(1);
+                if(!has_allocation) auto_assign_slot("PM");
 
             }
 
@@ -579,7 +805,7 @@
                     .get("v1/guest/location/"+vm.booking.location.id+"/find_schedules/"+vm.booking.schedule.id)
                     .then(function(res){
                         vm.location.active_slot = res.data.active_slot;
-                        vm.location.has_available_slot = res.data.has_available_slot;
+                        vm.location.has_available_slot = res.data.schedules[0].has_available_slot;
                         slot_mapper();              
                     });
             }
@@ -587,12 +813,12 @@
             function auto_assign_slot(meridian){
                 counter = 0;
                 do{
-                    if(vm.location.active_slot.data[meridian].key[counter].status){
-                        vm.booking.slot = vm.location.active_slot.data[meridian].key[counter];
+                    if(vm.location.active_slot.data[meridian][counter].status){
+                        vm.booking.slot = vm.location.active_slot.data[meridian][counter];
                         has_allocation = true;
                     };
                     counter++;
-                }while(!has_allocation  && counter < vm.location.active_slot.data[meridian].key.length)
+                }while(!has_allocation  && counter < vm.location.active_slot.data[meridian].length)
             }
         }
 })();
@@ -697,6 +923,12 @@
     angular
         .module("BiomarkBooking")
         .controller("bookingProfileController",bookingProfileController)
+        .config(function($mdDateLocaleProvider) {
+            
+            $mdDateLocaleProvider.formatDate = function(date) {
+                return moment(date).format('DD/MM/YYYY');
+            };
+        });
     
         function bookingProfileController( bookingService , $state , Http){ 
             var vm = this;
@@ -711,8 +943,8 @@
                     $state.go("home.booking-calendar");
                     return false;
                 }
-               
-                if(!vm.booking.patient) vm.booking.patient = {date_of_birth:''};
+                              
+                if(!vm.booking.patient) vm.booking.patient = {date_of_birth:'01/01/1990'};
                 Http.get("v1/guest/location/"+vm.booking.location.id+"/clinics").then(function(res){
                     vm.clinics = res.data;
                 });
@@ -767,11 +999,6 @@
                     return false;
                 }
                 
-                if(!angular.isDate(vm.booking.patient.date_of_birth)){
-                    alert("Please enter your date of birth");
-                    return false;
-                }
-
                 if(!vm.booking.patient.phone){
                     alert("Please fill up your contact number");
                     return false;
@@ -848,232 +1075,6 @@
                 return true;
             }
             
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("adminLogin",{
-            controller:"adminLoginController",
-            templateUrl:"/admin/login/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("adminLoginController",adminLoginController);
-
-        adminLoginController.$inject = ["Http","$state"];
-
-        function adminLoginController( Http, $state ){
-            var vm = this;
-            vm.state = false;
-            function error(err){
-                alert(err.data.message);
-            }
-            function success(res){
-                Http.set_token(res.data.token);
-                $state.go("admin.dashboard");
-            }
-            vm.signIn = function(credential){
-                Http
-                    .post("v1/user/sign_in",{credential:credential})
-                    .then(success,error);
-            }
-            vm.$onInit = function(){
-                Http
-                    .post("v1/user/authenticate")
-                    .then(function(){
-                        $state.go("admin.dashboard")
-                    },function(){
-                        vm.state = true;
-                    })
-            }
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("adminDashboard",{
-            controller:"adminDashboardController",
-            templateUrl:"/admin/dashboard/view.html"
-        })
-})();
-(function () {
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("adminDashboardController", adminDashboardController);
-
-    adminDashboardController.$inject = ["Http", "$state", "$sessionStorage"];
-
-    function adminDashboardController(Http, $state, $sessionStorage) {
-        var vm = this;
-        vm.loading = true;
-
-        function error(err) {
-            alert("Invalid access")
-            $state.go("admin");
-        }
-        function success(res) {
-            //can contain admin information
-            vm.loading = false
-            if (res.data.message) {
-                alert("User has no policies. Contact admin for details")
-                $sessionStorage.access_token = 0;
-                $state.go("admin");
-                return false;
-            }
-
-            vm.services = res.data.policies;
-
-            //Redirect to first service if there is no dashboard service
-            if (vm.services.filter(x => x.service_name === "Dashboard") == "") $state.go(vm.services[0].service_path)
-        }
-        vm.$onInit = function () {
-            Http
-                .post("v1/user/get_policies")
-                .then(success, error);
-        }
-        vm.logout = function () {
-            $sessionStorage.access_token = 0;
-            $state.go("admin");
-        }
-
-    }
-})();
-( function(){
-	"use strict";
-
-
-	angular
-		.module("BiomarkBooking")
-		.factory("Dashboard", Dashboard);
-
-		Dashboard.$inject=[];
-
-
-		function Dashboard(){
-                
-            var f = {
-                data:{
-                    pagination: 1
-                },
-                init:init
-            }
-
-            function init(cb){
-                cb(f.data)
-            }
-
-            return f;
-		}
-
-})();
-(function(){
-
-    angular
-        .module("BiomarkBooking")
-        .component("pagination", {
-            bindings:{
-				config:"=",
-                paginate:"="
-			},
-            controller: "paginationController",
-            templateUrl: "/admin/pagination/view.html"
-        })
-})();
-(function(){
-    angular
-        .module("BiomarkBooking")
-        .controller("paginationController", paginationController)
-
-        paginationController.$inject = ["Dashboard"];
-
-        function paginationController(Dashboard){
-            var vm = this;
-			// vm.records = dataJson.records;
-            var local_configurations = {
-                item_per_page: 10,
-                padding_per_page: 4,
-            };
-            Dashboard.init(function(data){
-                vm.portal = data;     
-                // vm.patients = vm.data;
-            });
-            vm.$onInit = function () {
-                vm.pagination = angular.merge(local_configurations, vm.config);
-				// vm.portal.pagination = 1;
-				// vm.pagination.page_position = 1;
-                init();
-            }
-          
-            vm.btn_previous = false;
-            vm.btn_next = true;
-            vm.btn_dotdot = true;
-            vm.btn_last = true;
-            vm.page_elements = [];
-
-            function init(){
-                var last_show_page = vm.pagination.page_position + vm.pagination.padding_per_page-1;
-                
-				vm.btn_dotdot = (last_show_page >= vm.pagination.total_pages) ? false : true;
-				vm.btn_previous = (vm.pagination.page_position > 1 );
-				vm.btn_next = (vm.pagination.page_position != vm.pagination.total_pages );
-
-				if(last_show_page <= vm.pagination.total_pages){
-					vm.page_elements.length = 0;
-					if(vm.pagination.total_pages > vm.pagination.padding_per_page){
-						for( var i = 1;i <= vm.pagination.total_pages; i++ ){
-							if(i >= vm.pagination.page_position && i <= last_show_page){
-								vm.page_elements.push(i);
-							}
-						}
-
-					}else{
-						for(var i = 1;i <= vm.pagination.total_pages; i++ ){
-							vm.page_elements.push(i);
-						}
-					}
-				}else{
-					vm.page_elements.length = 0;
-					var partial_index = vm.pagination.total_pages - vm.pagination.padding_per_page +1;
-					for( var i = 1;i <= vm.pagination.total_pages; i++ ){
-						if(i >= partial_index && i <= vm.pagination.total_pages){
-							vm.page_elements.push(i);
-						}
-					}
-				}
-				
-				
-			}
-			
-			
-			vm.previous = function(){
-				vm.portal.pagination -=1;	
-				vm.pagination.page_position -=1;
-				vm.paginate( vm.portal.pagination );
-				init();
-			}
-			vm.next = function(){
-				vm.portal.pagination +=1;
-				vm.pagination.page_position +=1;
-				vm.paginate( vm.portal.pagination );
-				init();
-			}
-			vm.page_click = function( page ){
-				vm.portal.pagination = page;
-				vm.pagination.page_position = page;
-				vm.paginate( vm.portal.pagination );
-				init();
-            }
         }
 })();
 ( function(){
@@ -1845,6 +1846,7 @@
                             vm.bookingDetails.schedule = res.data.schedule;
                             vm.bookingDetails.slot_time = res.data.slot_time;
                             vm.bookingDetails.slot = res.data.slot;
+                            vm.bookingDetails.payment_status = res.data.payment_status;
                             vm.closeModal()
                         },
                         function(err){
@@ -2011,30 +2013,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("locationUsers",{
-            controller:"locationUsersController",
-            templateUrl:"/admin/dashboard/locations/users/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("locationUsersController",locationUsersController);
-
-        locationUsersController.$inject = [];
-
-        function locationUsersController(){
-            var vm = this;
-            
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("locationSchedules",{
             controller:"locationSchedulesController",
             templateUrl:"/admin/dashboard/locations/schedules/view.html"
@@ -2094,6 +2072,30 @@
                     vm.schedules = res.data;
                 });
             }
+            
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("locationUsers",{
+            controller:"locationUsersController",
+            templateUrl:"/admin/dashboard/locations/users/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("locationUsersController",locationUsersController);
+
+        locationUsersController.$inject = [];
+
+        function locationUsersController(){
+            var vm = this;
             
         }
 })();
