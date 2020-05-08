@@ -53,6 +53,6 @@ class Booking < ApplicationRecord
     end
 
     def self.sort_by_datetime
-        self.joins(:slot, :schedule).order(schedule_date: :asc, slot_time: :asc)
+        self.joins(:schedule).order(schedule_date: :asc)
     end
 end

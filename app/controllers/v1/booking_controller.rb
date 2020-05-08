@@ -2,11 +2,11 @@ class V1::BookingController < ApplicationController
     before_action :must_be_authenticated
     
     def export 
-        @bookings = data_search
+        @bookings = data_search.sort_by_datetime
     end
 
     def filter 
-        @bookings = data_search.page(filter_params[:page])
+        @bookings = data_search.page(filter_params[:page]).sort_by_datetime
     end
 
     def index
@@ -39,6 +39,7 @@ class V1::BookingController < ApplicationController
     def edit_booking
         booking = Booking.find params[:past_booking_details][:id]
         booking.update(schedule_id: params[:new_booking_details][:schedule][:id])
+        booking.payment.update(payment_status: 1)
 
         # Update old slod to be available
         old_slot = Slot.find params[:past_booking_details][:slot][:id]
@@ -53,7 +54,7 @@ class V1::BookingController < ApplicationController
         end
         booking.update(slot_id: new_slot.id)
 
-        render json: {schedule: booking.schedule, slot: booking.slot, slot_time: booking.slot.slot_time.utc.strftime("%I:%M%p") + " - " + (booking.slot.slot_time + booking.schedule.minute_interval*60).utc.strftime("%I:%M%p")}
+        render json: {schedule: booking.schedule, slot: booking.slot, slot_time: booking.slot.slot_time.utc.strftime("%I:%M%p") + " - " + (booking.slot.slot_time + booking.schedule.minute_interval*60).utc.strftime("%I:%M%p"), payment_status: booking.payment.payment_status}
     end
 
     # def paginate
