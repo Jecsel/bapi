@@ -6,6 +6,7 @@ class Slot < ApplicationRecord
     scope :available, ->{where(status:true)}
 
     def slot_time_with_interval
-        self.slot_time.utc.strftime("%I:%M%p") + " - " + (self.slot_time + self.schedule.minute_interval*60).utc.strftime("%I:%M%p")
+        
+        self.slot_time.utc.strftime("%I:%M") + self.meridian + " - " + (self.slot_time + self.schedule.minute_interval*60).utc.strftime("%I:%M") + self.meridian
     end
 end
