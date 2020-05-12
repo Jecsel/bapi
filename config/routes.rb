@@ -73,6 +73,10 @@ Rails.application.routes.draw do
       end
     end
     resources :location, only:[:create, :index, :update, :destroy, :show] do 
+      collection do   
+        post 'filter'
+        post 'paginate'
+      end
       get 'schedules'
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"

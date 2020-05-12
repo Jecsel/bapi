@@ -12,6 +12,54 @@ class V1::LocationController < ApplicationController
     @clinics = @location.clinics
   end
 
+  def filter
+    if params[:search_referral] != nil && params[:search_status] != nil
+      @locations = Location
+      .search(params[:search_string])
+      .get_status(params[:search_status])
+      .get_referral(params[:search_referral])
+      .page(1)
+    elsif params[:search_referral] != nil && params[:search_status] == nil
+      @locations = Location
+      .search(params[:search_string])
+      .get_referral(params[:search_referral])
+      .page(1)
+    elsif params[:search_referral] == nil && params[:search_status] != nil
+      @locations = Location
+      .search(params[:search_string])
+      .get_status(params[:search_status])
+      .page(1)
+    else
+      @locations = Location
+      .search(params[:search_string]) 
+      .page(1)
+    end
+  end
+
+  def paginate
+    if params[:search_referral] != nil && params[:search_status] != nil
+      @locations = Location
+      .search(params[:search_string])
+      .get_status(params[:search_status])
+      .get_referral(params[:search_referral])
+      .page(params[:page])
+    elsif params[:search_referral] != nil && params[:search_status] == nil
+      @locations = Location
+      .search(params[:search_string])
+      .get_referral(params[:search_referral])
+      .page(params[:page])
+    elsif params[:search_referral] == nil && params[:search_status] != nil
+      @locations = Location
+      .search(params[:search_string])
+      .get_status(params[:search_status])
+      .page(params[:page])
+    else
+      @locations = Location
+      .search(params[:search_string]) 
+      .page(params[:page])
+    end
+  end
+
   def add_clinic
     clinic = @location.location_clinics.where("clinic_id = ?",params[:clinic_id])
     if clinic.any?
@@ -31,23 +79,23 @@ class V1::LocationController < ApplicationController
   end 
 
   def index
-    @locations = Location.active.all
+    @locations = Location.page(1)
   end
   
   def create
-    data = Location.create location_params
-    render json: {data:data,message: :created}
+    @location = Location.create location_params
   end
 
   def update
-    Location.find(params[:id]).update location_params
-    render json: {message: params}
+    @location = Location.find(params[:id])
+    @location.update location_params
+    @location
   end
   private 
   def get_location
     @location = Location.find params[:location_id]
   end
   def location_params
-    params.require(:location).permit(:name, :address, :longitude, :latitude, :code)
+    params.require(:location).permit(:name, :address, :longitude, :latitude, :code, :status, :referral_type)
   end
 end
