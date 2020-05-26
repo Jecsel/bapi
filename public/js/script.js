@@ -717,119 +717,6 @@
             }
         }
 })();
-( function(){
-
-	"use strict";
-
-	angular
-		.module("BiomarkBooking")
-		.component('mobileCountry',{
-			bindings:{
-				country:"=",
-				mobile:"=",
-				invalid:"=",
-				submitted:"="
-			},
-			controller:"mobileController",
-			templateUrl:"/components/mobile/view.html"
-		})
-})();
-( function(){
-	
-	"use strict";
-
-
-	angular
-		.module("BiomarkBooking")
-		.controller("mobileController",mobileController);
-
-		mobileController.$inject=["MobileConfig"];
-
-		function mobileController( MobileConfig ){
-			var vm = this;
-			vm.dial_code = "+60"
-			vm.code= "MY";
-			vm.invalid = false;
-
-			vm.$onInit = function(){
-		 		vm.is_visible = false;
-				var opt = vm.country || 0;
-				vm.countries = MobileConfig.countries;	
-				vm.default  = MobileConfig.countries[0];
-				
-				// vm.mobile_placeholder = "2 1234 5678";
-				// vm.mobile_regex = "^[0-9]{1,9}$";
-				// vm.mobile_max = 9;
-				vm.select_dialcode = function(){
-					vm.is_visible = !vm.is_visible;
-				}
-
-				if(vm.default.code == undefined){
-					vm.default.code = "MY"
-					vm.check_data(vm.default.code);
-				}else{
-					if(vm.country != undefined || vm.country != ""){
-						vm.check_data(vm.country);
-					}
-				}
-			}
-
-			vm.closeDropDown = function(){
-				vm.is_visible = false;
-			}
-
-			vm.check_data = function(data){
-				switch(data){
-					case "PH":
-						vm.dial_code = "+63";
-						vm.code = "PH"
-						vm.mobile_placeholder = "12 1234 5678";
-						vm.mobile_regex = "(^[0-9]{1,9})|(^[0-9]{1,10})";
-						vm.mobile_min = 0;
-						vm.mobile_max = 10;
-					break;
-					case "SG":
-						vm.dial_code = "+65"
-						vm.code = "SG"
-						vm.mobile_placeholder = "1234 4567";
-						vm.mobile_regex = "^[0-9]{1,8}$";
-						vm.mobile_min = 8;
-						vm.mobile_max = 8;
-
-					break;
-					case "MY":
-						vm.dial_code = "+60"
-						vm.code = "MY"
-						vm.mobile_placeholder = "12 1234 5678";
-						vm.mobile_regex = "(^[0-9]{1,9})|(^[0-9]{1,10})";
-						vm.mobile_min = 8;
-						vm.mobile_max = 10;
-					break;
-					case "ID":
-						vm.dial_code = "+62"
-						vm.code = "ID"
-						vm.mobile_placeholder = "12 1234 5678";
-						vm.mobile_regex = "(^[0-9]{1,9})|(^[0-9]{1,10})";
-						vm.mobile_min = 8;
-						vm.mobile_max = 12;
-					break;
-				}
-			}
-
-			vm.onValueChanged = function( data ){
-				vm.default = data;
-				vm.country = data.code;
-				vm.check_data(data.code);
-			}
-
-			
-			vm.mobile_change = function(phone){
-				phone == undefined || phone == '' ? vm.invalid = true : vm.invalid = false;
-			}
-			
-
-		}
-})();
 (function(){
     "use strict";
 
@@ -978,6 +865,45 @@
 
     angular
         .module("BiomarkBooking")
+        .component("bookingLocations",{
+            controller:"bookingLocationController",
+            templateUrl:"/booking/booking-locations/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("bookingLocationController", bookingLocationController);
+
+        bookingLocationController.$inject = ["bookingService","$state","Http"];
+
+        function bookingLocationController(bookingService, $state, Http){
+            var vm = this;
+
+            vm.$onInit = function(){
+                Http
+                    .get("v1/guest/location")
+                    .then(function(res){
+                        vm.locations = res.data;
+                    });
+            }
+            vm.locationClicked = function( loc ){
+                vm.booking = bookingService.get_booking_data();
+                vm.booking.location_state = true;
+                vm.booking.location = loc;
+                bookingService.data = vm.booking;
+                bookingService.save();
+                $state.go("home.booking-calendar");
+            }
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("bookingProfile",{
             controller:"bookingProfileController",
             templateUrl:"/booking/booking-profile/view.html"
@@ -1098,45 +1024,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("bookingLocations",{
-            controller:"bookingLocationController",
-            templateUrl:"/booking/booking-locations/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("bookingLocationController", bookingLocationController);
-
-        bookingLocationController.$inject = ["bookingService","$state","Http"];
-
-        function bookingLocationController(bookingService, $state, Http){
-            var vm = this;
-
-            vm.$onInit = function(){
-                Http
-                    .get("v1/guest/location")
-                    .then(function(res){
-                        vm.locations = res.data;
-                    });
-            }
-            vm.locationClicked = function( loc ){
-                vm.booking = bookingService.get_booking_data();
-                vm.booking.location_state = true;
-                vm.booking.location = loc;
-                bookingService.data = vm.booking;
-                bookingService.save();
-                $state.go("home.booking-calendar");
-            }
-        }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("bookingReview",{
             controller:"bookingReviewController",
             templateUrl:"/booking/booking-review/view.html"
@@ -1182,57 +1069,118 @@
             
         }
 })();
-(function(){
-    "use strict";
+( function(){
 
-    angular
-        .module("BiomarkBooking")
-        .component("dashboardClinics",{
-            controller:"dashboardClinicController",
-            templateUrl:"/admin/dashboard/clinics/view.html"
-        })
+	"use strict";
+
+	angular
+		.module("BiomarkBooking")
+		.component('mobileCountry',{
+			bindings:{
+				country:"=",
+				mobile:"=",
+				invalid:"=",
+				submitted:"="
+			},
+			controller:"mobileController",
+			templateUrl:"/components/mobile/view.html"
+		})
 })();
-(function () {
-    "use strict";
+( function(){
+	
+	"use strict";
 
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardClinicController", dashboardClinicController);
 
-    dashboardClinicController.$inject = ["Http"];
+	angular
+		.module("BiomarkBooking")
+		.controller("mobileController",mobileController);
 
-    function dashboardClinicController(Http) {
-        var vm = this;
-        vm.clinic_modal = false;
+		mobileController.$inject=["MobileConfig"];
 
-        vm.cancel = function () {
-            vm.clinic_modal = false;
-        }
-        vm.openModal = function () {
-            vm.clinic_modal = true;
-        }
-        vm.addClinic = function (data, mode) {
-            if (mode == "add") {
-                Http
-                    .post("v1/clinic", { clinic: data })
-                    .then(function (res) {
-                        vm.clinics.push(res.data.data);
-                        vm.clinic = {};
-                        vm.clinic_modal = false;
-                    });
-                //add clinic
-            } else {
-                //update clinic
-            }
-        }
-        vm.$onInit = function () {
-            Http
-                .get("v1/clinic")
-                .then(function (res) {
-                    vm.clinics = res.data;
-                })
-        }
-    }
+		function mobileController( MobileConfig ){
+			var vm = this;
+			vm.dial_code = "+60"
+			vm.code= "MY";
+			vm.invalid = false;
+
+			vm.$onInit = function(){
+		 		vm.is_visible = false;
+				var opt = vm.country || 0;
+				vm.countries = MobileConfig.countries;	
+				vm.default  = MobileConfig.countries[0];
+				
+				// vm.mobile_placeholder = "2 1234 5678";
+				// vm.mobile_regex = "^[0-9]{1,9}$";
+				// vm.mobile_max = 9;
+				vm.select_dialcode = function(){
+					vm.is_visible = !vm.is_visible;
+				}
+
+				if(vm.default.code == undefined){
+					vm.default.code = "MY"
+					vm.check_data(vm.default.code);
+				}else{
+					if(vm.country != undefined || vm.country != ""){
+						vm.check_data(vm.country);
+					}
+				}
+			}
+
+			vm.closeDropDown = function(){
+				vm.is_visible = false;
+			}
+
+			vm.check_data = function(data){
+				switch(data){
+					case "PH":
+						vm.dial_code = "+63";
+						vm.code = "PH"
+						vm.mobile_placeholder = "12 1234 5678";
+						vm.mobile_regex = "(^[0-9]{1,9})|(^[0-9]{1,10})";
+						vm.mobile_min = 0;
+						vm.mobile_max = 10;
+					break;
+					case "SG":
+						vm.dial_code = "+65"
+						vm.code = "SG"
+						vm.mobile_placeholder = "1234 4567";
+						vm.mobile_regex = "^[0-9]{1,8}$";
+						vm.mobile_min = 8;
+						vm.mobile_max = 8;
+
+					break;
+					case "MY":
+						vm.dial_code = "+60"
+						vm.code = "MY"
+						vm.mobile_placeholder = "12 1234 5678";
+						vm.mobile_regex = "(^[0-9]{1,9})|(^[0-9]{1,10})";
+						vm.mobile_min = 8;
+						vm.mobile_max = 10;
+					break;
+					case "ID":
+						vm.dial_code = "+62"
+						vm.code = "ID"
+						vm.mobile_placeholder = "12 1234 5678";
+						vm.mobile_regex = "(^[0-9]{1,9})|(^[0-9]{1,10})";
+						vm.mobile_min = 8;
+						vm.mobile_max = 12;
+					break;
+				}
+			}
+
+			vm.onValueChanged = function( data ){
+				vm.default = data;
+				vm.country = data.code;
+				vm.check_data(data.code);
+			}
+
+			
+			vm.mobile_change = function(phone){
+				phone == undefined || phone == '' ? vm.invalid = true : vm.invalid = false;
+			}
+			
+
+		}
 })();
 (function(){
     "use strict";
@@ -1604,6 +1552,58 @@
 
     angular
         .module("BiomarkBooking")
+        .component("dashboardClinics",{
+            controller:"dashboardClinicController",
+            templateUrl:"/admin/dashboard/clinics/view.html"
+        })
+})();
+(function () {
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("dashboardClinicController", dashboardClinicController);
+
+    dashboardClinicController.$inject = ["Http"];
+
+    function dashboardClinicController(Http) {
+        var vm = this;
+        vm.clinic_modal = false;
+
+        vm.cancel = function () {
+            vm.clinic_modal = false;
+        }
+        vm.openModal = function () {
+            vm.clinic_modal = true;
+        }
+        vm.addClinic = function (data, mode) {
+            if (mode == "add") {
+                Http
+                    .post("v1/clinic", { clinic: data })
+                    .then(function (res) {
+                        vm.clinics.push(res.data.data);
+                        vm.clinic = {};
+                        vm.clinic_modal = false;
+                    });
+                //add clinic
+            } else {
+                //update clinic
+            }
+        }
+        vm.$onInit = function () {
+            Http
+                .get("v1/clinic")
+                .then(function (res) {
+                    vm.clinics = res.data;
+                })
+        }
+    }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("dashboardLocations",{
             controller:"dashboardLocationsController",
             templateUrl:"/admin/dashboard/locations/view.html"
@@ -1692,45 +1692,6 @@
 
     angular
         .module("BiomarkBooking")
-        .component("dashboardSidemenu",{
-            controller:"dashboardSideMenuController",
-            templateUrl:"/admin/dashboard/sidemenu/view.html",
-            bindings:{
-                services:"=",
-            },
-        })
-})();
-(function () {
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("dashboardSideMenuController", dashboardSideMenuController);
-
-    dashboardSideMenuController.$inject = ["Http", "$state", "$localStorage"];
-
-    function dashboardSideMenuController(Http, $state, $localStorage) {
-        var vm = this;
-        vm.control_ids = [1, 2, 4, 6, 8, 9]; // Service Ids
-
-        vm.isAllowed = function (controls) {
-            for (var i = 0; i < controls.length; i++) {
-                for (var x = 0; x < vm.control_ids.length; x++) {
-                    if (controls[i].id == vm.control_ids[x]) {
-                        if (controls[i].status) return true;
-                    }
-                }
-            }
-        }
-
-
-    }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
         .component("dashboardSettings",{
             controller:"dashboardSettingController",
             templateUrl:"/admin/dashboard/settings/view.html"
@@ -1764,6 +1725,45 @@
                     });
             }
         }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("dashboardSidemenu",{
+            controller:"dashboardSideMenuController",
+            templateUrl:"/admin/dashboard/sidemenu/view.html",
+            bindings:{
+                services:"=",
+            },
+        })
+})();
+(function () {
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("dashboardSideMenuController", dashboardSideMenuController);
+
+    dashboardSideMenuController.$inject = ["Http", "$state", "$localStorage"];
+
+    function dashboardSideMenuController(Http, $state, $localStorage) {
+        var vm = this;
+        vm.control_ids = [1, 2, 4, 6, 8, 9]; // Service Ids
+
+        vm.isAllowed = function (controls) {
+            for (var i = 0; i < controls.length; i++) {
+                for (var x = 0; x < vm.control_ids.length; x++) {
+                    if (controls[i].id == vm.control_ids[x]) {
+                        if (controls[i].status) return true;
+                    }
+                }
+            }
+        }
+
+
+    }
 })();
 (function(){
     "use strict";
