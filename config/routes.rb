@@ -32,11 +32,17 @@ Rails.application.routes.draw do
 
   #ADMIN
   namespace :v1, defaults: { format: :json } do
+    resources :dashboard do 
+      collection do 
+        get 'booking_graph'
+      end
+    end
     resources :setting, only:[:index] do 
       collection do 
         patch 'update'
       end
     end
+    
     resources :booking, only:[:index, :show] do 
       collection do 
         get  'search/:search_str', to:"booking#search"
