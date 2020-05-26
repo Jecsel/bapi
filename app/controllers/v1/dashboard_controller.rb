@@ -2,13 +2,17 @@ class V1::DashboardController < ApplicationController
     before_action :must_be_authenticated
 
     def booking_graph
-        #enum payment_status:[:reserved, :confirmed, :missed, :completed, :cancelled, :reschedule]
-
+        today = DateTime.now.in_time_zone
         bookings = Booking.all.group_by(&:schedule_id)
-        data = []
+        
+        clinics = Clinic.count
+        users = User.count
+        locations = Location.count
+        today_bookings = Booking.joins(:schedule).where("schedule_date > ?",today.beginning_of_day).count
+        graph_data = []
         bookings.each do |e|
             status  = Payment.where(id:e.last.pluck(:id)).group(:payment_status).count
-            data << {
+            graph_data << {
                 booking_date: e.last.first.schedule.schedule_date,
                 reserved: status["reserved"] || 0,
                 confirmed: status["confirmed"] || 0,
@@ -18,6 +22,12 @@ class V1::DashboardController < ApplicationController
                 reschedule: status["reschedule"] || 0,
             }
         end
-        render json: data
+        render json: {
+            users: users,
+            locations: locations,
+            clinics: clinics,
+            todays_bookings: today_bookings,
+            graph_data: graph_data
+        }
     end
 end
