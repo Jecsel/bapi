@@ -3,7 +3,7 @@ class V1::DashboardController < ApplicationController
 
     def booking_graph
         today = DateTime.now.in_time_zone
-        bookings = Booking.all.group_by(&:schedule_id)
+        bookings = Booking.all.order(:id).group_by(&:schedule_id)
         
         clinics = Clinic.count
         users = User.count
