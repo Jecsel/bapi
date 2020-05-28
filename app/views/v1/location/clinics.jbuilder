@@ -1,1 +1,1 @@
-json.array! @clinics, :id, :name, :status, :billing_code
+json.array! @clinics, :id, :code, :name, :status, :billing_code
