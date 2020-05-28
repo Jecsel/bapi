@@ -1,0 +1,2 @@
+class ClinicArea < ApplicationRecord
+end
