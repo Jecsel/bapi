@@ -37,6 +37,11 @@ Rails.application.routes.draw do
         get 'booking_graph'
       end
     end
+    resources :clinic_area, only:[:create, :index] do 
+      collection do 
+        
+      end
+    end
     resources :setting, only:[:index] do 
       collection do 
         patch 'update'
