@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_12_024631) do
+ActiveRecord::Schema.define(version: 2020_05_28_102923) do
 
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "patient_id"
@@ -31,6 +31,13 @@ ActiveRecord::Schema.define(version: 2020_05_12_024631) do
     t.index ["slot_id"], name: "index_bookings_on_slot_id"
   end
 
+  create_table "clinic_areas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.boolean "status", default: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "clinics", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "code"
@@ -42,6 +49,8 @@ ActiveRecord::Schema.define(version: 2020_05_12_024631) do
     t.string "contact_person"
     t.string "billing_code"
     t.boolean "status"
+    t.bigint "clinic_area_id"
+    t.index ["clinic_area_id"], name: "index_clinics_on_clinic_area_id"
     t.index ["code"], name: "index_clinics_on_code", unique: true
   end
 
