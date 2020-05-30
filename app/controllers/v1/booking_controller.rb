@@ -1,6 +1,10 @@
 class V1::BookingController < ApplicationController
     before_action :must_be_authenticated
     
+    def upload_document
+        Booking.find(1).upload_document.attach(params[:files][0])
+        render json: params[:files]
+    end
     def export 
         @bookings = data_search.sort_by_datetime
     end

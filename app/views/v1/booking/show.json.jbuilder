@@ -20,3 +20,4 @@ json.question_details do
     json.q1 @booking.patient.q1 ? "Yes": "No"
     json.q2 @booking.patient.q2 ? "Yes": "No"
 end
+json.document url_for(@booking.upload_document) if @booking.upload_document.attached?

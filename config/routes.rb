@@ -57,6 +57,7 @@ Rails.application.routes.draw do
         post 'mark_no_show'
         post 'mark_as_completed'
         post 'edit_booking'
+        post 'upload_document'
         # post 'paginate'
         # post 'filter_status'
         # post 'filter_date'
