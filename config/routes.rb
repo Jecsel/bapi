@@ -57,6 +57,8 @@ Rails.application.routes.draw do
         post 'mark_no_show'
         post 'mark_as_completed'
         post 'edit_booking'
+        post 'upload_document'
+        post 'confirm_manual_payment', to:'booking#confirm_manual_payment'
         # post 'paginate'
         # post 'filter_status'
         # post 'filter_date'
@@ -69,6 +71,7 @@ Rails.application.routes.draw do
         post 'authenticate'
         post 'get_policies'
         post 'sign_out'
+        post 'edit_user'
       end
     end
 

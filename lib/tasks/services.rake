@@ -137,6 +137,11 @@ namespace :services do
                 service_id: 6, #Settings service
                 name: "View settings", #service_policy_id 9
                 status: true
+            },
+            {
+                service_id: 1, #User service
+                name: "Edit user User", #service_policy_id 10
+                status: true
             }
         ]
         ServicePolicy.create _servicePolicies
@@ -198,6 +203,12 @@ namespace :services do
                 user_group_id: _user_group_id,
                 service_id: 6, #Booking service
                 service_policy_id: 9, #Export csv
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 1, #User service
+                service_policy_id: 10, #Edit user
                 status: true
             }
         ]
