@@ -3,10 +3,14 @@ class V1::BookingController < ApplicationController
     
     def confirm_manual_payment 
         payment = Payment.find_by_booking_id manual_payment_params[:booking_id]
-        if !payment.payment_histories.last.upload_document.attached?
-            render json: {message: "Please upload payment document"},status:404
-            return false
+        
+        if payment.payment_histories.present?
+            if !payment.payment_histories.last.upload_document.attached?
+                render json: {message: "Please upload payment document"},status:404
+                return false
+            end
         end
+        
         ActiveRecord::Base.transaction do
             if payment.payment_histories.present?
                 payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
