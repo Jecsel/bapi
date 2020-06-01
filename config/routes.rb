@@ -71,6 +71,7 @@ Rails.application.routes.draw do
         post 'authenticate'
         post 'get_policies'
         post 'sign_out'
+        post 'edit_user'
       end
     end
 
