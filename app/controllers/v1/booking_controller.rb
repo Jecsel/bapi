@@ -9,18 +9,19 @@ class V1::BookingController < ApplicationController
                 render json: {message: "Please upload payment document"},status:404
                 return false
             end
-        end
-        
-        ActiveRecord::Base.transaction do
-            if payment.payment_histories.present?
-                payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
-                payment.update payment_status: :confirmed
-            else
-                payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
-                payment.update payment_status: :confirmed
+            ActiveRecord::Base.transaction do
+                if payment.payment_histories.present?
+                    payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                    payment.update payment_status: :confirmed
+                else
+                    payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                    payment.update payment_status: :confirmed
+                end
             end
+            render json: :approved
+        else
+            render json: {message: "Please upload payment document"},status:404
         end
-        render json: :approved
     end
 
     def upload_document
