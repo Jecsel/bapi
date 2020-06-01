@@ -10,9 +10,7 @@ class Booking < ApplicationRecord
     belongs_to :schedule
     belongs_to :clinic
     private
-
-    has_one_attached :upload_document
-    
+        
     search_scope :search do
         attributes :id, :reference_code
         attributes patient: ["patient.id_number", "patient.fullname"]

@@ -58,6 +58,7 @@ Rails.application.routes.draw do
         post 'mark_as_completed'
         post 'edit_booking'
         post 'upload_document'
+        post 'confirm_manual_payment', to:'booking#confirm_manual_payment'
         # post 'paginate'
         # post 'filter_status'
         # post 'filter_date'
