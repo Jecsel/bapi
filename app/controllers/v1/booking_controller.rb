@@ -1,6 +1,42 @@
 class V1::BookingController < ApplicationController
     before_action :must_be_authenticated
     
+    def confirm_manual_payment 
+        payment = Payment.find_by_booking_id manual_payment_params[:booking_id]
+        
+        if payment.payment_histories.present?
+            if !payment.payment_histories.last.upload_document.attached?
+                render json: {message: "Please upload payment document"},status:404
+                return false
+            end
+            ActiveRecord::Base.transaction do
+                
+                if payment.payment_histories.present?
+                    payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                    payment.update payment_status: :confirmed
+                else
+                    payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                    payment.update payment_status: :confirmed
+                end
+            end
+            BookingMailer.manual_confirmation(payment.booking_id).deliver_later
+            render json: :confirmed
+        else
+            render json: {message: "Please upload payment document"},status:404
+        end
+    end
+
+    def upload_document
+        payment = Payment.find_by_booking_id request.headers['x-booking-id'].to_i
+        history = payment.payment_histories.new
+        
+        if history.save
+            history.upload_document.attach(params[:files][0])
+        end
+
+        render json: :uploaded
+    end
+
     def export 
         @bookings = data_search.sort_by_datetime
     end
@@ -94,6 +130,9 @@ class V1::BookingController < ApplicationController
     def filter_params
         params
             .require(:filter)
-            .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string)
+            .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string, :only_expired_booking)
+    end
+    def manual_payment_params 
+        params.require(:payment).permit(:booking_id, :payment_reference, :payment_date)
     end
 end
