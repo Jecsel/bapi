@@ -44,9 +44,15 @@ class V1::UserController < ApplicationController
 
   def edit_user
     @user = User.find edit_params[:id]
-    @user.update(username: edit_params[:username])
-    @user.user_role.update(user_group_id: edit_params[:user_group_id])
-
+    
+    if @user.user_role.present?
+      old_value = @user.user_role.user_group.name
+      @user.user_role.update(user_group_id: edit_params[:user_group_id]) 
+    else
+      old_value = nil
+      @user.user_role = UserRole.create(user_id: @user.id, user_group_id: edit_params[:user_group_id])
+    end
+    AuditLog.log_changes("Users", "user_role", @user.user_role.id, old_value, @user.user_role.user_group.name, 1, @current_user.username)
     @user
   end
 

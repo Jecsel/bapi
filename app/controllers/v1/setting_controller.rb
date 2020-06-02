@@ -10,9 +10,11 @@ class V1::SettingController < ApplicationController
         if @setting.nil?
             @setting = Setting.create covid_price:0
         end
+        old_value = @setting.covid_price
         case setting_params[:type]
             when 1
                 @setting.update covid_price:setting_params[:new_value]
+                AuditLog.log_changes("Setting", "covid_price", @setting.id, old_value, @setting.covid_price, 1, @current_user.username)
             when 2
                 @setting.update booking_date_range:setting_params[:new_value]
         end

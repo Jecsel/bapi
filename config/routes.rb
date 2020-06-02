@@ -95,6 +95,11 @@ Rails.application.routes.draw do
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"
     end
+    resources :audit, only:[:index] do 
+      collection do   
+        post 'filter'
+      end
+    end
   end
 
 end
