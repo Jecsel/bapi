@@ -9,7 +9,7 @@ class BookingMailer < ApplicationMailer
             subject: "COVID-19 Drive-Through Booking Confirmation  | REF: #{@booking.reference_code}")
     end
     
-    def manual_confirmation 
+    def manual_confirmation booking_id
         @booking = Booking.find booking_id
         clinic_copy = @booking.clinic.present? ? @booking.clinic.email_address.split() : []
         mail(

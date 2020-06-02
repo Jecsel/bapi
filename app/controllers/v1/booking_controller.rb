@@ -20,7 +20,7 @@ class V1::BookingController < ApplicationController
                 end
             end
             BookingMailer.manual_confirmation(payment.booking_id).deliver_later
-            render json: :approved
+            render json: :confirmed
         else
             render json: {message: "Please upload payment document"},status:404
         end
