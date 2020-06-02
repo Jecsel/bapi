@@ -130,7 +130,7 @@ class V1::BookingController < ApplicationController
     def filter_params
         params
             .require(:filter)
-            .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string)
+            .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string, :only_expired_booking)
     end
     def manual_payment_params 
         params.require(:payment).permit(:booking_id, :payment_reference, :payment_date)
