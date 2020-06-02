@@ -10,6 +10,7 @@ class V1::BookingController < ApplicationController
                 return false
             end
             ActiveRecord::Base.transaction do
+                
                 if payment.payment_histories.present?
                     payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
                     payment.update payment_status: :confirmed
@@ -18,6 +19,7 @@ class V1::BookingController < ApplicationController
                     payment.update payment_status: :confirmed
                 end
             end
+            BookingMailer.manual_confirmation(payment.booking_id).deliver_later
             render json: :approved
         else
             render json: {message: "Please upload payment document"},status:404
