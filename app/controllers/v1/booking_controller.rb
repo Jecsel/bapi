@@ -3,20 +3,27 @@ class V1::BookingController < ApplicationController
     
     def confirm_manual_payment 
         payment = Payment.find_by_booking_id manual_payment_params[:booking_id]
-        if !payment.payment_histories.last.upload_document.attached?
-            render json: {message: "Please upload payment document"},status:404
-            return false
-        end
-        ActiveRecord::Base.transaction do
-            if payment.payment_histories.present?
-                payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
-                payment.update payment_status: :confirmed
-            else
-                payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
-                payment.update payment_status: :confirmed
+        
+        if payment.payment_histories.present?
+            if !payment.payment_histories.last.upload_document.attached?
+                render json: {message: "Please upload payment document"},status:404
+                return false
             end
+            ActiveRecord::Base.transaction do
+                
+                if payment.payment_histories.present?
+                    payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                    payment.update payment_status: :confirmed
+                else
+                    payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                    payment.update payment_status: :confirmed
+                end
+            end
+            BookingMailer.manual_confirmation(payment.booking_id).deliver_later
+            render json: :confirmed
+        else
+            render json: {message: "Please upload payment document"},status:404
         end
-        render json: :approved
     end
 
     def upload_document
