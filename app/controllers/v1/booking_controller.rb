@@ -143,9 +143,10 @@ class V1::BookingController < ApplicationController
         test_site = "test site: #{filter_params[:location_id] == 0? "All" : Location.find(filter_params[:location_id]).name}, "
         status = "status: #{Payment.payment_statuses.invert[filter_params[:status]]}, "
         search = "search: #{filter_params[:search_string] == nil ? "blank" : filter_params[:search_string]}, "
+        registration_date = "registration date from #{filter_params[:register_date_start] == nil ? "blank" : filter_params[:register_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:register_date_end] == nil ? "blank" : filter_params[:register_date_end].to_date.strftime("%d %A %Y")}, "
         appointment_date = "appointment date from #{filter_params[:booking_date_start] == nil ? "blank" : filter_params[:booking_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:booking_date_end] == nil ? "blank" : filter_params[:booking_date_end].to_date.strftime("%d %A %Y")}"
-
-        log_text = header + test_site + status + search + appointment_date
+        
+        log_text = header + test_site + status + search + registration_date + appointment_date
         log_text
     end
     def filter_params
