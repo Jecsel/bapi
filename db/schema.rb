@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_30_123054) do
+<<<<<<< HEAD
+ActiveRecord::Schema.define(version: 2020_06_02_041923) do
+=======
+ActiveRecord::Schema.define(version: 2020_06_03_004447) do
+>>>>>>> b17c9fff616dbc9ada84ca4ec2506d421aff9fd3
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -31,6 +35,18 @@ ActiveRecord::Schema.define(version: 2020_05_30_123054) do
     t.string "checksum", null: false
     t.datetime "created_at", null: false
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "audit_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "model"
+    t.string "field_name"
+    t.integer "field_id"
+    t.string "old_value"
+    t.string "new_value"
+    t.integer "action"
+    t.string "modified_by"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -143,7 +159,7 @@ ActiveRecord::Schema.define(version: 2020_05_30_123054) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status"
+    t.integer "payment_status", default: 0
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -209,6 +225,18 @@ ActiveRecord::Schema.define(version: 2020_05_30_123054) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "resource_order"
+  end
+
+  create_table "setting_histories", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "setting_id"
+    t.bigint "user_id"
+    t.string "setting_type"
+    t.string "old_value"
+    t.string "new_value"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["setting_id"], name: "index_setting_histories_on_setting_id"
+    t.index ["user_id"], name: "index_setting_histories_on_user_id"
   end
 
   create_table "settings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
