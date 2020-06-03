@@ -1,5 +1,5 @@
 class V1::SettingController < ApplicationController
-    before_action :must_be_authenticated
+    before_action :must_be_authenticated, except: [:index]
 
     def index
         @setting = Setting.last
