@@ -16,13 +16,33 @@ class Booking < ApplicationRecord
         attributes patient: ["patient.id_number", "patient.fullname"]
     end
 
+    def self.filter_by_registration_date filter_params
+        if filter_params[:register_date_start].present? && filter_params[:register_date_end].present?
+            _start = filter_params[:register_date_start].to_date.beginning_of_day
+            _end = filter_params[:register_date_end].to_date.end_of_day
+            return where(bookings:{created_at:[_start.._end]})
+        end
+        if filter_params[:register_date_start].present? && filter_params[:register_date_end].nil?
+            return where("bookings.created_at >= ?",filter_params[:register_date_start])
+        end
+        if filter_params[:register_date_start].nil? && filter_params[:register_date_end].present?
+            return where("bookings.created_at <= ?",filter_params[:register_date_end]) 
+        end
+        return self
+    end
+
     def self.search_filter( filter_params )
         _sql =  get_location(filter_params[:location_id]).payment_status(filter_params[:status])
         
+        if filter_params[:register_date_start].present? || filter_params[:register_date_end].present?
+            _sql = filter_by_registration_date filter_params
+        end  
+
         if filter_params[:only_expired_booking]
             elapse_time = Time.now - 60.minutes
             _sql = _sql.where("bookings.created_at <= ?",elapse_time)
         end
+
         if filter_params[:booking_date_start].present? && filter_params[:booking_date_end].present?
             return _sql.where(schedules:{schedule_date:[filter_params[:booking_date_start]..filter_params[:booking_date_end]]})
         end
