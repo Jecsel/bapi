@@ -53,6 +53,7 @@ class V1::BookingController < ApplicationController
     def show
         @booking = Booking.find params[:id]
         @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ?",4)
+        @payment_mode = PaymentMode.all
     end
 
     def cancel_booking
