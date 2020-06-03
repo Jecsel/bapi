@@ -10,6 +10,9 @@ class V1::AuditController < ApplicationController
         @audit_log = AuditLog.page(filter_params[:page]).order(created_at: :desc)
     end
 
+    def export
+        @audit_log = AuditLog.all.order(created_at: :desc)
+    end
 
     private
     def filter_params

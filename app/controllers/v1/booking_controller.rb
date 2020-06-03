@@ -3,34 +3,25 @@ class V1::BookingController < ApplicationController
     
     def confirm_manual_payment 
         payment = Payment.find_by_booking_id manual_payment_params[:booking_id]
-        
-        if payment.payment_histories.present?
-            if !payment.payment_histories.last.upload_document.attached?
-                render json: {message: "Please upload payment document"},status:404
-                return false
+        ActiveRecord::Base.transaction do
+            
+            if payment.payment_histories.present?
+                payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                #Log update of payment details
+                AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 1, @current_user.username)
+                payment.update payment_status: :confirmed
+            else
+                payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                #Log create of payment details
+                AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 0, @current_user.username)
+                payment.update payment_status: :confirmed,payment_type:1
             end
-            ActiveRecord::Base.transaction do
-                
-                if payment.payment_histories.present?
-                    payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
-                    #Log update of payment details
-                    AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 1, @current_user.username)
-                    payment.update payment_status: :confirmed
-                else
-                    payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
-                    #Log create of payment details
-                    AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 0, @current_user.username)
-                    payment.update payment_status: :confirmed
-                end
 
-                #Log update of payment status
-                AuditLog.log_changes("Bookings", "booking_status", payment.booking_id, "", "", 1, @current_user.username)
-            end
-            BookingMailer.manual_confirmation(payment.booking_id).deliver_later
-            render json: :confirmed
-        else
-            render json: {message: "Please upload payment document"},status:404
+            #Log update of payment status
+            AuditLog.log_changes("Bookings", "booking_status", payment.booking_id, "", "", 1, @current_user.username)
         end
+        BookingMailer.manual_confirmation(payment.booking_id).deliver_later
+        render json: :confirmed
     end
 
     def upload_document
@@ -61,6 +52,8 @@ class V1::BookingController < ApplicationController
 
     def show
         @booking = Booking.find params[:id]
+        @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ?",4)
+        @payment_mode = PaymentMode.all
     end
 
     def cancel_booking
@@ -148,15 +141,16 @@ class V1::BookingController < ApplicationController
         test_site = "test site: #{filter_params[:location_id] == 0? "All" : Location.find(filter_params[:location_id]).name}, "
         status = "status: #{Payment.payment_statuses.invert[filter_params[:status]]}, "
         search = "search: #{filter_params[:search_string] == nil ? "blank" : filter_params[:search_string]}, "
+        registration_date = "registration date from #{filter_params[:register_date_start] == nil ? "blank" : filter_params[:register_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:register_date_end] == nil ? "blank" : filter_params[:register_date_end].to_date.strftime("%d %A %Y")}, "
         appointment_date = "appointment date from #{filter_params[:booking_date_start] == nil ? "blank" : filter_params[:booking_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:booking_date_end] == nil ? "blank" : filter_params[:booking_date_end].to_date.strftime("%d %A %Y")}"
-
-        log_text = header + test_site + status + search + appointment_date
+        
+        log_text = header + test_site + status + search + registration_date + appointment_date
         log_text
     end
     def filter_params
         params
             .require(:filter)
-            .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string, :only_expired_booking)
+            .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string, :only_expired_booking, :register_date_start, :register_date_end)
     end
     def manual_payment_params 
         params.require(:payment).permit(:booking_id, :payment_reference, :payment_date)
