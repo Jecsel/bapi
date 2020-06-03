@@ -13,6 +13,9 @@ Rails.application.routes.draw do
         get 'clinics', to:"location#clinics"
         get 'schedules', to:"location#schedules"
         get 'find_schedules/:scheduled_id', to:"location#find_schedules"
+        collection do
+          post 'clinic_area'
+        end
       end
       resources :payment, only:[] do 
         collection do
@@ -95,6 +98,11 @@ Rails.application.routes.draw do
       get 'schedules'
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"
+    end
+    resources :audit, only:[:index] do 
+      collection do   
+        post 'filter'
+      end
     end
   end
 
