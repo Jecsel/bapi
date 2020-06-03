@@ -10,11 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 2020_06_02_041923) do
-=======
 ActiveRecord::Schema.define(version: 2020_06_03_004447) do
->>>>>>> b17c9fff616dbc9ada84ca4ec2506d421aff9fd3
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -159,7 +155,7 @@ ActiveRecord::Schema.define(version: 2020_06_03_004447) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status", default: 0
+    t.integer "payment_status"
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
