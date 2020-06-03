@@ -10,8 +10,18 @@ class V1::Guest::BookingController < ApplicationController
             render json: {message:ex,status:false},status:403
         end
     end
+
+    def pay_later
+        data_payment = Payment.find_by_id later_params[:id]
+        p data_payment
+        BookingMailer.pay_later_email(data_payment[:booking_id]).deliver_now
+    end
     
     private
+    def later_params
+        params.require(:later).permit(:id)
+    end
+
     def booking_params
         params
             .require(:booking)

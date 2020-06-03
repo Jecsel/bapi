@@ -26,7 +26,8 @@ Rails.application.routes.draw do
       end
       resources :booking, only:[:create, :index] do 
         collection do
-          post 'payment_confirmation', to:'booking#payment_confirmation'
+          post 'pay_later'
+          post 'payment_confirmation', to:'booking#payment_confirmation'     
         end
       end
     end
