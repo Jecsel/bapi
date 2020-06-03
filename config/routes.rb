@@ -102,6 +102,7 @@ Rails.application.routes.draw do
     resources :audit, only:[:index] do 
       collection do   
         post 'filter'
+        post 'export'
       end
     end
   end
