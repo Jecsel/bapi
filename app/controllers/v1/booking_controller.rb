@@ -3,28 +3,25 @@ class V1::BookingController < ApplicationController
     
     def confirm_manual_payment 
         payment = Payment.find_by_booking_id manual_payment_params[:booking_id]
-        
-        if payment.payment_histories.present?
-            ActiveRecord::Base.transaction do
-                
-                if payment.payment_histories.present?
-                    payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
-                    #Log update of payment details
-                    AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 1, @current_user.username)
-                    payment.update payment_status: :confirmed
-                else
-                    payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
-                    #Log create of payment details
-                    AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 0, @current_user.username)
-                    payment.update payment_status: :confirmed
-                end
-
-                #Log update of payment status
-                AuditLog.log_changes("Bookings", "booking_status", payment.booking_id, "", "", 1, @current_user.username)
+        ActiveRecord::Base.transaction do
+            
+            if payment.payment_histories.present?
+                payment.payment_histories.last.update payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                #Log update of payment details
+                AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 1, @current_user.username)
+                payment.update payment_status: :confirmed
+            else
+                payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
+                #Log create of payment details
+                AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 0, @current_user.username)
+                payment.update payment_status: :confirmed
             end
-            BookingMailer.manual_confirmation(payment.booking_id).deliver_later
-            render json: :confirmed
+
+            #Log update of payment status
+            AuditLog.log_changes("Bookings", "booking_status", payment.booking_id, "", "", 1, @current_user.username)
         end
+        BookingMailer.manual_confirmation(payment.booking_id).deliver_later
+        render json: :confirmed
     end
 
     def upload_document
