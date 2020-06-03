@@ -14,7 +14,7 @@ class V1::SettingController < ApplicationController
         case setting_params[:type]
             when 1
                 @setting.update covid_price:setting_params[:new_value]
-                AuditLog.log_changes("Setting", "covid_price", @setting.id, old_value, @setting.covid_price, 1, @current_user.username)
+                AuditLog.log_changes("Settings", "covid_price", @setting.id, old_value, @setting.covid_price, 1, @current_user.username)
             when 2
                 @setting.update booking_date_range:setting_params[:new_value]
         end

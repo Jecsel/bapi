@@ -1,6 +1,6 @@
 class AuditLog < ApplicationRecord
 
-    enum action:["Added", "Updated", "Exported"]
+    enum action:["Add", "Update", "Export"]
 
     def self.log_changes model, field_name, field_id, old_value, new_value, action, user
         
