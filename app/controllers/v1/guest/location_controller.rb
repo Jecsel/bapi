@@ -3,7 +3,14 @@ class V1::Guest::LocationController < ApplicationController
     def clinics 
         loc = Location.active.find params[:location_id]
         @clinics = loc.clinics
-    end 
+    end     
+
+    def clinic_area
+        loc = Location.active.find area_params[:location_id]
+        @clinics = loc.clinics
+        selected_clinic_area = @clinics.where(clinic_area_id: area_params[:area_code])
+        render json:selected_clinic_area
+    end
 
     def find_schedules
         booking_date_range = Setting.last.booking_date_range
@@ -42,6 +49,11 @@ class V1::Guest::LocationController < ApplicationController
     def index
         @locations = Location.active.all
     end
+
+    def area_params
+        params.permit(:location_id, :area_code)
+    end
+
     private
     def cut_off_time
         today = DateTime.now.in_time_zone

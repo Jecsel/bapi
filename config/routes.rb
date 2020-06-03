@@ -13,6 +13,9 @@ Rails.application.routes.draw do
         get 'clinics', to:"location#clinics"
         get 'schedules', to:"location#schedules"
         get 'find_schedules/:scheduled_id', to:"location#find_schedules"
+        collection do
+          post 'clinic_area'
+        end
       end
       resources :payment, only:[] do 
         collection do
@@ -23,7 +26,8 @@ Rails.application.routes.draw do
       end
       resources :booking, only:[:create, :index] do 
         collection do
-          post 'payment_confirmation', to:'booking#payment_confirmation'
+          post 'pay_later'
+          post 'payment_confirmation', to:'booking#payment_confirmation'     
         end
       end
     end

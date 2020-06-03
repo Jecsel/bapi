@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+ 
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>Booking Confirmation</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+   <meta name="viewport" content="width=device-width, user-scalable=no" />
+  <style type="text/css">
+  body {margin: 0; padding: 0; min-width: 100%!important;}
+  img {height: auto;}
+  .content {width: 100%; max-width: 600px;}
+  .header {padding: 40px 30px 20px 30px;}
+  .innerpadding {padding: 30px 30px 30px 30px;}
+  .borderbottom {border-bottom: 1px solid #f2eeed;}
+  .subhead {font-size: 15px; color: #ffffff; font-family: sans-serif; letter-spacing: 10px;}
+  .h1, .h2, .bodycopy {color: #153643; font-family: sans-serif;}
+  .h1 {font-size: 33px; line-height: 38px; font-weight: bold;}
+  .h2 {padding: 0 0 15px 0; font-size: 24px; line-height: 28px; font-weight: bold;}
+  .h3 {padding: 0 0 15px 0; font-size: 18px; line-height: 18px; font-weight: bold;}
+  .bodycopy {font-size: 16px; line-height: 22px;}
+  .button {text-align: center; font-size: 18px; font-family: sans-serif; font-weight: bold; padding: 0 30px 0 30px;}
+  .button a {color: #ffffff; text-decoration: none;}
+  .footer {padding: 20px 30px 15px 30px;}
+  .footercopy {font-family: sans-serif; font-size: 14px; color: #ffffff;}
+  .footercopy a {color: #ffffff; text-decoration: underline;}
+
+  @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
+  body[biomark] .hide {display: none!important;}
+  body[biomark] .buttonwrapper {background-color: transparent!important;}
+  body[biomark] .button {padding: 0px!important;}
+  body[biomark] .button a {background-color: #e05443; padding: 15px 15px 13px!important;}
+  body[biomark] .unsubscribe {display: block; margin-top: 20px; padding: 10px 50px; background: #2f3942; border-radius: 5px; text-decoration: none!important; font-weight: bold;}
+  }
+
+  </style>
+</head>
+
+<body biomark bgcolor="#f6f8f1">
+<table width="100%" bgcolor="#f6f8f1" border="0" cellpadding="0" cellspacing="0">
+<tr>
+  <td>   
+    <table bgcolor="#ffffff" class="content" align="center" cellpadding="0" cellspacing="0" border="0">
+      <tr>
+        <td class="innerpadding borderbottom">
+          <table width="100%" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+              <td class="h3">
+                Dear <%=@booking.payment.username%>,
+              </td>
+            </tr>
+            <tr>
+              <td class="bodycopy">
+                Your COVID-19 Drive-Through test appointment has been reserved. 
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td class="innerpadding borderbottom">
+          <table border="0" cellpadding="0" cellspacing="0" style="width: 100%">  
+            <tr>
+              <td>
+                <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                  <tr>
+                    <td class="bodycopy" align="left" style="font-size: 13px">
+
+Booking details:
+<br>
+Booking Reference: <%=@booking.reference_code%>
+<br>
+Full Name: <%=@booking.patient.fullname%>
+<br>
+IC / Passport Number: <%=@booking.patient.id_number%>
+<br>
+Contact Number: <%=@booking.patient.contact_number%>
+<br>
+<br>
+Appointment Time:  <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.utc.strftime("%H:%M %p")%>
+<br>
+Testing Location:
+<br>
+<%=@booking.location.name%>
+<br>
+<%=@booking.location.address%>
+<br>
+<br>
+Referred Clinic:
+<br>
+<%=@booking.clinic.name%>
+<br>
+<%=@booking.clinic.address%>
+<br>
+<%=@booking.clinic.contact_number%>
+<br>
+<br>
+To secure your appointment, please transfer the exact amount through your preferred bank via interbank 
+<br>
+INSTANT or DuitNow fund transfer to the following bank account details:
+<br>
+Payee Name: <b>Gribbles Pathology (M) Sdn Bhd</b>
+<br>
+Bank Name: <b>HSBC</b>
+<br>
+Account Number: <b>202157731101</b>
+<br>
+Amount to transfer: <%=@booking.amount%> <b>MYR</b>
+<br>
+Business Registration Number (For <b>DuitNow</b> ONLY): <b>149031W</b>
+<br>
+Reference No: <%=@booking.reference_code%>
+<br>
+Upon transfer, whatsapp the confirmation slip to this mobile number: <b>+6016 3977 497</b> or email to <b>finance.drvtCV@gribbles.com.my</b>
+<br>
+<br>
+Scan here to pay
+<br>
+<img src="https://lh3.googleusercontent.com/J9vdi3S6_Hl-_UnN9tp401bwv6RV_wWD-BNw0FAg89jmDJ1PDV5qn-TSOFUmRxsa4C_-u3D_b3JYoTLvGu4omNH0Q4_ZunoZPHXDaYfVtg8YW2kcv-PwUQYk6_NwcTdn5hYQycxP=w2879-h1495" alt="Description"  style="height: 300px; width: 300px"/>
+<br>
+<br>
+Please make the payment within one hour to reserve your slot, otherwise it will be released. Once payment is received, you will receive a confirmation email from us. You are required to show your confirmation when you arrive at the testing site. Thank you.
+<br>
+<br>
+For any clarification, please do not hesitate to contact our call centre at <b>1 800 22 6843</b> for further assistance.
+<br>
+<br>
+IMPORTANT: This is a system-generated email. Please DO NOT reply to this email.
+<br>
+</div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    </td>
+  </tr>
+</table>
+</body>
+</html>
