@@ -1,5 +1,5 @@
 class V1::SettingController < ApplicationController
-    before_action :must_be_authenticated
+    before_action :must_be_authenticated, except: [:index]
 
     def index
         @setting = Setting.last
@@ -18,6 +18,7 @@ class V1::SettingController < ApplicationController
         if @setting.nil?
             @setting = Setting.create covid_price:0
         end
+        old_value = @setting.covid_price
         case setting_params[:type]
             when 1
                 @setting.setting_histories.create(
@@ -27,6 +28,7 @@ class V1::SettingController < ApplicationController
                     new_value: setting_params[:new_value]
                 )
                 @setting.update covid_price:setting_params[:new_value]
+                AuditLog.log_changes("Settings", "covid_price", @setting.id, old_value, @setting.covid_price, 1, @current_user.username)
                 render json: {message:"Price updated successfully"}
             when 2
                 @setting.setting_histories.create(
