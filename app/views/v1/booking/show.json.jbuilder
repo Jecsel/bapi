@@ -23,11 +23,13 @@ json.question_details do
 end
 json.payment_details do
     json.extract! @booking, :id, :reference_code
-    json.payment_type @booking.payment.payment_id ? "Auto": "Manual"
-    json.username @booking.payment.username
-    json.created_at @booking.payment.created_at
     json.payment_status @booking.payment.payment_status
     json.ref_no @booking.payment.ref_no
     json.amount @booking.payment.amount
     json.currency @booking.payment.currency
+    json.payment_date @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.created_at : "N/A"
+    json.payment_mode @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.payment_mode_id : "N/A"
+    json.payment_type @booking.payment.payment_id ? "Auto": "Manual"
+    json.username @current_user.username
+    json.updated_at @booking.payment.updated_at
 end
