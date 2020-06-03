@@ -3,27 +3,57 @@ class V1::Guest::LocationController < ApplicationController
     def clinics 
         loc = Location.active.find params[:location_id]
         @clinics = loc.clinics
+    end     
+
+    def clinic_area
+        loc = Location.active.find area_params[:location_id]
+        @clinics = loc.clinics
+        selected_clinic_area = @clinics.where(clinic_area_id: area_params[:area_code])
+        render json:selected_clinic_area
     end
 
-    def until
-        self.slot_time +10.minutes
-    end
-    
     def find_schedules
         booking_date_range = Setting.last.booking_date_range
         @loc = Location.find params[:location_id]
         @schedules = @loc.schedules.where("id = ? && schedule_date > ?",params[:scheduled_id],cut_off_time).order(schedule_date: :asc).limit(booking_date_range)
+        render json:{
+            active_slot:{
+                status: @schedules.any?,
+                data: @schedules.first.slots.group_by(&:meridian).as_json(
+                    methods: [:slot_time_with_interval]
+                )
+            },
+            schedules: @schedules.as_json(only: [:id, :schedule_date], methods:[:has_available_slot])
+        }
     end
     
     def schedules
         booking_date_range = Setting.last.booking_date_range
         @loc = Location.find params[:location_id]
         @schedules = @loc.schedules.where("schedule_date > ?",cut_off_time).order(schedule_date: :asc).limit(booking_date_range)
+
+        render json:{
+            id: @loc.id, 
+            name: @loc.name,
+            address: @loc.address,
+            active_slot:{
+                status: @schedules.any?,
+                data: @schedules.first.slots.group_by(&:meridian).as_json(
+                    methods: [:slot_time_with_interval]
+                )
+            },
+            schedules: @schedules.as_json(only: [:id, :schedule_date], methods:[:has_available_slot])
+        }
     end
     
     def index
         @locations = Location.active.all
     end
+
+    def area_params
+        params.permit(:location_id, :area_code)
+    end
+
     private
     def cut_off_time
         today = DateTime.now.in_time_zone

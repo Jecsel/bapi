@@ -13,6 +13,9 @@ Rails.application.routes.draw do
         get 'clinics', to:"location#clinics"
         get 'schedules', to:"location#schedules"
         get 'find_schedules/:scheduled_id', to:"location#find_schedules"
+        collection do
+          post 'clinic_area'
+        end
       end
       resources :payment, only:[] do 
         collection do
@@ -32,11 +35,22 @@ Rails.application.routes.draw do
 
   #ADMIN
   namespace :v1, defaults: { format: :json } do
+    resources :dashboard do 
+      collection do 
+        get 'booking_graph'
+      end
+    end
+    resources :clinic_area, only:[:create, :index] do 
+      collection do 
+        
+      end
+    end
     resources :setting, only:[:index] do 
       collection do 
         patch 'update'
       end
     end
+    
     resources :booking, only:[:index, :show] do 
       collection do 
         get  'search/:search_str', to:"booking#search"
@@ -46,6 +60,8 @@ Rails.application.routes.draw do
         post 'mark_no_show'
         post 'mark_as_completed'
         post 'edit_booking'
+        post 'upload_document'
+        post 'confirm_manual_payment', to:'booking#confirm_manual_payment'
         # post 'paginate'
         # post 'filter_status'
         # post 'filter_date'
@@ -58,6 +74,7 @@ Rails.application.routes.draw do
         post 'authenticate'
         post 'get_policies'
         post 'sign_out'
+        post 'edit_user'
       end
     end
 
@@ -73,6 +90,10 @@ Rails.application.routes.draw do
       end
     end
     resources :location, only:[:create, :index, :update, :destroy, :show] do 
+      collection do   
+        post 'filter'
+        post 'paginate'
+      end
       get 'schedules'
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"

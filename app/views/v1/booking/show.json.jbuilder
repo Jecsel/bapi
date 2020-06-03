@@ -7,10 +7,11 @@ json.booking_details do
     json.clinic_name @booking.clinic.name
     json.clinic_code @booking.clinic.code
     json.billing_code @booking.clinic.billing_code
-    json.slot_time @booking.slot.slot_time.utc.strftime("%I:%M%p") + " - " + (@booking.slot.slot_time + @booking.schedule.minute_interval*60).utc.strftime("%I:%M%p")
+    json.slot_time_with_interval @booking.slot.slot_time.utc.strftime("%I:%M") + @booking.slot.meridian + " - " + (@booking.slot.slot_time + @booking.schedule.minute_interval*60).utc.strftime("%I:%M") + @booking.slot.meridian
     json.slot @booking.slot
     json.schedule @booking.schedule
     json.location @booking.location
+    json.payment_price @booking.payment.amount
 end
 json.patient_details do 
     json.extract! @booking.patient, :fullname, :id_number, :date_of_birth, :contact_number, :email_address

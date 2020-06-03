@@ -10,7 +10,7 @@ class Booking < ApplicationRecord
     belongs_to :schedule
     belongs_to :clinic
     private
-
+        
     search_scope :search do
         attributes :id, :reference_code
         attributes patient: ["patient.id_number", "patient.fullname"]
@@ -53,6 +53,6 @@ class Booking < ApplicationRecord
     end
 
     def self.sort_by_datetime
-        self.joins(:slot, :schedule).order(schedule_date: :asc, slot_time: :asc)
+        self.joins(:schedule).order(schedule_date: :asc)
     end
 end

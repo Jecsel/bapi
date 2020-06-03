@@ -10,7 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_05_05_023600) do
+ActiveRecord::Schema.define(version: 2020_05_30_123054) do
+
+  create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "record_type", null: false
+    t.bigint "record_id", null: false
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "key", null: false
+    t.string "filename", null: false
+    t.string "content_type"
+    t.text "metadata"
+    t.bigint "byte_size", null: false
+    t.string "checksum", null: false
+    t.datetime "created_at", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
 
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "patient_id"
@@ -31,6 +52,13 @@ ActiveRecord::Schema.define(version: 2020_05_05_023600) do
     t.index ["slot_id"], name: "index_bookings_on_slot_id"
   end
 
+  create_table "clinic_areas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.boolean "status", default: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "clinics", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.string "code"
@@ -42,6 +70,8 @@ ActiveRecord::Schema.define(version: 2020_05_05_023600) do
     t.string "contact_person"
     t.string "billing_code"
     t.boolean "status"
+    t.bigint "clinic_area_id"
+    t.index ["clinic_area_id"], name: "index_clinics_on_clinic_area_id"
     t.index ["code"], name: "index_clinics_on_code", unique: true
   end
 
@@ -63,6 +93,7 @@ ActiveRecord::Schema.define(version: 2020_05_05_023600) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "code"
     t.boolean "status", default: true
+    t.integer "referral_type"
   end
 
   create_table "patients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -90,6 +121,9 @@ ActiveRecord::Schema.define(version: 2020_05_05_023600) do
     t.string "amount"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "payment_mode_id"
+    t.string "payment_reference"
+    t.datetime "payment_date"
     t.index ["payment_id"], name: "index_payment_histories_on_payment_id"
   end
 
@@ -109,7 +143,7 @@ ActiveRecord::Schema.define(version: 2020_05_05_023600) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status"
+    t.integer "payment_status", default: 0
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -220,6 +254,7 @@ ActiveRecord::Schema.define(version: 2020_05_05_023600) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "role_policies", "service_policies"
   add_foreign_key "role_policies", "services"
   add_foreign_key "role_policies", "user_groups"
