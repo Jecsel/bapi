@@ -9,7 +9,8 @@ namespace :services do
 
         create_super_admin_policies
         create_admin_policies
-        create_bookings_only_policies
+        create_finance_policies
+        create_call_center_policies
     end
 
     def clean_up
@@ -34,7 +35,10 @@ namespace :services do
                 name:"Admin"
             },
             {
-                name:"BookingsOnly"
+                name:"Finance"
+            },
+            {
+                name:"Call Center"
             }
         ]
         UserGroup.create _groups
@@ -147,12 +151,37 @@ namespace :services do
             },
             {
                 service_id: 1, #User service
-                name: "Edit user User", #service_policy_id 10
+                name: "Edit user", #service_policy_id 10
                 status: true
             },
             {
                 service_id: 7, #Audit log service
                 name: "View audit log", #service_policy_id 11
+                status: true
+            },
+            {
+                service_id: 4, #Booking service
+                name: "Reschedule booking", #service_policy_id 12
+                status: true
+            },
+            {
+                service_id: 4, #Booking service
+                name: "Confirm booking", #service_policy_id 13
+                status: true
+            },
+            {
+                service_id: 4, #Booking service
+                name: "Cancel booking", #service_policy_id 14
+                status: true
+            },
+            {
+                service_id: 4, #Booking service
+                name: "Mark as completed", #service_policy_id 15
+                status: true
+            },
+            {
+                service_id: 4, #Booking service
+                name: "Mark as no show", #service_policy_id 16
                 status: true
             }
         ]
@@ -207,14 +236,14 @@ namespace :services do
             },
             {
                 user_group_id: _user_group_id,
-                service_id: 5, #Booking service
-                service_policy_id: 8, #Export csv
+                service_id: 5, #Dashboard service
+                service_policy_id: 8, #View dashboard
                 status: true
             },
             {
                 user_group_id: _user_group_id,
-                service_id: 6, #Booking service
-                service_policy_id: 9, #Export csv
+                service_id: 6, #Settings service
+                service_policy_id: 9, #View settings
                 status: true
             },
             {
@@ -225,8 +254,38 @@ namespace :services do
             },
             {
                 user_group_id: _user_group_id,
-                service_id: 7, #Audit log service
+                service_id: 7, #Audit log
                 service_policy_id: 11, #View audit log
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 12, #Reschedule booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 13, #Confirm booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 14, #Cancel booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 15, #Mark as completed
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 16, #Mark as no show
                 status: true
             }
         ]
@@ -239,26 +298,26 @@ namespace :services do
         _role_policies = [
             {
                 user_group_id: _user_group_id,
-                service_id: 2, #Location service
-                service_policy_id: 2, #View location module
-                status: true
-            },
-            { 
-                user_group_id: _user_group_id,
-                service_id: 2, #Location service
-                service_policy_id: 3, #Add location
+                service_id: 1, #User service
+                service_policy_id: 1, #View user module
                 status: true
             },
             {
                 user_group_id: _user_group_id,
-                service_id: 3, #Clinic service
-                service_policy_id: 4, #View clinic module
+                service_id: 1, #User service
+                service_policy_id: 10, #Edit user
                 status: true
             },
             {
                 user_group_id: _user_group_id,
-                service_id: 3, #Clinic service
-                service_policy_id: 5, #Add clinic
+                service_id: 6, #Settings service
+                service_policy_id: 9, #View settings
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 7, #Audit log
+                service_policy_id: 11, #View audit log
                 status: true
             },
             {
@@ -275,33 +334,113 @@ namespace :services do
             },
             {
                 user_group_id: _user_group_id,
-                service_id: 5, #Booking service
-                service_policy_id: 8, #Export csv
+                service_id: 4, #Booking service
+                service_policy_id: 12, #Reschedule booking
                 status: true
             },
             {
                 user_group_id: _user_group_id,
-                service_id: 6, #Booking service
-                service_policy_id: 9, #Export csv
+                service_id: 4, #Booking service
+                service_policy_id: 13, #Confirm booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 14, #Cancel booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 15, #Mark as completed
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 16, #Mark as no show
                 status: true
             }
         ]
         RolePolicy.create _role_policies
-        p 'Super admin policies created'
+        p 'Admin policies created'
     end
 
-    def create_bookings_only_policies
+    def create_finance_policies
         _user_group_id = 3
         _role_policies = [
             {
                 user_group_id: _user_group_id,
-                service_id: 4, #Bookings service
+                service_id: 4, #Booking service
                 service_policy_id: 6, #View booking module
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 7, #Export csv
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 13, #Confirm booking
                 status: true
             },
         ]
         RolePolicy.create _role_policies
-        p 'Bookings only policies created'
+        p 'Finance policies created'
+    end
+
+    def create_call_center_policies
+        _user_group_id = 4
+        _role_policies = [
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 6, #View booking module
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 7, #Export csv
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 12, #Reschedule booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 13, #Confirm booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 14, #Cancel booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 15, #Mark as completed
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 16, #Mark as no show
+                status: true
+            }
+        ]
+        RolePolicy.create _role_policies
+        p 'Call center policies created'
     end
 
 
