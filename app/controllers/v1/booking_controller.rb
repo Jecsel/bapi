@@ -5,10 +5,6 @@ class V1::BookingController < ApplicationController
         payment = Payment.find_by_booking_id manual_payment_params[:booking_id]
         
         if payment.payment_histories.present?
-            if !payment.payment_histories.last.upload_document.attached?
-                render json: {message: "Please upload payment document"},status:404
-                return false
-            end
             ActiveRecord::Base.transaction do
                 
                 if payment.payment_histories.present?
@@ -28,8 +24,6 @@ class V1::BookingController < ApplicationController
             end
             BookingMailer.manual_confirmation(payment.booking_id).deliver_later
             render json: :confirmed
-        else
-            render json: {message: "Please upload payment document"},status:404
         end
     end
 
