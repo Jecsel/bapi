@@ -16,7 +16,7 @@ class PaymentWorker
     private 
     def start_payment_approval
         if histories.last.signature == generate_system_signature
-            payment.update payment_status:1
+            payment.update payment_status:1,payment_type:0
             BookingMailer.itinerary(payment.booking_id).deliver_later
         else
             raise "invalid payment signature"

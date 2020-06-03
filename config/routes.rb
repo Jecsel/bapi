@@ -36,6 +36,8 @@ Rails.application.routes.draw do
 
   #ADMIN
   namespace :v1, defaults: { format: :json } do
+    resources :payment_mode, only:[:index] do 
+    end
     resources :dashboard do 
       collection do 
         get 'booking_graph'

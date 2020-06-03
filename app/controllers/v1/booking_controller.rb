@@ -14,7 +14,7 @@ class V1::BookingController < ApplicationController
                 payment.payment_histories.create payment_mode_id: :manual,payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date]
                 #Log create of payment details
                 AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 0, @current_user.username)
-                payment.update payment_status: :confirmed
+                payment.update payment_status: :confirmed,payment_type:1
             end
 
             #Log update of payment status
