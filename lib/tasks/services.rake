@@ -84,6 +84,13 @@ namespace :services do
                 resource_path: "admin.dashboard.settings",
                 resource_icon: "fas fa-cog",
                 resource_order: 6,
+            },
+            {
+                name:"Audit Log",
+                status: true, 
+                resource_path: "admin.dashboard.audit",
+                resource_icon: "fas fa-history",
+                resource_order: 7,
             }
         ]
         Service.create _services
@@ -141,6 +148,11 @@ namespace :services do
             {
                 service_id: 1, #User service
                 name: "Edit user User", #service_policy_id 10
+                status: true
+            },
+            {
+                service_id: 7, #Audit log service
+                name: "View audit log", #service_policy_id 11
                 status: true
             }
         ]
@@ -209,6 +221,12 @@ namespace :services do
                 user_group_id: _user_group_id,
                 service_id: 1, #User service
                 service_policy_id: 10, #Edit user
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 7, #Audit log service
+                service_policy_id: 11, #View audit log
                 status: true
             }
         ]

@@ -33,6 +33,18 @@ ActiveRecord::Schema.define(version: 2020_06_03_004447) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
+  create_table "audit_logs", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "model"
+    t.string "field_name"
+    t.integer "field_id"
+    t.string "old_value"
+    t.string "new_value"
+    t.integer "action"
+    t.string "modified_by"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "bookings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "patient_id"
     t.bigint "location_id"
@@ -143,7 +155,7 @@ ActiveRecord::Schema.define(version: 2020_06_03_004447) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status", default: 0
+    t.integer "payment_status"
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
