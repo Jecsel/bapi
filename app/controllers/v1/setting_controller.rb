@@ -21,15 +21,19 @@ class V1::SettingController < ApplicationController
         old_value = @setting.covid_price
         case setting_params[:type]
             when 1
-                @setting.setting_histories.create(
-                    user_id:@current_user.id, 
-                    setting_type:setting_params[:type],
-                    old_value: @setting.covid_price,
-                    new_value: setting_params[:new_value]
-                )
-                @setting.update covid_price:setting_params[:new_value]
-                AuditLog.log_changes("Settings", "covid_price", @setting.id, old_value, @setting.covid_price, 1, @current_user.username)
-                render json: {message:"Price updated successfully"}
+                if old_value != setting_params[:new_value]
+                    @setting.setting_histories.create(
+                        user_id:@current_user.id, 
+                        setting_type:setting_params[:type],
+                        old_value: @setting.covid_price,
+                        new_value: setting_params[:new_value]
+                    )
+                    @setting.update covid_price:setting_params[:new_value]
+                    AuditLog.log_changes("Settings", "covid_price", @setting.id, old_value, @setting.covid_price, 1, @current_user.username)
+                    render json: {message:"Price updated successfully"}
+                else
+                    render json: {message:"This is the current price. No update required."}
+                end
             when 2
                 @setting.setting_histories.create(
                     user_id:@current_user.id, 
