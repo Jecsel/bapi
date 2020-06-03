@@ -33,13 +33,11 @@ class Booking < ApplicationRecord
     end
 
     def self.search_filter( filter_params )
-
-        _sql = get_location(filter_params[:location_id]).payment_status(filter_params[:status])
+        _sql =  get_location(filter_params[:location_id]).payment_status(filter_params[:status])
         
         if filter_params[:register_date_start].present? || filter_params[:register_date_end].present?
             _sql = _sql.filter_by_registration_date filter_params
         end 
-        
         if filter_params[:only_expired_booking]
             elapse_time = Time.now - 60.minutes
             _sql = _sql.where("bookings.created_at <= ?",elapse_time)
@@ -59,12 +57,12 @@ class Booking < ApplicationRecord
     
     def self.get_location id 
         return where(location_id: id) if id != 0
+        return self
     end
     def self.payment_status status
         return where({payments:{payment_status:status}})
     end
     
-
     def generate_ref_code
         self.reference_code = Generator.new().generate_reference_code
     end
