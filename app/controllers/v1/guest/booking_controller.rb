@@ -3,7 +3,7 @@ class V1::Guest::BookingController < ApplicationController
     def create
         begin
             data = PatientBooking.new booking_params    
-            SlotWorker.perform_in(1.hour, data.payment.booking_id )
+            # SlotWorker.perform_in(1.hour, data.payment.booking_id )
             # BookingMailer.itinerary(data.payment.booking_id).deliver_later
             render json: {status:true, data:data.payment}
         rescue => ex
@@ -13,7 +13,6 @@ class V1::Guest::BookingController < ApplicationController
 
     def pay_later
         data_payment = Payment.find_by_id later_params[:id]
-        p data_payment
         BookingMailer.pay_later_email(data_payment[:booking_id]).deliver_now
     end
     
