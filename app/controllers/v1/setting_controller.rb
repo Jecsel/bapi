@@ -21,7 +21,7 @@ class V1::SettingController < ApplicationController
         old_value = @setting.covid_price
         case setting_params[:type]
             when 1
-                if old_value != setting_params[:new_value]
+                if old_value.to_f != setting_params[:new_value].to_f
                     @setting.setting_histories.create(
                         user_id:@current_user.id, 
                         setting_type:setting_params[:type],
