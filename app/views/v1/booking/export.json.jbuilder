@@ -7,7 +7,7 @@ json.array! @bookings do |booking|
     json.id_number booking.patient.id_number
     json.date_of_birth booking.patient.date_of_birth
     json.gender booking.patient.gender_id == 1? "M": "F"
-    json.contact_numberg booking.patient.contact_number
+    json.contact_number booking.patient.contact_number
     json.email_address booking.patient.email_address
     json.q1 booking.patient.q1 ? "Y": "N"
     json.q2 booking.patient.q2 ? "Y": "N"
@@ -24,4 +24,7 @@ json.array! @bookings do |booking|
     json.ref_no booking.payment.ref_no
     json.amount booking.payment.amount
     json.currency booking.payment.currency
+    json.file_name booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.upload_document.name : "N/A"
+    json.username @current_user.username
+    json.updated_at booking.payment.updated_at
 end
