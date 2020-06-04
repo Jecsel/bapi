@@ -10,9 +10,7 @@ class V1::BookingController < ApplicationController
                 payment.update({payment_status: :confirmed,payment_type:1})
                 #Log update of payment details
                 AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 1, @current_user.username)
-                
             else
-               
                 history = payment.payment_histories.new
                 history.payment_mode_id = manual_payment_params[:payment_mode]
                 history.payment_reference = manual_payment_params[:payment_reference]
