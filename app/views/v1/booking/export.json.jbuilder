@@ -20,13 +20,15 @@ json.array! @bookings do |booking|
     json.payment_date booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.created_at : "N/A"
     json.payment_status booking.payment.payment_status
     json.payment booking.payment.payment_type ? "Auto": "Manual"
-    json.payment_mode booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.payment_mode.name : ""
+    json.payment_mode booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.payment_mode_id.nil? ? booking.payment.payment_histories.last.payment_mode.name : ""
     json.ref_no booking.payment.ref_no
     json.amount booking.payment.amount
     json.currency booking.payment.currency
     json.file_name booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.upload_document.name : "N/A"
-    json.username @current_user.username
+    json.username booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.approved_by : "N/A"
     json.updated_at booking.payment.updated_at
 end
+
+
 
 
