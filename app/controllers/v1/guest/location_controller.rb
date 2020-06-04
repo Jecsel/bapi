@@ -8,7 +8,7 @@ class V1::Guest::LocationController < ApplicationController
     def clinic_area
         loc = Location.active.find area_params[:location_id]
         @clinics = loc.clinics
-        selected_clinic_area = @clinics.where(clinic_area_id: area_params[:area_code], status: true).order(name:)
+        selected_clinic_area = @clinics.where(clinic_area_id: area_params[:area_code], status: true).order(name: :asc)
         render json:selected_clinic_area
     end
 
