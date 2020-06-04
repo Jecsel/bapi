@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_03_004447) do
+ActiveRecord::Schema.define(version: 2020_06_04_005344) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -133,10 +133,17 @@ ActiveRecord::Schema.define(version: 2020_06_03_004447) do
     t.string "amount"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.integer "payment_mode_id"
     t.string "payment_reference"
     t.datetime "payment_date"
+    t.bigint "payment_mode_id"
     t.index ["payment_id"], name: "index_payment_histories_on_payment_id"
+    t.index ["payment_mode_id"], name: "index_payment_histories_on_payment_mode_id"
+  end
+
+  create_table "payment_modes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "payments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

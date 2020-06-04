@@ -21,3 +21,25 @@ json.question_details do
     json.q1 @booking.patient.q1 ? "Yes": "No"
     json.q2 @booking.patient.q2 ? "Yes": "No"
 end
+json.payment_details do
+    json.extract! @booking, :id, :reference_code
+    json.payment_status @booking.payment.payment_status
+    json.ref_no @booking.payment.ref_no
+    json.amount @booking.payment.amount
+    json.currency @booking.payment.currency
+    json.payment_date @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.created_at : ""
+    json.payment_mode @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.payment_mode_id : ""
+    json.payment_type @booking.payment.payment_id ? "Auto": "Manual"
+    json.username @current_user.username
+    json.updated_at @booking.payment.updated_at
+    json.file_name @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.upload_document : "N/A"
+end
+json.controls @role_policy do |rol|
+    json.extract! rol.service_policy, :id, :status
+end
+json.payment_modes @payment_mode do |pm|
+    p "======="
+    p pm
+    json.id pm.id
+    json.name pm.name
+end
