@@ -6,7 +6,7 @@ class V1::BookingController < ApplicationController
         ActiveRecord::Base.transaction do
             
             if payment.payment_histories.present?
-                payment.payment_histories.last.update payment_mode_id: manual_payment_params[:payment_mode],payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date],amount:manual_payment_params[:amount]
+                payment.payment_histories.last.update payment_mode_id: manual_payment_params[:payment_mode],payment_reference:manual_payment_params[:payment_reference],payment_date:manual_payment_params[:payment_date],amount:manual_payment_params[:amount], approved_by:@current_user.username
                 payment.update({payment_status: :confirmed,payment_type:1})
                 #Log update of payment details
                 AuditLog.log_changes("Bookings", "booking_id", payment.booking_id, "", "", 1, @current_user.username)
@@ -14,8 +14,9 @@ class V1::BookingController < ApplicationController
                 history = payment.payment_histories.new
                 history.payment_mode_id = manual_payment_params[:payment_mode]
                 history.payment_reference = manual_payment_params[:payment_reference]
-                history.payment_date =manual_payment_params[:payment_date]
+                history.payment_date = manual_payment_params[:payment_date]
                 history.amount = manual_payment_params[:amount]
+                history.approved_by = @current_user.username
                 history.save
                 
                 payment.update({payment_status: :confirmed,payment_type:1})
@@ -158,6 +159,6 @@ class V1::BookingController < ApplicationController
             .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string, :only_expired_booking, :register_date_start, :register_date_end)
     end
     def manual_payment_params 
-        params.require(:payment).permit(:booking_id, :payment_reference, :payment_date, :amount, :payment_mode)
+        params.require(:payment).permit(:booking_id, :payment_reference, :payment_date, :amount, :payment_mode, :type)
     end
 end
