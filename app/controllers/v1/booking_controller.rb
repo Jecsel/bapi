@@ -33,7 +33,7 @@ class V1::BookingController < ApplicationController
     def upload_document
         payment = Payment.find_by_booking_id request.headers['x-booking-id'].to_i
         history = payment.payment_histories.new
-        
+        history.payment_mode_id = 1
         if history.save
             history.upload_document.attach(params[:files][0])
         end

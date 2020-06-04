@@ -32,7 +32,7 @@ json.payment_details do
     json.payment_type @booking.payment.payment_id == 0 ? "Auto": "Manual"
     json.username @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.approved_by : "N/A"
     json.updated_at @booking.payment.updated_at
-    json.file_name @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.upload_document : "N/A"
+    json.file_name @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.upload_document.filename : "N/A"
 end
 json.controls @role_policy do |rol|
     json.extract! rol.service_policy, :id, :status
