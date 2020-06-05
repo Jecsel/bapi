@@ -24,7 +24,7 @@ end
 json.payment_details do
     json.extract! @booking, :id, :reference_code
     json.payment_status @booking.payment.payment_status
-    json.ref_no @booking.payment.ref_no
+    json.ref_no @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.payment_reference : ""
     json.amount @booking.payment.amount
     json.currency @booking.payment.currency
     json.payment_date @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.created_at : ""
