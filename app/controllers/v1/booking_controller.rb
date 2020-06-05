@@ -42,15 +42,14 @@ class V1::BookingController < ApplicationController
 
     def download_document
         booking = Booking.find_by_id params[:id]
-        # if booking.payment.present?
-        #     if booking.payment.payment_histories.present?
-        #         p "====="
-        #             history = booking.payment.payment_histories.last
-        #             binary = history.upload_document.download
-        #             encoded_file = Base64.encode64(binary)
-        #             render json: {file_data: encoded_file}
-        #     end
-        # end
+        if booking.payment.present?
+            if booking.payment.payment_histories.present?
+                p "====="
+                    history = booking.payment.payment_histories.last
+                    url_file = url_for(booking.payment.payment_histories.last.upload_document)
+                    render json: {file_data: url_file}
+            end
+        end
     end
 
     def export 
