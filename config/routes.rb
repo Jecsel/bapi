@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   namespace :v1 do
     namespace :guest do 
       resources :location, only:[:index] do 
-        get 'clinics', to:"location#clinics"
+        get 'areas', to:"location#areas"
         get 'schedules', to:"location#schedules"
         get 'find_schedules/:scheduled_id', to:"location#find_schedules"
         collection do

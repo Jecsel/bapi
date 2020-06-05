@@ -1,8 +1,8 @@
 class V1::ClinicAreaController < ApplicationController
     before_action :must_be_authenticated, except: [:index]
-    def index 
-        @areas = ClinicArea.active.order(:name)
-    end
+    # def index 
+    #     @areas = ClinicArea.active.order(:name)
+    # end
     def create
         area = ClinicArea.where("name = ?", create_params[:name])
         if area.any?
