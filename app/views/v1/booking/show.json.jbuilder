@@ -29,7 +29,7 @@ json.payment_details do
     json.currency @booking.payment.currency
     json.payment_date @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.created_at : ""
     json.payment_mode @booking.payment.payment_histories.any? && !@booking.payment.payment_histories.last.payment_mode_id.nil? ? @booking.payment.payment_histories.last.payment_mode.name : "iPay88"
-    json.payment_type @booking.payment.payment_type == :auto ? "Auto": "Manual"
+    json.payment_type @booking.payment.payment_type == 0 ? "Auto": "Manual"
     json.username @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.approved_by : "N/A"
     json.updated_at @booking.payment.updated_at
     json.file_name @booking.payment.payment_histories.any? && !@booking.payment.payment_histories.last.upload_document.attachment.nil?  ? @booking.payment.payment_histories.last.upload_document.filename : "N/A"
@@ -37,7 +37,4 @@ end
 json.controls @role_policy do |rol|
     json.extract! rol.service_policy, :id, :status
 end
-json.payment_modes @payment_mode do |pm|
-    json.id pm.id
-    json.name pm.name
-end
+json.payment_modes @payment_mode, :id, :name
