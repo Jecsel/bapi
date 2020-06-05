@@ -13,6 +13,7 @@ class V1::Guest::PaymentController < ApplicationController
         hist.s_bankname = payment_params[:S_bankname]
         hist.s_country  = payment_params[:S_country]
         hist.amount     = payment_params[:Amount]
+        hist.payment_reference = payment_params[:TransId]
         hist.save
         PaymentWorker.perform_async pay.id,hist.id, payment_params[:PaymentId]
         render html: :RECEIVEOK,status:200
