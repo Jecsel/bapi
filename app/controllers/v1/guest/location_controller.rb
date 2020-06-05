@@ -1,8 +1,10 @@
 class V1::Guest::LocationController < ApplicationController
 
-    def clinics 
+    
+    def areas 
         loc = Location.active.find params[:location_id]
-        @clinics = loc.clinics
+        area_ids = loc.clinics.pluck(:clinic_area_id)
+        @areas = ClinicArea.where(id: area_ids)
     end     
 
     def clinic_area
