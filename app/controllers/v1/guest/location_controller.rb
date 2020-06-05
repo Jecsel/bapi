@@ -4,9 +4,9 @@ class V1::Guest::LocationController < ApplicationController
     def areas 
         loc = Location.active.find params[:location_id]
         area_ids = loc.clinics.pluck(:clinic_area_id)
-        @areas = ClinicArea.where(id: area_ids)
+        @areas = ClinicArea.where(id: area_ids).order(name: :asc)
     end     
-
+    
     def clinic_area
         loc = Location.active.find area_params[:location_id]
         @clinics = loc.clinics
