@@ -37,8 +37,20 @@ class V1::BookingController < ApplicationController
         if history.save
             history.upload_document.attach(params[:files][0])
         end
-
         render json: :uploaded
+    end
+
+    def download_document
+        booking = Booking.find_by_id params[:id]
+        # if booking.payment.present?
+        #     if booking.payment.payment_histories.present?
+        #         p "====="
+        #             history = booking.payment.payment_histories.last
+        #             binary = history.upload_document.download
+        #             encoded_file = Base64.encode64(binary)
+        #             render json: {file_data: encoded_file}
+        #     end
+        # end
     end
 
     def export 
