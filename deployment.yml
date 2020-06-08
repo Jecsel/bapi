@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: biomark-booking-api
-  namespace: biomark-demo
+  namespace: biomark-production
 spec:
   selector: 
     matchLabels:
@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: booking-api
-        image: registry.gitlab.com/biomark/biomark-booking-api:MASTER_527583045
+        image: registry.gitlab.com/biomark/biomark-booking-api:MASTER_585577756
         args: ["bundle exec rails db:migrate && bundle exec puma"]
         imagePullPolicy: Always
         envFrom:
@@ -28,7 +28,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: biomark-booking-sidekiq
-  namespace: biomark-demo
+  namespace: biomark-production
 spec:
   selector: 
     matchLabels:
@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
       - name: booking-sidekiq
-        image: registry.gitlab.com/biomark/biomark-booking-api:MASTER_527583045
+        image: registry.gitlab.com/biomark/biomark-booking-api:MASTER_585577756
         args: ["bundle exec sidekiq"]
         imagePullPolicy: Always
         envFrom:
@@ -54,10 +54,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: biomark-booking-service
-  namespace: biomark-demo
+  namespace: biomark-production
 spec:
   ports:
-    - port: 3002
+    - port: 3004
       targetPort: 3002
       protocol: TCP
   type: NodePort
