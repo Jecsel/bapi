@@ -9,8 +9,10 @@ class Booking < ApplicationRecord
     belongs_to :clinic
     belongs_to :schedule
     belongs_to :clinic
-    private
-        
+    
+  
+    enum booking_type:[:patient, :clinic]
+
     search_scope :search do
         attributes :id, :reference_code
         attributes patient: ["patient.id_number", "patient.fullname"]

@@ -56,7 +56,8 @@
             schedule_id: schedule_id,
             clinic_id: patient[:clinic_id],
             amount: covid_price,
-            referral_code: referral_code
+            referral_code: referral_code,
+            booking_type: patient[:booking_type] ? 1 : 0
         })
         generate_payment_info booking
     end

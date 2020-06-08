@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_04_010924) do
+ActiveRecord::Schema.define(version: 2020_06_08_113435) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -57,6 +57,7 @@ ActiveRecord::Schema.define(version: 2020_06_04_010924) do
     t.datetime "updated_at", precision: 6, null: false
     t.integer "referral_id"
     t.string "referral_code"
+    t.integer "booking_type", default: 0
     t.index ["clinic_id"], name: "index_bookings_on_clinic_id"
     t.index ["location_id"], name: "index_bookings_on_location_id"
     t.index ["patient_id"], name: "index_bookings_on_patient_id"
@@ -135,8 +136,8 @@ ActiveRecord::Schema.define(version: 2020_06_04_010924) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "payment_reference"
     t.datetime "payment_date"
-    t.string "approved_by"
     t.bigint "payment_mode_id"
+    t.string "approved_by"
     t.index ["payment_id"], name: "index_payment_histories_on_payment_id"
     t.index ["payment_mode_id"], name: "index_payment_histories_on_payment_mode_id"
   end
