@@ -28,7 +28,7 @@ json.payment_details do
     json.amount @booking.payment.amount
     json.currency @booking.payment.currency
     json.payment_date @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.created_at : ""
-    json.payment_mode @booking.payment.payment_histories.any? && !@booking.payment.payment_histories.last.payment_mode_id.nil? ? @booking.payment.payment_histories.last.payment_mode.name : "iPay88"
+    json.payment_mode @booking.payment.payment_histories.any? && !@booking.payment.payment_histories.last.payment_mode_id.nil? ? @booking.payment.payment_histories.last.payment_mode.name : ""
     json.payment_type @booking.payment.payment_type
     json.username @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.approved_by : "N/A"
     json.updated_at @booking.payment.updated_at
