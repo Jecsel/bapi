@@ -28,9 +28,6 @@ services:
         command: bundle exec sidekiq
     api:
         build: .
-        depends_on:
-        - redis
-        - db
         command: bundle exec rails s -b '0.0.0.0'
         env_file:
         - .env

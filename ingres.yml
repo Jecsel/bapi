@@ -1,0 +1,30 @@
+kind: Ingress
+apiVersion: extensions/v1beta1
+metadata:
+  name: rails-app-ingress
+  namespace: biomark-demo
+  selfLink: /apis/extensions/v1beta1/namespaces/biomark-demo/ingresses/rails-app-ingress
+  uid: 58c1f26b-5f99-11e9-811c-0af88fa0e6be
+  resourceVersion: '16228689'
+  generation: 1
+  creationTimestamp: '2019-04-15T16:13:03Z'
+  labels:
+    app: nginx-app
+  annotations:
+    alb.ingress.kubernetes.io/certificate-arn: >-
+      arn:aws:acm:ap-southeast-1:290487249729:certificate/c39aa442-b8ea-42c1-a0b9-0475be701ae9
+    alb.ingress.kubernetes.io/healthcheck-path: /ping
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-2016-08
+    alb.ingress.kubernetes.io/subnets: >-
+      subnet-0786bcc7927833eb9, subnet-0ca43efc1bad051e3,
+      subnet-0eb9fbecca3af1279
+    kubernetes.io/ingress.class: alb
+spec:
+  rules:
+    - host: my.biomarking.com
+    http:
+        paths:
+        - backend:
+            serviceName: biomark-booking-service
+            servicePort: 3002
