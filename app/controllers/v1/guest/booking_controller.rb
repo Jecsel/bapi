@@ -35,6 +35,7 @@ class V1::Guest::BookingController < ApplicationController
                     :q1,
                     :q2,
                     :clinic_id,
+                    :booking_type
                 ]
             )
     end
