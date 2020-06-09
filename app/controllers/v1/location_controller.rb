@@ -70,6 +70,17 @@ class V1::LocationController < ApplicationController
     end
   end
 
+  def unlink_clinic
+    location = Location.find params[:location_id]
+    clinic = location.location_clinics.where("clinic_id = ?",params[:clinic_id])
+    if clinic.any?
+      clinic.last.delete
+      render json: {message: "Clinic was been unlink with this location"},status:200
+    else
+      render json: {message: "No Clinic associated with this location"},status:406 
+    end
+  end
+
   def show
     @location = Location.find params[:id]
   end

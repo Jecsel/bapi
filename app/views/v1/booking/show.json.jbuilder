@@ -1,5 +1,5 @@
 json.booking_details do
-    json.extract! @booking, :id, :reference_code
+    json.extract! @booking, :id, :reference_code, :booking_type
     json.payment_status @booking.payment.payment_status
     json.test_site_name @booking.location.name
     json.test_site_code @booking.location.code
