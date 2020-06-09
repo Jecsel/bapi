@@ -23,6 +23,9 @@ json.audit_logs @audit_log.each do |log|
         json.log_text "#{log.action} #{log.model} #{log.field_name} from #{log.old_value} to #{log.new_value}"
     end
 end
+json.user_list @users.each do |user|
+    json.extract! user, :id, :username
+end
 json.counts @audit_log.count
 json.total_pages @audit_log.total_pages
 json.total_count @audit_log.total_count
