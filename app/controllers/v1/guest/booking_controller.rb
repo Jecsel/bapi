@@ -11,10 +11,6 @@ class V1::Guest::BookingController < ApplicationController
         end
     end
 
-    def pay_later
-        data_payment = Payment.find_by_id later_params[:id]
-        BookingMailer.pay_later_email(data_payment[:booking_id]).deliver_now
-    end
     
     private
     def later_params
@@ -39,6 +35,7 @@ class V1::Guest::BookingController < ApplicationController
                     :q1,
                     :q2,
                     :clinic_id,
+                    :booking_type
                 ]
             )
     end

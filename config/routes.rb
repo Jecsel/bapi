@@ -26,7 +26,6 @@ Rails.application.routes.draw do
       end
       resources :booking, only:[:create, :index] do 
         collection do
-          post 'pay_later'
           post 'payment_confirmation', to:'booking#payment_confirmation'     
         end
       end
@@ -101,6 +100,7 @@ Rails.application.routes.draw do
       get 'schedules'
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"
+      post 'unlink_clinic', to:"location#unlink_clinic"
     end
     resources :audit, only:[:index] do 
       collection do   

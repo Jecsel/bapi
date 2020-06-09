@@ -26,7 +26,8 @@ class V1::BookingController < ApplicationController
             #Log update of payment status
             AuditLog.log_changes("Bookings", "booking_status", payment.booking_id, "", "", 1, @current_user.username)
         end
-        BookingMailer.manual_confirmation(payment.booking_id).deliver_later
+        # BookingMailer.manual_confirmation(payment.booking_id).deliver_later
+        BookingMailer.reservation(payment.booking_id).deliver_later
         render json: :confirmed
     end
 
@@ -166,7 +167,7 @@ class V1::BookingController < ApplicationController
     def filter_params
         params
             .require(:filter)
-            .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string, :only_expired_booking, :register_date_start, :register_date_end)
+            .permit(:location_id, :status, :booking_date_start, :booking_date_end, :page , :search_string, :only_expired_booking, :register_date_start, :register_date_end, :booking_type)
     end
     def manual_payment_params 
         params.require(:payment).permit(:booking_id, :payment_reference, :payment_date, :amount, :payment_mode, :type)

@@ -9,8 +9,10 @@ class Booking < ApplicationRecord
     belongs_to :clinic
     belongs_to :schedule
     belongs_to :clinic
-    private
-        
+    
+  
+    enum booking_type:[:patient, :clinic]
+
     search_scope :search do
         attributes :id, :reference_code
         attributes patient: ["patient.id_number", "patient.fullname"]
@@ -34,7 +36,9 @@ class Booking < ApplicationRecord
 
     def self.search_filter( filter_params )
         _sql =  get_location(filter_params[:location_id]).payment_status(filter_params[:status])
-        
+        if filter_params[:booking_type] != "all"
+            _sql = _sql.where("bookings.booking_type = ?",filter_params[:booking_type])
+        end
         if filter_params[:register_date_start].present? || filter_params[:register_date_end].present?
             _sql = _sql.filter_by_registration_date filter_params
         end 
