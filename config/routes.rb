@@ -100,6 +100,7 @@ Rails.application.routes.draw do
       get 'schedules'
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"
+      post 'unlink_clinic', to:"location#unlink_clinic"
     end
     resources :audit, only:[:index] do 
       collection do   
