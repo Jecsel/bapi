@@ -18,7 +18,12 @@ class V1::ClinicController < ApplicationController
         clinics = Clinic.find params[:id]
         render json: {clinic: clinics}
     end
+   
     def update
+        p params
+        @clinics = Clinic.find(params[:id])
+        @clinics.update clinic_params
+        render json: {msg: 'update success'}
     end
 
     def paginate
