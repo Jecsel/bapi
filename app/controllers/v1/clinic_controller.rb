@@ -1,8 +1,11 @@
 class V1::ClinicController < ApplicationController
     before_action :must_be_authenticated
-    
+
+    def list 
+        @clinics = Clinic.order('id desc')
+    end
     def index
-        @clinics = Clinic.all.order('id desc')
+        @clinics = Clinic.page(1).order('id desc')
     end
     
     def create
@@ -12,8 +15,14 @@ class V1::ClinicController < ApplicationController
     def destroy 
     end
     def show
+        clinics = Clinic.find params[:id]
+        render json: {clinic: clinics}
     end
     def update
+    end
+
+    def paginate
+        @clinics_page = Clinic.page(params[:page]).order('id desc')
     end
 
     private 

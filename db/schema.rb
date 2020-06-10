@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 2020_06_09_123208) do
+=======
+ActiveRecord::Schema.define(version: 2020_06_10_071838) do
+>>>>>>> b510ff02f8022815454ee98a61d96bcad456f0d3
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -211,6 +215,7 @@ ActiveRecord::Schema.define(version: 2020_06_09_123208) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "no_of_session"
+    t.boolean "status", default: true
     t.index ["location_id"], name: "index_schedules_on_location_id"
   end
 

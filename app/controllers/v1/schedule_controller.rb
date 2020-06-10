@@ -1,6 +1,13 @@
 class V1::ScheduleController < ApplicationController
     before_action :must_be_authenticated
 
+    def destroy 
+        schedule = Schedule.find(params[:id])
+        schedule.update status:false
+        schedule.slots.update_all status:false
+        render json: :deleted
+    end
+
     def close_slot
         _schedule = Schedule.find params[:schedule_id]
         slot = _schedule.slots.find params[:slot_id]
