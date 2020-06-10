@@ -10,7 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_08_113435) do
+<<<<<<< HEAD
+ActiveRecord::Schema.define(version: 2020_06_09_123208) do
+=======
+ActiveRecord::Schema.define(version: 2020_06_09_025847) do
+>>>>>>> 7e88fd2dda9cd9260e286a3f92b68f30624c0a8d
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -106,7 +110,7 @@ ActiveRecord::Schema.define(version: 2020_06_08_113435) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "code"
     t.boolean "status", default: true
-    t.integer "referral_type"
+    t.integer "referral_type", default: 0
   end
 
   create_table "patients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -136,8 +140,8 @@ ActiveRecord::Schema.define(version: 2020_06_08_113435) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "payment_reference"
     t.datetime "payment_date"
-    t.string "approved_by"
     t.bigint "payment_mode_id"
+    t.string "approved_by"
     t.index ["payment_id"], name: "index_payment_histories_on_payment_id"
     t.index ["payment_mode_id"], name: "index_payment_histories_on_payment_mode_id"
   end
@@ -210,6 +214,7 @@ ActiveRecord::Schema.define(version: 2020_06_08_113435) do
     t.time "afternoon_end_time"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "no_of_session"
     t.index ["location_id"], name: "index_schedules_on_location_id"
   end
 
