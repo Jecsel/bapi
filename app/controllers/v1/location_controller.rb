@@ -42,21 +42,21 @@ class V1::LocationController < ApplicationController
       .search(params[:search_string])
       .get_status(params[:search_status])
       .get_referral(params[:search_referral])
-      .page(params[:page])
+      .page(params[:page]).order(created_at: :desc)
     elsif params[:search_referral] != nil && params[:search_status] == nil
       @locations = Location
       .search(params[:search_string])
       .get_referral(params[:search_referral])
-      .page(params[:page])
+      .page(params[:page]).order(created_at: :desc)
     elsif params[:search_referral] == nil && params[:search_status] != nil
       @locations = Location
       .search(params[:search_string])
       .get_status(params[:search_status])
-      .page(params[:page])
+      .page(params[:page]).order(created_at: :desc)
     else
       @locations = Location
       .search(params[:search_string]) 
-      .page(params[:page])
+      .page(params[:page]).order(created_at: :desc)
     end
   end
 
@@ -90,7 +90,7 @@ class V1::LocationController < ApplicationController
   end 
 
   def index
-    @locations = Location.page(1)
+    @locations = Location.page(1).order(created_at: :desc)
   end
   
   def create
