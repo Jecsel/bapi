@@ -81,7 +81,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :schedule, only:[:create, :show] do 
+    resources :schedule, only:[:create, :show, :destroy] do 
       get 'slot/:slot_id', to:"schedule#slot"
       post 'close_slot/:slot_id', to:"schedule#close_slot"
       collection do 

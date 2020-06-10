@@ -5,7 +5,7 @@ class V1::LocationController < ApplicationController
 
   def schedules 
     today = Date.today
-    @schedules = Schedule.where("location_id = ? && schedule_date > ?",params[:location_id], today).page(params[:page])
+    @schedules = Schedule.where("location_id = ? && schedule_date >= ?",params[:location_id], today).available.order(schedule_date: :asc).page(params[:page])
   end
 
   def clinics

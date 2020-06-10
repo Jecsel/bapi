@@ -17,7 +17,7 @@ class V1::Guest::LocationController < ApplicationController
     def find_schedules
         booking_date_range = Setting.last.booking_date_range
         @loc = Location.find params[:location_id]
-        @schedules = @loc.schedules.where("id = ? && schedule_date > ?",params[:scheduled_id],cut_off_time).order(schedule_date: :asc).limit(booking_date_range)
+        @schedules = @loc.schedules.where("id = ? && schedule_date > ?",params[:scheduled_id],cut_off_time).available.order(schedule_date: :asc).limit(booking_date_range)
         render json:{
             active_slot:{
                 status: @schedules.any?,
@@ -32,7 +32,7 @@ class V1::Guest::LocationController < ApplicationController
     def schedules
         booking_date_range = Setting.last.booking_date_range
         @loc = Location.find params[:location_id]
-        @schedules = @loc.schedules.where("schedule_date > ?",cut_off_time).order(schedule_date: :asc).limit(booking_date_range)
+        @schedules = @loc.schedules.where("schedule_date > ?",cut_off_time).available.order(schedule_date: :asc).limit(booking_date_range)
 
         render json:{
             id: @loc.id, 
