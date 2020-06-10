@@ -90,6 +90,7 @@ Rails.application.routes.draw do
     end
     resources :clinic, only:[:create, :index, :update, :destroy, :show] do 
       collection do 
+        get 'list'
         post 'paginate'
       end
     end

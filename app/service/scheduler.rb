@@ -80,7 +80,7 @@ class Scheduler
 
     def time_calculator id,start_time, end_time, a
         payload = []
-        (start_time.to_time.to_i..end_time.to_time.to_i).step(minutes_interval.minutes) do |date|
+        (start_time.to_time.to_i..(end_time.to_time - minutes_interval.minutes).to_i).step(minutes_interval.minutes) do |date|
             payload << {
                 schedule_id:id,
                 slot_time: (Time.at(date) + 8.hours).strftime("%H:%M:00"), #compensate the timezone
