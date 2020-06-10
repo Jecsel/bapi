@@ -71,13 +71,14 @@ Rails.application.routes.draw do
         # post 'filter_booking'
       end
     end
-    resources :user, only: [:index] do
+    resources :user, only: [:index, :create] do
       collection do
         post 'sign_in'
         post 'authenticate'
         post 'get_policies'
         post 'sign_out'
         post 'edit_user'
+        post 'update_pass'
       end
     end
 
