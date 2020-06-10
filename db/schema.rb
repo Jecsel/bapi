@@ -10,7 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_09_101910) do
+ActiveRecord::Schema.define(version: 2020_06_09_123208) do
+
+
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -210,6 +212,7 @@ ActiveRecord::Schema.define(version: 2020_06_09_101910) do
     t.time "afternoon_end_time"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "no_of_session"
     t.index ["location_id"], name: "index_schedules_on_location_id"
   end
 
