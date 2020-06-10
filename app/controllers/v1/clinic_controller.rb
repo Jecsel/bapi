@@ -2,7 +2,7 @@ class V1::ClinicController < ApplicationController
     before_action :must_be_authenticated
     
     def index
-        @clinics = Clinic.all.order('id desc')
+        @clinics = Clinic.page(1).order('id desc')
     end
     
     def create
@@ -14,6 +14,10 @@ class V1::ClinicController < ApplicationController
     def show
     end
     def update
+    end
+
+    def paginate
+        @clinics_page = Clinic.page(params[:page]).order('id desc')
     end
 
     private 
