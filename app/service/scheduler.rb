@@ -31,7 +31,7 @@ class Scheduler
     private
     def  generate_schedule
         dates = date_to.blank? ? [date_from] : (date_from..date_to).to_a
-        if Schedule.where(schedule_date: dates).any?
+        if Schedule.where(location_id:location_id,schedule_date: dates).any?
             raise "Existing slots found. Please delete or reschedule the bookings before adding new slots."
         end
         
@@ -46,9 +46,15 @@ class Scheduler
                 payload[:morning_start_time]        = "#{first_session[:start][:hh]}:#{first_session[:start][:mm]}".to_time
                 payload[:morning_end_time]          = "#{first_session[:end][:hh]}:#{first_session[:end][:mm]}".to_time
                 payload[:no_of_session]             = no_of_session
+                if payload[:morning_start_time] > payload[:morning_end_time] 
+                    raise "Please check your slot time settings."
+                end
                 if no_of_session == 2
                     payload[:afternoon_start_time]   = "#{second_session[:start][:hh]}:#{second_session[:start][:mm]}".to_time
                     payload[:afternoon_end_time]     = "#{second_session[:end][:hh]}:#{second_session[:end][:mm]}".to_time
+                    if payload[:morning_end_time] > payload[:afternoon_start_time] || payload[:afternoon_start_time] > payload[:afternoon_end_time]
+                        raise "Please check your slot time settings."
+                    end
                 end
                 sched = Schedule.create payload
                 generate_slot sched
@@ -74,7 +80,7 @@ class Scheduler
 
     def time_calculator id,start_time, end_time, a
         payload = []
-        (start_time.to_time.to_i..end_time.to_time.to_i).step(minutes_interval.minutes) do |date|
+        (start_time.to_time.to_i..(end_time.to_time - minutes_interval.minutes).to_i).step(minutes_interval.minutes) do |date|
             payload << {
                 schedule_id:id,
                 slot_time: (Time.at(date) + 8.hours).strftime("%H:%M:00"), #compensate the timezone

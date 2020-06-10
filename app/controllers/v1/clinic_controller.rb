@@ -1,6 +1,9 @@
 class V1::ClinicController < ApplicationController
     before_action :must_be_authenticated
-    
+
+    def list 
+        @clinics = Clinic.order('id desc')
+    end
     def index
         @clinics = Clinic.page(1).order('id desc')
     end

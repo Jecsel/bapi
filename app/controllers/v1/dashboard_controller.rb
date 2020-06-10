@@ -8,12 +8,12 @@ class V1::DashboardController < ApplicationController
         clinics = Clinic.count
         users = User.count
         locations = Location.count
-        today_bookings = Booking.joins(:schedule).where("schedule_date > ?",today.beginning_of_day).count
+        today_bookings = Booking.joins(:schedule).where("bookings.created_at >= ?",today.beginning_of_day).count
         graph_data = []
         bookings.each do |e|
-            status  = Payment.where(id:e.last.pluck(:id)).group(:payment_status).count
+            status  = Payment.where(booking_id:e.last.pluck(:id)).group(:payment_status).count
             graph_data << {
-                booking_date: e.last.first.schedule.schedule_date,
+                booking_date: e.last.first.schedule.created_at.strftime("%^b %e"),
                 reserved: status["reserved"] || 0,
                 confirmed: status["confirmed"] || 0,
                 missed: status["missed"] || 0,
