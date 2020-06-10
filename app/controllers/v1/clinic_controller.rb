@@ -15,6 +15,8 @@ class V1::ClinicController < ApplicationController
     def destroy 
     end
     def show
+        clinics = Clinic.find params[:id]
+        render json: {clinic: clinics}
     end
     def update
     end
