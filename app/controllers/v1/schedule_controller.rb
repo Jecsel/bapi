@@ -22,7 +22,7 @@ class V1::ScheduleController < ApplicationController
             Scheduler.new schedule_params 
             render json: {message: :generated, status:true}
         rescue=>ex
-            render json: {message:ex,status:false}
+            render json: {message:ex,status:false},status:403
         end
     end
 
@@ -35,8 +35,19 @@ class V1::ScheduleController < ApplicationController
             :date_to, 
             :allocation_per_slot, 
             :minutes_interval,
-            :afternoon=>[:start, :end],
-            :morning=>[:start, :end]
+            :no_of_session,
+            :first_session=>[
+                :start=>[:hh, :mm], 
+                :end=>[:hh, :mm]
+            ],
+            :second_session=>[
+                :start=>[:hh, :mm], 
+                :end=>[:hh, :mm]
+            ],
+            :days =>[
+                :is_selected,
+                :id
+            ]
         )
     end
 end
