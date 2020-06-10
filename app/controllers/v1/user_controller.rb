@@ -56,6 +56,26 @@ class V1::UserController < ApplicationController
     @user
   end
 
+  def create
+    if !User.exists?(username: create_params[:username])
+      temp_pass = rand.to_s[2..7] 
+
+      @user           = User.new
+      @user.username  = create_params[:username]
+      @user.password  = temp_pass
+      @user.email     = create_params[:email]
+      @user.is_active = create_params[:status]
+  
+      if @user.save!
+        AdminMailer.new_user(@user, request.host, temp_pass).deliver_later
+      end
+      render json: {user: @user}
+    else
+      render json: {message: "Username already exists."}
+    end
+    
+  end
+
   def sign_out
 
   end
@@ -72,6 +92,10 @@ class V1::UserController < ApplicationController
 
   def edit_params
     params.require(:user).permit(:id, :username, :user_group_id)
+  end
+
+  def create_params
+    params.require(:user).permit(:username, :email, :status)
   end
 
 end
