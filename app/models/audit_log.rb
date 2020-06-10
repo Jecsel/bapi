@@ -15,4 +15,32 @@ class AuditLog < ApplicationRecord
         log.save
     end
 
+
+    def self.search_filter(filter_params)
+        _sql =  get_by_module(filter_params[:module_type])
+        if filter_params[:user_id] != 0
+            _sql = _sql.get_by_user(filter_params[:user_id])
+        end
+        if filter_params[:audit_date_start].present? && filter_params[:audit_date_end].present?
+            _sql = _sql.where(created_at:[filter_params[:audit_date_start]..filter_params[:audit_date_end]])
+        end
+        if filter_params[:audit_date_start].present? && filter_params[:audit_date_end].nil?
+            _sql = _sql.where("created_at >= ?",filter_params[:audit_date_start])
+        end
+        if filter_params[:audit_date_start].nil? && filter_params[:audit_date_end].present?
+            _sql = _sql.where("created_at <= ?",filter_params[:audit_date_end]) 
+        end
+        return _sql
+    end
+
+    def self.get_by_module id 
+        return where(model: Service.find(id).name) if id != 0
+        return self
+    end
+
+    def self.get_by_user id 
+        return where(modified_by: User.find(id).username) if id != 0
+        return self
+    end
+
 end
