@@ -97,7 +97,7 @@ Rails.application.routes.draw do
         post 'filter'
         post 'paginate'
       end
-      get 'schedules'
+      get 'schedules/:page', to:"location#schedules"
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"
       post 'unlink_clinic', to:"location#unlink_clinic"
