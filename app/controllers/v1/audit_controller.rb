@@ -12,7 +12,7 @@ class V1::AuditController < ApplicationController
     end
 
     def export
-        @audit_log = AuditLog.all.order(created_at: :desc)
+        @audit_log = data_search.order(created_at: :desc)
     end
 
     private
