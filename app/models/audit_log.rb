@@ -22,7 +22,7 @@ class AuditLog < ApplicationRecord
             _sql = _sql.get_by_user(filter_params[:user_id])
         end
         if filter_params[:audit_date_start].present? && filter_params[:audit_date_end].present?
-            _sql = _sql.where(created_at:[filter_params[:audit_date_start]..filter_params[:audit_date_end]])
+            _sql = _sql.where(created_at:[filter_params[:audit_date_start].to_date.beginning_of_day..filter_params[:audit_date_end].to_date.end_of_day])
         end
         if filter_params[:audit_date_start].present? && filter_params[:audit_date_end].nil?
             _sql = _sql.where("created_at >= ?",filter_params[:audit_date_start])
