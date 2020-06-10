@@ -1,8 +1,6 @@
-json.extract! @_slot, :id, :status, :slot_time, :allocations
-json.bookings @_bookings do |book|
-    json.extract! book, :reference_code    
-    json.patient_name book.patient.fullname
-    json.clinic book.clinic.name
-    json.location book.location.name
-end
-# json.schedules @schedules, :id, :schedule_date
+json.extract! @_slot, :id, :slot_time
+json.slot_allocation @_slot.schedule.allocation_per_slot
+json.available @_slot.allocations 
+json.slot_time_to @_slot.slot_time + @_slot.schedule.minute_interval.minutes
+json.status @status
+json.booked @booking_count
