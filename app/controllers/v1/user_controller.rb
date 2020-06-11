@@ -1,6 +1,6 @@
 class V1::UserController < ApplicationController
   
-  before_action :must_be_authenticated, only:[:authenticate, :get_policies, :index, :edit_user, :update_pass]
+  before_action :must_be_authenticated, only:[:authenticate, :get_policies, :index, :edit_user]
 
   def sign_in
     user = User.find_by_username user_params[:username]
@@ -87,18 +87,20 @@ class V1::UserController < ApplicationController
   end
 
   def update_pass
-    @current_user.update(first_login: false)
-    @current_user.update(password: Digest::MD5.hexdigest(params[:pass])[0..19])
+    user = User.find_by_username params[:user]
+    user.update(first_login: false)
+    user.update(password: Digest::MD5.hexdigest(params[:pass])[0..19])
 
-    render json: {message: "Password updated successfully"}
+    bearer_token = encode({user_id: user.id,secret: user.user_token})
+
+    render json: {message: "Password updated successfully", token: bearer_token}
   end
 
   private 
   
 
   def set_new_pass user
-    bearer_token = encode({user_id: user.id,secret: user.user_token})
-    render json: {message:"Set new password", token: bearer_token}
+    render json: {message:"Set new password"}
     return false
   end
 
