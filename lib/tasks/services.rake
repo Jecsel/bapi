@@ -183,6 +183,11 @@ namespace :services do
                 service_id: 4, #Booking service
                 name: "Mark as no show", #service_policy_id 16
                 status: true
+            },
+            {
+                service_id: 1, #Booking service
+                name: "Add new user", #service_policy_id 17
+                status: true
             }
         ]
         ServicePolicy.create _servicePolicies
@@ -286,6 +291,12 @@ namespace :services do
                 user_group_id: _user_group_id,
                 service_id: 4, #Booking service
                 service_policy_id: 16, #Mark as no show
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 1, #User service
+                service_policy_id: 17, #Add new user
                 status: true
             }
         ]
