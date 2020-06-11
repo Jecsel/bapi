@@ -53084,6 +53084,61 @@ $provide.value("$locale", {
 
     angular
         .module("BiomarkBooking")
+        .component("bookingAdmin",{
+            templateUrl:"/admin/view.html"
+        })
+})();
+( function(){
+
+	"use strict";
+
+	angular
+		.module('BiomarkBooking')
+		.config(['$stateProvider','$urlRouterProvider','$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
+			
+			$stateProvider
+    			.state("admin",{
+					url:"/admin",
+		            template:"<booking-admin></booking-admin>",
+				})
+				.state("admin.dashboard",{
+		            url:"/dashboard",
+		            template:"<admin-dashboard></adamin-dashboard>",
+				})
+				.state("admin.dashboard.users",{
+		            url:"/users",
+		            template:"<dashboard-users></dashboard-users>",
+				})
+				.state("admin.dashboard.locations",{
+		            url:"/locations",
+		            template:"<dashboard-locations></dashboard-locations>",
+				})
+				.state("admin.dashboard.clinics",{
+		            url:"/clinics",
+		            template:"<dashboard-clinics></dashboard-clinics>",
+				})
+				.state("admin.dashboard.bookings",{
+		            url:"/bookings",
+		            template:"<dashboard-bookings></dashboard-bookings>",
+				})
+				.state("admin.dashboard.settings",{
+					url:"/settings",
+					template:"<dashboard-settings></dashboard-settings>"
+				})
+				.state("admin.dashboard.audit",{
+					url:"/audit-log",
+					template:"<dashboard-audit></dashboard-audit>"
+				})
+				
+		}])
+
+	
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .factory("bookingService",bookingService);
 
         bookingService.$inject = ["$localStorage"];
@@ -53204,61 +53259,6 @@ $provide.value("$locale", {
                 elmnt.scrollIntoView();
             }
         }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("bookingAdmin",{
-            templateUrl:"/admin/view.html"
-        })
-})();
-( function(){
-
-	"use strict";
-
-	angular
-		.module('BiomarkBooking')
-		.config(['$stateProvider','$urlRouterProvider','$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
-			
-			$stateProvider
-    			.state("admin",{
-					url:"/admin",
-		            template:"<booking-admin></booking-admin>",
-				})
-				.state("admin.dashboard",{
-		            url:"/dashboard",
-		            template:"<admin-dashboard></adamin-dashboard>",
-				})
-				.state("admin.dashboard.users",{
-		            url:"/users",
-		            template:"<dashboard-users></dashboard-users>",
-				})
-				.state("admin.dashboard.locations",{
-		            url:"/locations",
-		            template:"<dashboard-locations></dashboard-locations>",
-				})
-				.state("admin.dashboard.clinics",{
-		            url:"/clinics",
-		            template:"<dashboard-clinics></dashboard-clinics>",
-				})
-				.state("admin.dashboard.bookings",{
-		            url:"/bookings",
-		            template:"<dashboard-bookings></dashboard-bookings>",
-				})
-				.state("admin.dashboard.settings",{
-					url:"/settings",
-					template:"<dashboard-settings></dashboard-settings>"
-				})
-				.state("admin.dashboard.audit",{
-					url:"/audit-log",
-					template:"<dashboard-audit></dashboard-audit>"
-				})
-				
-		}])
-
-	
 })();
 ( function(){
 
@@ -53531,6 +53531,338 @@ $provide.value("$locale", {
           });
 })();
 
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("adminLogin",{
+            controller:"adminLoginController",
+            templateUrl:"/admin/login/view.html"
+        })
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("adminLoginController",adminLoginController);
+
+        adminLoginController.$inject = ["Http","$state"];
+
+        function adminLoginController( Http, $state ){
+            
+            var vm = this;
+            vm.state = false;
+
+            vm.stage = 1
+            vm.showPassword = false
+            function error(err){
+                alert(err.data.message);
+            }
+            function success(res){
+
+                if(res.data.message == "Set new password"){
+                    vm.stage = 2
+                }else{
+                    Http.set_token(res.data.token);
+                    $state.go("admin.dashboard");
+                }
+                
+            }
+            vm.signIn = function(credential){
+                Http
+                    .post("v1/user/sign_in",{credential:credential})
+                    .then(success,error);
+            }
+            vm.$onInit = function(){
+                Http
+                    .post("v1/user/authenticate")
+                    .then(function(){
+                        $state.go("admin.dashboard")
+                    },function(){
+                        vm.state = true;
+                    })
+            }
+            vm.setPassword = function(pass){
+                Http
+                    .post("v1/user/update_pass",{pass:pass.password, user: vm.credential.username})
+                    .then(
+                        function(res){
+                            Http.set_token(res.data.token);
+                            alert(res.data.message)
+
+                            $state.go("admin.dashboard");
+                        },
+                        function(err){
+                            console.log(err)
+                        }
+                    );
+            }
+            vm.togglePassword = function(){
+                vm.showPassword = !vm.showPassword
+            }
+        }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .component("adminDashboard",{
+            controller:"adminDashboardController",
+            templateUrl:"/admin/dashboard/view.html"
+        })
+})();
+(function () {
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("adminDashboardController", adminDashboardController);
+
+    adminDashboardController.$inject = ["Http", "$state", "$sessionStorage","$timeout"];
+
+    function adminDashboardController(Http, $state, $sessionStorage, $timeout) {
+        var vm = this;
+        vm.loading = true;
+        vm.is_ready = false;
+        function error(err) {
+            alert("Invalid access")
+            $state.go("admin");
+        }
+        function load_chart(){
+            // enum payment_status:[:reserved, :confirmed, :missed, :completed, :cancelled, :reschedule]
+            Http.get("v1/dashboard/booking_graph").then(function(res){
+                vm.is_ready = true;
+                vm.data = res.data;
+                vm.chartOptions = {
+                    palette: "ocean",
+                    dataSource: res.data.graph_data,
+                    commonSeriesSettings: {
+                        argumentField: "booking_date",
+                        type: "stackedBar"
+                    },
+                    series: [
+                        { valueField: "reserved", name: "Reserved" },
+                        { valueField: "confirmed", name: "Confirmed" },
+                        { valueField: "missed", name: "Missed" },
+                        { valueField: "completed", name: "Completed" },
+                        { valueField: "cancelled", name: "Cancelled" },
+                        { valueField: "reschedule", name: "Reschedule" },
+                    ],
+                    legend: {
+                        verticalAlignment: "bottom",
+                        horizontalAlignment: "center",
+                        itemTextPosition: 'top'
+                    },
+                    valueAxis: {
+                        position: "right"
+                    },
+                    title: "Daily Bookings",
+                    tooltip: {
+                        enabled: true,
+                        location: "edge",
+                        customizeTooltip: function (arg) {
+                            return {
+                                text: arg.seriesName + " Bookings: " + arg.valueText
+                            };
+                        }
+                    }
+                };
+                var pie_ds = [
+                    {
+                        status:"Reserved",
+                        value:res.data.graph_data[7].reserved
+                    },
+                    {
+                        status:"Cancelled",
+                        value:res.data.graph_data[7].cancelled
+                    },
+                    {
+                        status:"Completed",
+                        value:res.data.graph_data[7].completed
+                    },
+                    {
+                        status:"Reschedule",
+                        value:res.data.graph_data[7].reschedule
+                    },
+                    {
+                        status:"Confirmed",
+                        value:res.data.graph_data[7].confirmed
+                    },
+                    {
+                        status:"Missed",
+                        value:res.data.graph_data[7].missed
+                    }
+                ]
+                vm.pie_chart = {
+                    palette: "ocean",
+                    type: "doughnut",
+                    dataSource: pie_ds,
+                    title: "Today's Booking Status",
+                    legend: {
+                        horizontalAlignment: "center",
+                        verticalAlignment: "bottom",
+                        margin: 0
+                    },
+                    series: [{            
+                        argumentField: "status",
+                        valueField: "value",
+                    }]
+                }
+            });
+        }
+        function success(res) {
+            load_chart();
+            //can contain admin information
+            vm.loading = false
+            if (res.data.message) {
+                alert("User has no policies. Contact admin for details")
+                $sessionStorage.access_token = 0;
+                $state.go("admin");
+                return false;
+            }
+
+            vm.services = res.data.policies;
+
+            //Redirect to first service if there is no dashboard service
+            if (vm.services.filter(x => x.service_name === "Dashboard") == "") $state.go(vm.services[0].service_path)
+            
+            
+        }
+        vm.$onInit = function () {
+            Http
+                .post("v1/user/get_policies")
+                .then(success, error);
+                
+        }
+        vm.logout = function () {
+            $sessionStorage.access_token = 0;
+            $state.go("admin");
+        }
+
+    }
+})();
+( function(){
+	"use strict";
+
+
+	angular
+		.module("BiomarkBooking")
+		.factory("Dashboard", Dashboard);
+
+		Dashboard.$inject=[];
+
+
+		function Dashboard(){
+                
+            var f = {
+                data:{
+                    pagination: 1
+                },
+                init:init
+            }
+
+            function init(cb){
+                cb(f.data)
+            }
+
+            return f;
+		}
+
+})();
+(function(){
+
+    angular
+        .module("BiomarkBooking")
+        .component("pagination", {
+            bindings:{
+				config:"=",
+                paginate:"="
+			},
+            controller: "paginationController",
+            templateUrl: "/admin/pagination/view.html"
+        })
+})();
+(function(){
+    angular
+        .module("BiomarkBooking")
+        .controller("paginationController", paginationController)
+
+        paginationController.$inject = [];
+
+        function paginationController(){
+			var vm = this;
+			
+            var local_configurations = {
+                item_per_page: 10,
+                padding_per_page: 4,
+            };
+            
+            vm.$onInit = function () {
+                vm.pagination = angular.merge(local_configurations, vm.config);
+                init();
+            }
+          
+            vm.btn_previous = false;
+            vm.btn_next = true;
+            vm.btn_dotdot = true;
+            vm.btn_last = true;
+            vm.page_elements = [];
+
+            function init(){
+                var last_show_page = vm.pagination.page_position + vm.pagination.padding_per_page-1;
+                
+				vm.btn_dotdot = (last_show_page >= vm.pagination.total_pages) ? false : true;
+				vm.btn_previous = (vm.pagination.page_position > 1 );
+				vm.btn_next = (vm.pagination.page_position != vm.pagination.total_pages );
+
+				if(last_show_page <= vm.pagination.total_pages){
+					vm.page_elements.length = 0;
+					if(vm.pagination.total_pages > vm.pagination.padding_per_page){
+						for( var i = 1;i <= vm.pagination.total_pages; i++ ){
+							if(i >= vm.pagination.page_position && i <= last_show_page){
+								vm.page_elements.push(i);
+							}
+						}
+
+					}else{
+						for(var i = 1;i <= vm.pagination.total_pages; i++ ){
+							vm.page_elements.push(i);
+						}
+					}
+				}else{
+					vm.page_elements.length = 0;
+					var partial_index = vm.pagination.total_pages - vm.pagination.padding_per_page +1;
+					for( var i = 1;i <= vm.pagination.total_pages; i++ ){
+						if(i >= partial_index && i <= vm.pagination.total_pages){
+							vm.page_elements.push(i);
+						}
+					}
+				}
+				
+				
+			}
+			
+			
+			vm.previous = function(){
+				vm.pagination.page_position -=1;
+				vm.paginate( vm.pagination.page_position );
+				init();
+			}
+			vm.next = function(){
+				vm.pagination.page_position +=1;
+				vm.paginate( vm.pagination.page_position );
+				init();
+			}
+			vm.page_click = function( page ){
+				vm.pagination.page_position = page;
+				vm.paginate( vm.pagination.page_position );
+				init();
+            }
+        }
+})();
 (function(){
     "use strict";
 
@@ -54097,297 +54429,6 @@ $provide.value("$locale", {
 			
 
 		}
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("adminDashboard",{
-            controller:"adminDashboardController",
-            templateUrl:"/admin/dashboard/view.html"
-        })
-})();
-(function () {
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("adminDashboardController", adminDashboardController);
-
-    adminDashboardController.$inject = ["Http", "$state", "$sessionStorage","$timeout"];
-
-    function adminDashboardController(Http, $state, $sessionStorage, $timeout) {
-        var vm = this;
-        vm.loading = true;
-        vm.is_ready = false;
-        function error(err) {
-            alert("Invalid access")
-            $state.go("admin");
-        }
-        function load_chart(){
-            // enum payment_status:[:reserved, :confirmed, :missed, :completed, :cancelled, :reschedule]
-            Http.get("v1/dashboard/booking_graph").then(function(res){
-                vm.is_ready = true;
-                vm.data = res.data;
-                vm.chartOptions = {
-                    palette: "ocean",
-                    dataSource: res.data.graph_data,
-                    commonSeriesSettings: {
-                        argumentField: "booking_date",
-                        type: "stackedBar"
-                    },
-                    series: [
-                        { valueField: "reserved", name: "Reserved" },
-                        { valueField: "confirmed", name: "Confirmed" },
-                        { valueField: "missed", name: "Missed" },
-                        { valueField: "completed", name: "Completed" },
-                        { valueField: "cancelled", name: "Cancelled" },
-                        { valueField: "reschedule", name: "Reschedule" },
-                    ],
-                    legend: {
-                        verticalAlignment: "bottom",
-                        horizontalAlignment: "center",
-                        itemTextPosition: 'top'
-                    },
-                    valueAxis: {
-                        position: "right"
-                    },
-                    title: "Daily Bookings",
-                    tooltip: {
-                        enabled: true,
-                        location: "edge",
-                        customizeTooltip: function (arg) {
-                            return {
-                                text: arg.seriesName + " Bookings: " + arg.valueText
-                            };
-                        }
-                    }
-                };
-            });
-        }
-        function success(res) {
-            load_chart();
-            //can contain admin information
-            vm.loading = false
-            if (res.data.message) {
-                alert("User has no policies. Contact admin for details")
-                $sessionStorage.access_token = 0;
-                $state.go("admin");
-                return false;
-            }
-
-            vm.services = res.data.policies;
-
-            //Redirect to first service if there is no dashboard service
-            if (vm.services.filter(x => x.service_name === "Dashboard") == "") $state.go(vm.services[0].service_path)
-            
-            
-        }
-        vm.$onInit = function () {
-            Http
-                .post("v1/user/get_policies")
-                .then(success, error);
-                
-        }
-        vm.logout = function () {
-            $sessionStorage.access_token = 0;
-            $state.go("admin");
-        }
-
-    }
-})();
-( function(){
-	"use strict";
-
-
-	angular
-		.module("BiomarkBooking")
-		.factory("Dashboard", Dashboard);
-
-		Dashboard.$inject=[];
-
-
-		function Dashboard(){
-                
-            var f = {
-                data:{
-                    pagination: 1
-                },
-                init:init
-            }
-
-            function init(cb){
-                cb(f.data)
-            }
-
-            return f;
-		}
-
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("adminLogin",{
-            controller:"adminLoginController",
-            templateUrl:"/admin/login/view.html"
-        })
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("adminLoginController",adminLoginController);
-
-        adminLoginController.$inject = ["Http","$state"];
-
-        function adminLoginController( Http, $state ){
-            
-            var vm = this;
-            vm.state = false;
-
-            vm.stage = 1
-            vm.showPassword = false
-            function error(err){
-                alert(err.data.message);
-            }
-            function success(res){
-
-                if(res.data.message == "Set new password"){
-                    vm.stage = 2
-                }else{
-                    Http.set_token(res.data.token);
-                    $state.go("admin.dashboard");
-                }
-                
-            }
-            vm.signIn = function(credential){
-                Http
-                    .post("v1/user/sign_in",{credential:credential})
-                    .then(success,error);
-            }
-            vm.$onInit = function(){
-                Http
-                    .post("v1/user/authenticate")
-                    .then(function(){
-                        $state.go("admin.dashboard")
-                    },function(){
-                        vm.state = true;
-                    })
-            }
-            vm.setPassword = function(pass){
-                Http
-                    .post("v1/user/update_pass",{pass:pass.password, user: vm.credential.username})
-                    .then(
-                        function(res){
-                            Http.set_token(res.data.token);
-                            alert(res.data.message)
-
-                            $state.go("admin.dashboard");
-                        },
-                        function(err){
-                            console.log(err)
-                        }
-                    );
-            }
-            vm.togglePassword = function(){
-                vm.showPassword = !vm.showPassword
-            }
-        }
-})();
-(function(){
-
-    angular
-        .module("BiomarkBooking")
-        .component("pagination", {
-            bindings:{
-				config:"=",
-                paginate:"="
-			},
-            controller: "paginationController",
-            templateUrl: "/admin/pagination/view.html"
-        })
-})();
-(function(){
-    angular
-        .module("BiomarkBooking")
-        .controller("paginationController", paginationController)
-
-        paginationController.$inject = [];
-
-        function paginationController(){
-			var vm = this;
-			
-            var local_configurations = {
-                item_per_page: 10,
-                padding_per_page: 4,
-            };
-            
-            vm.$onInit = function () {
-                vm.pagination = angular.merge(local_configurations, vm.config);
-                init();
-            }
-          
-            vm.btn_previous = false;
-            vm.btn_next = true;
-            vm.btn_dotdot = true;
-            vm.btn_last = true;
-            vm.page_elements = [];
-
-            function init(){
-                var last_show_page = vm.pagination.page_position + vm.pagination.padding_per_page-1;
-                
-				vm.btn_dotdot = (last_show_page >= vm.pagination.total_pages) ? false : true;
-				vm.btn_previous = (vm.pagination.page_position > 1 );
-				vm.btn_next = (vm.pagination.page_position != vm.pagination.total_pages );
-
-				if(last_show_page <= vm.pagination.total_pages){
-					vm.page_elements.length = 0;
-					if(vm.pagination.total_pages > vm.pagination.padding_per_page){
-						for( var i = 1;i <= vm.pagination.total_pages; i++ ){
-							if(i >= vm.pagination.page_position && i <= last_show_page){
-								vm.page_elements.push(i);
-							}
-						}
-
-					}else{
-						for(var i = 1;i <= vm.pagination.total_pages; i++ ){
-							vm.page_elements.push(i);
-						}
-					}
-				}else{
-					vm.page_elements.length = 0;
-					var partial_index = vm.pagination.total_pages - vm.pagination.padding_per_page +1;
-					for( var i = 1;i <= vm.pagination.total_pages; i++ ){
-						if(i >= partial_index && i <= vm.pagination.total_pages){
-							vm.page_elements.push(i);
-						}
-					}
-				}
-				
-				
-			}
-			
-			
-			vm.previous = function(){
-				vm.pagination.page_position -=1;
-				vm.paginate( vm.pagination.page_position );
-				init();
-			}
-			vm.next = function(){
-				vm.pagination.page_position +=1;
-				vm.paginate( vm.pagination.page_position );
-				init();
-			}
-			vm.page_click = function( page ){
-				vm.pagination.page_position = page;
-				vm.paginate( vm.pagination.page_position );
-				init();
-            }
-        }
 })();
 (function(){
     "use strict";
@@ -55963,6 +56004,51 @@ $provide.value("$locale", {
 
     angular
         .module("BiomarkBooking")
+        .component("locationDetails",{
+            controller:"locationDetailsController",
+            templateUrl:"/admin/dashboard/locations/details/view.html",
+            bindings:{
+                locationDetails: "="
+            }
+        })
+})();
+(function () {
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
+        .controller("locationDetailsController", locationDetailsController);
+
+        locationDetailsController.$inject = ["Http", "$state"];
+
+    function locationDetailsController(Http, $state) {
+        var vm = this;
+
+
+        vm.openEditModal = function(location){
+            vm.edit_location_modal = true;
+        }
+        vm.closeModal = function(){
+            vm.edit_location_modal = false
+        }
+
+        vm.updateLocation = function(location){
+            location.status = parseInt(location.status_id)
+            location.referral_type = parseInt(location.referral_id)
+            Http
+                .patch("v1/location/" + location.id, { location: location })
+                .then(function (res) {
+                    vm.locationDetails = res.data.location;
+                    vm.edit_location_modal = false;
+                }); 
+        }
+    }
+})();
+(function(){
+    "use strict";
+
+    angular
+        .module("BiomarkBooking")
         .component("locationSchedules",{
             controller:"locationSchedulesController",
             templateUrl:"/admin/dashboard/locations/schedules/view.html"
@@ -56043,51 +56129,6 @@ $provide.value("$locale", {
             }
             
         }
-})();
-(function(){
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .component("locationDetails",{
-            controller:"locationDetailsController",
-            templateUrl:"/admin/dashboard/locations/details/view.html",
-            bindings:{
-                locationDetails: "="
-            }
-        })
-})();
-(function () {
-    "use strict";
-
-    angular
-        .module("BiomarkBooking")
-        .controller("locationDetailsController", locationDetailsController);
-
-        locationDetailsController.$inject = ["Http", "$state"];
-
-    function locationDetailsController(Http, $state) {
-        var vm = this;
-
-
-        vm.openEditModal = function(location){
-            vm.edit_location_modal = true;
-        }
-        vm.closeModal = function(){
-            vm.edit_location_modal = false
-        }
-
-        vm.updateLocation = function(location){
-            location.status = parseInt(location.status_id)
-            location.referral_type = parseInt(location.referral_id)
-            Http
-                .patch("v1/location/" + location.id, { location: location })
-                .then(function (res) {
-                    vm.locationDetails = res.data.location;
-                    vm.edit_location_modal = false;
-                }); 
-        }
-    }
 })();
 (function(){
     "use strict";
@@ -56481,8 +56522,11 @@ $provide.value("$locale", {
             }
         }
 })();
-angular.module('BiomarkBooking').run(['$templateCache', function($templateCache) {$templateCache.put('/booking/view.html','<div ui-view>\n<div class="biomark-container">\n    <div class="container">\n        <div class="landing-page">\n            <div class="d-none d-sm-block">\n                <div class="faq-container d-flex flex-row justify-content-end">\n                    <div class="d-flex justify-content-end align-items-center pt-3">\n                        <i class="fa fa-phone fa-flip-horizontal pl-2 black-blue" style="font-size:16px"></i>\n                        <div class="contact-label black-blue">Contact us at &nbsp;<b class="fontMukta black-blue"> 1800 22 6843</b><b class="pl-5 fontMukta pointer black-blue" ng-click="$ctrl.scroll_to()">FAQ</b></div>\n                    </div>\n                </div>\n            </div>\n            <div class="d-block d-sm-none">\n                <div class="faq-container d-flex flex-row justify-content-between pt-3">\n                    <div class="d-flex justify-content-end align-items-center">\n                        <i class="fa fa-phone fa-flip-horizontal pl-2 black-blue" style="font-size:16px"></i>\n                        <div class="contact-label black-blue">Contact us at &nbsp;<b class="fontMukta black-blue"> 1800 22 6843</b></div>\n                    </div>\n                    <b class="pl-5 fontMukta pointer black-blue" ng-click="$ctrl.sm_scroll_to()">FAQ</b>\n                </div>\n            </div>\n            <div class="biomark-intro mt-3">\n                <div class="d-none d-sm-block main-title">COVID-19 Drive-Thru Testing</div>\n                <div class="d-block d-sm-none sm-main-title">COVID-19 Drive-Thru Testing</div>\n                <div class="appointment-holder muli-label-14">By Appointment Only</div>\n                <div class="appointment-holder muli-label-14">Results will be ready in 48 -72 hrs</div>\n                <div class="row">\n                    <div class="col-lg-6 col-md-6 col-sm-12">\n                        <div class="row">\n                            <div class="col-sm-6 mt-2">\n                                <div class="d-none d-sm-block">\n                                    <div class="test-center-holder">TEST CENTER</div>\n                                    <div class="test-address">Galeri Empire, No. 23, Jalan</div> \n                                    <div class="test-address"> Empayar Off Persiaran Sultan </div>\n                                    <div class="test-address">Ibrahim / KU1, 41150,Klang</div>\n                                </div>\n                                <div class="d-block d-sm-none">\n                                    <div class="test-center-holder">TEST CENTER</div>\n                                    <div class="test-address">Galeri Empire, No. 23, Jalan Empayar</div> \n                                    <div class="test-address">Off Persiaran Sultan Ibrahim / KU1,</div>\n                                    <div class="test-address">41150,Klang</div>\n                                </div>\n                            </div>\n                            <div class="col-sm-6 mt-2">\n                                <div class="test-center-holder">SCHEDULE</div>\n                                <div class="test-address">Monday to Saturday</div> \n                                <div class="test-address">9:00 AM - 12:00 PM</div>\n                                <div class="test-address">1:00 PM - 4:00 PM</div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n                <div class="d-none d-sm-block ">\n                    <div class="d-flex flex-row align-items-center mt-5">\n                        <button class="biomark-btn-primary pl-3 pr-3" ui-sref="home.booking-locations">Book Test - RM 380</button>\n                        <div class="mukta-label-18">&nbsp;&nbsp;or Call &nbsp;<b class="mukta-label-18">1800 22 6843</b></div>\n                    </div>\n                </div>\n                <div class="row pr-3">\n                    <div class="col-lg-6 col-md-6 col-sm-12 important-message-container mt-5">\n                        <div class="label-title dark-red">IMPORTANT MESSAGE:</div>\n                        <div class="label-text black-red">If you display any symptoms such as fever, cough and sore throat and have been\n                            in contact with a CONFIRMED case of COVID-19, please proceed to the nearest publc healthcare\n                            facility for screening and management.</div>\n                    </div>\n                </div>\n                <div class="d-none d-sm-block">\n                    <div class="row">\n                        <div class="col-md-6 col-lg-7 mt-3">\n                            <span class="muli-label-14 bluey-grey">A collaboration between</span>\n                            <div class="d-flex flex-row align-self-end mt-3">\n                                <div class="bd-highlight d-flex align-items-center justify-content-center"><img src="./images/clinipath.png" style="width:250px" alt=""></div>\n                                <div class="bd-highlight pl-3 d-flex align-items-center justify-content-center"><img src="./images/quantum.png" style="width: 186px;" alt=""></div>\n                                <div class="bd-highlight pl-3 d-flex align-items-center justify-content-center"><img src="./images/gribbles.jpg" style="width:100px" alt=""></div>\n                            </div>\n                        </div>\n                        <!-- <div class="col-md-6 col-lg-5 mt-3">\n                            <span style="color:  #8493AE;">Certified by</span>\n                            <div class="d-flex flex-row align-self-end mt-3">\n                                <div class="bd-highlight pl-5 d-flex align-items-center justify-content-center"><img src="./images/moh.png" style="width:100px" alt=""></div>\n                            </div>\n                        </div> -->\n                    </div>\n                </div>\n                <div class="d-block d-sm-none mt-3">\n                    <div class="d-flex justify-content-center">A collaboration between</div>\n                    <div class="row">\n                        <div class="col-5 d-flex align-items-center justify-content-center"><img src="./images/clinipath.png" style="width:150px" alt=""></div>\n                        <div class="col-4 d-flex align-items-center justify-content-center"><img src="./images/quantum.png" style="width:120px" alt=""></div>\n                        <div class="col-3 d-flex align-items-center justify-content-center"><img src="./images/gribbles.jpg" style="width:65px" alt=""></div>\n                    </div>\n                    <!-- <div class="d-flex justify-content-center">Certified by</div>\n                    <div class="d-flex justify-content-center"><img src="./images/moh.png" style="width:110px" alt=""> -->\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class="asked-box pb-5 m-3">\n        <div class="d-none d-sm-block">\n            <div id="frequent_id" class="frequent-container d-flex justify-content-center">Frequently Asked Questions</div>\n        </div>\n        <div class="d-block d-sm-none">\n            <div id="sm_frequent_id" class="sm-frequent-container d-flex justify-content-center">Frequently Asked Questions</div>\n        </div>\n        <div class="frequent-questions d-flex flex-column pb-1" ng-repeat="freq in $ctrl.frequent">\n            <div class="d-none d-sm-block">\n                <div class="d-flex justify-content-center">\n                    <div class=" group-container d-flex justify-content-between p-2">\n                            <div class="desc-text d-flex align-items-center flex-grow-1 bd-highlight">{{freq.question}}</div>\n                            <div class="d-flex align-items-center pl-3"><i\n                                    class="fas {{(freq.status_faq) ? \'fa-angle-up\':\'fas fa-angle-down \'}} pointer"\n                                    ng-click="$ctrl.show_faq($index)"></i></div>\n                    </div>\n                </div>\n            </div>\n            <div class="d-block d-sm-none">\n                <div class="d-flex justify-content-center">\n                    <div class="sm-group-container d-flex justify-content-between p-2">\n                        <div class="desc-text d-flex align-items-center flex-grow-1 bd-highlight">{{freq.question}}</div>\n                        <div class="d-flex align-items-center pl-3"><i\n                                class="fas {{(freq.status_faq) ? \'fa-angle-up\':\'fas fa-angle-down \'}} pointer"\n                                ng-click="$ctrl.show_faq($index)"></i></div>\n                    </div>\n                </div>\n            </div>\n            <div ng-if="freq.status_faq" class="d-flex justify-content-center pt-2 pb-2">\n                <div class="desc-container p-2">\n                    <div ng-bind-html="freq.desc"></div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class="d-block d-sm-none">\n        <div class="sm-footer">\n            <div class="container py-4">\n                <div class="d-flex flex-column">\n                    <a href="https://pdpa.gribbles.com.my/english"><div class="pb-1">Data Privacy of Service</div></a>\n                    <a href="https://pdpa.gribbles.com.my/english"><div class="pb-1">Data Privacy of Biomark</div></a>\n                    <a href="https://pdpa.gribbles.com.my/english"><div>Terms of Service of Biomark</div></a>\n                </div>\n                <div class="d-flex justify-content-center pt-2">\n                    <div class="footer-sign">This site is powered by BioMark &reg;</div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class="d-block d-sm-none">\n        <div class="bottom-navigation d-flex justify-content-center p-3">\n            <div class="d-flex flex-column">\n                <button class="biomark-btn-primary pl-3 pr-3" ui-sref="home.booking-locations">Book Test - RM 380</button>\n                <div class="d-flex justify-content-center pt-1">or Call &nbsp;<b>1800 22 6843</b></div>\n            </div>\n        </div>\n    </div>\n    <footer class="d-none d-sm-block">\n        <div class="container py-4">\n            <div class="d-flex justify-content-center pt-2">\n                <div class="d-flex flex-row">\n                    <a href="https://pdpa.gribbles.com.my/english"><div>Data Privacy of Service</div></a>\n                    <a href="https://www.biomarking.com/privacy.html"><div class="pr-5 pl-5">Data Privacy of Biomark</div></a>\n                    <a href="https://www.biomarking.com/terms.html"><div>Terms of Service of Biomark</div></a>\n                </div>\n            </div>\n            <div class="d-flex justify-content-center pt-2">\n                <div class="footer-sign">This site is powered by BioMark &reg;</div>\n            </div>\n        </div>\n    </footer>\n</div>\n</div>');
-$templateCache.put('/admin/view.html','<div ui-view>\n    <div class="container">\n        <div class="row">\n            <div class="col-12 col-sm-8 col-md-5 col-lg-4 mx-sm-auto">\n                <div class="login-container d-flex align-items-center">\n                    <admin-login></admin-login>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>');
+angular.module('BiomarkBooking').run(['$templateCache', function($templateCache) {$templateCache.put('/admin/view.html','<div ui-view>\n    <div class="container">\n        <div class="row">\n            <div class="col-12 col-sm-8 col-md-5 col-lg-4 mx-sm-auto">\n                <div class="login-container d-flex align-items-center">\n                    <admin-login></admin-login>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>');
+$templateCache.put('/booking/view.html','<div ui-view>\n<div class="biomark-container">\n    <div class="container">\n        <div class="landing-page">\n            <div class="d-none d-sm-block">\n                <div class="faq-container d-flex flex-row justify-content-end">\n                    <div class="d-flex justify-content-end align-items-center pt-3">\n                        <i class="fa fa-phone fa-flip-horizontal pl-2 black-blue" style="font-size:16px"></i>\n                        <div class="contact-label black-blue">Contact us at &nbsp;<b class="fontMukta black-blue"> 1800 22 6843</b><b class="pl-5 fontMukta pointer black-blue" ng-click="$ctrl.scroll_to()">FAQ</b></div>\n                    </div>\n                </div>\n            </div>\n            <div class="d-block d-sm-none">\n                <div class="faq-container d-flex flex-row justify-content-between pt-3">\n                    <div class="d-flex justify-content-end align-items-center">\n                        <i class="fa fa-phone fa-flip-horizontal pl-2 black-blue" style="font-size:16px"></i>\n                        <div class="contact-label black-blue">Contact us at &nbsp;<b class="fontMukta black-blue"> 1800 22 6843</b></div>\n                    </div>\n                    <b class="pl-5 fontMukta pointer black-blue" ng-click="$ctrl.sm_scroll_to()">FAQ</b>\n                </div>\n            </div>\n            <div class="biomark-intro mt-3">\n                <div class="d-none d-sm-block main-title">COVID-19 Drive-Thru Testing</div>\n                <div class="d-block d-sm-none sm-main-title">COVID-19 Drive-Thru Testing</div>\n                <div class="appointment-holder muli-label-14">By Appointment Only</div>\n                <div class="appointment-holder muli-label-14">Results will be ready in 48 -72 hrs</div>\n                <div class="row">\n                    <div class="col-lg-6 col-md-6 col-sm-12">\n                        <div class="row">\n                            <div class="col-sm-6 mt-2">\n                                <div class="d-none d-sm-block">\n                                    <div class="test-center-holder">TEST CENTER</div>\n                                    <div class="test-address">Galeri Empire, No. 23, Jalan</div> \n                                    <div class="test-address"> Empayar Off Persiaran Sultan </div>\n                                    <div class="test-address">Ibrahim / KU1, 41150,Klang</div>\n                                </div>\n                                <div class="d-block d-sm-none">\n                                    <div class="test-center-holder">TEST CENTER</div>\n                                    <div class="test-address">Galeri Empire, No. 23, Jalan Empayar</div> \n                                    <div class="test-address">Off Persiaran Sultan Ibrahim / KU1,</div>\n                                    <div class="test-address">41150,Klang</div>\n                                </div>\n                            </div>\n                            <div class="col-sm-6 mt-2">\n                                <div class="test-center-holder">SCHEDULE</div>\n                                <div class="test-address">Monday to Saturday</div> \n                                <div class="test-address">9:00 AM - 12:00 PM</div>\n                                <div class="test-address">1:00 PM - 4:00 PM</div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n                <div class="d-none d-sm-block ">\n                    <div class="d-flex flex-row align-items-center mt-5">\n                        <button class="biomark-btn-primary pl-3 pr-3" ui-sref="home.booking-locations">Book Test - RM 380</button>\n                        <div class="mukta-label-18">&nbsp;&nbsp;or Call &nbsp;<b class="mukta-label-18">1800 22 6843</b></div>\n                    </div>\n                </div>\n                <div class="row pr-3">\n                    <div class="col-lg-6 col-md-6 col-sm-12 important-message-container mt-5">\n                        <div class="label-title dark-red">IMPORTANT MESSAGE:</div>\n                        <div class="label-text black-red">If you display any symptoms such as fever, cough and sore throat and have been\n                            in contact with a CONFIRMED case of COVID-19, please proceed to the nearest publc healthcare\n                            facility for screening and management.</div>\n                    </div>\n                </div>\n                <div class="d-none d-sm-block">\n                    <div class="row">\n                        <div class="col-md-6 col-lg-7 mt-3">\n                            <span class="muli-label-14 bluey-grey">A collaboration between</span>\n                            <div class="d-flex flex-row align-self-end mt-3">\n                                <div class="bd-highlight d-flex align-items-center justify-content-center"><img src="./images/clinipath.png" style="width:250px" alt=""></div>\n                                <div class="bd-highlight pl-3 d-flex align-items-center justify-content-center"><img src="./images/quantum.png" style="width: 186px;" alt=""></div>\n                                <div class="bd-highlight pl-3 d-flex align-items-center justify-content-center"><img src="./images/gribbles.jpg" style="width:100px" alt=""></div>\n                            </div>\n                        </div>\n                        <!-- <div class="col-md-6 col-lg-5 mt-3">\n                            <span style="color:  #8493AE;">Certified by</span>\n                            <div class="d-flex flex-row align-self-end mt-3">\n                                <div class="bd-highlight pl-5 d-flex align-items-center justify-content-center"><img src="./images/moh.png" style="width:100px" alt=""></div>\n                            </div>\n                        </div> -->\n                    </div>\n                </div>\n                <div class="d-block d-sm-none mt-3">\n                    <div class="d-flex justify-content-center">A collaboration between</div>\n                    <div class="row">\n                        <div class="col-5 d-flex align-items-center justify-content-center"><img src="./images/clinipath.png" style="width:150px" alt=""></div>\n                        <div class="col-4 d-flex align-items-center justify-content-center"><img src="./images/quantum.png" style="width:120px" alt=""></div>\n                        <div class="col-3 d-flex align-items-center justify-content-center"><img src="./images/gribbles.jpg" style="width:65px" alt=""></div>\n                    </div>\n                    <!-- <div class="d-flex justify-content-center">Certified by</div>\n                    <div class="d-flex justify-content-center"><img src="./images/moh.png" style="width:110px" alt=""> -->\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class="asked-box pb-5 m-3">\n        <div class="d-none d-sm-block">\n            <div id="frequent_id" class="frequent-container d-flex justify-content-center">Frequently Asked Questions</div>\n        </div>\n        <div class="d-block d-sm-none">\n            <div id="sm_frequent_id" class="sm-frequent-container d-flex justify-content-center">Frequently Asked Questions</div>\n        </div>\n        <div class="frequent-questions d-flex flex-column pb-1" ng-repeat="freq in $ctrl.frequent">\n            <div class="d-none d-sm-block">\n                <div class="d-flex justify-content-center">\n                    <div class=" group-container d-flex justify-content-between p-2">\n                            <div class="desc-text d-flex align-items-center flex-grow-1 bd-highlight">{{freq.question}}</div>\n                            <div class="d-flex align-items-center pl-3"><i\n                                    class="fas {{(freq.status_faq) ? \'fa-angle-up\':\'fas fa-angle-down \'}} pointer"\n                                    ng-click="$ctrl.show_faq($index)"></i></div>\n                    </div>\n                </div>\n            </div>\n            <div class="d-block d-sm-none">\n                <div class="d-flex justify-content-center">\n                    <div class="sm-group-container d-flex justify-content-between p-2">\n                        <div class="desc-text d-flex align-items-center flex-grow-1 bd-highlight">{{freq.question}}</div>\n                        <div class="d-flex align-items-center pl-3"><i\n                                class="fas {{(freq.status_faq) ? \'fa-angle-up\':\'fas fa-angle-down \'}} pointer"\n                                ng-click="$ctrl.show_faq($index)"></i></div>\n                    </div>\n                </div>\n            </div>\n            <div ng-if="freq.status_faq" class="d-flex justify-content-center pt-2 pb-2">\n                <div class="desc-container p-2">\n                    <div ng-bind-html="freq.desc"></div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class="d-block d-sm-none">\n        <div class="sm-footer">\n            <div class="container py-4">\n                <div class="d-flex flex-column">\n                    <a href="https://pdpa.gribbles.com.my/english"><div class="pb-1">Data Privacy of Service</div></a>\n                    <a href="https://pdpa.gribbles.com.my/english"><div class="pb-1">Data Privacy of Biomark</div></a>\n                    <a href="https://pdpa.gribbles.com.my/english"><div>Terms of Service of Biomark</div></a>\n                </div>\n                <div class="d-flex justify-content-center pt-2">\n                    <div class="footer-sign">This site is powered by BioMark &reg;</div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class="d-block d-sm-none">\n        <div class="bottom-navigation d-flex justify-content-center p-3">\n            <div class="d-flex flex-column">\n                <button class="biomark-btn-primary pl-3 pr-3" ui-sref="home.booking-locations">Book Test - RM 380</button>\n                <div class="d-flex justify-content-center pt-1">or Call &nbsp;<b>1800 22 6843</b></div>\n            </div>\n        </div>\n    </div>\n    <footer class="d-none d-sm-block">\n        <div class="container py-4">\n            <div class="d-flex justify-content-center pt-2">\n                <div class="d-flex flex-row">\n                    <a href="https://pdpa.gribbles.com.my/english"><div>Data Privacy of Service</div></a>\n                    <a href="https://www.biomarking.com/privacy.html"><div class="pr-5 pl-5">Data Privacy of Biomark</div></a>\n                    <a href="https://www.biomarking.com/terms.html"><div>Terms of Service of Biomark</div></a>\n                </div>\n            </div>\n            <div class="d-flex justify-content-center pt-2">\n                <div class="footer-sign">This site is powered by BioMark &reg;</div>\n            </div>\n        </div>\n    </footer>\n</div>\n</div>');
+$templateCache.put('/admin/login/view.html','<div ng-if="$ctrl.state">\n    <div class="text-center">\n        <div class="title">Biomark<span style="font-weight: lighter;">ADMIN</span></div>\n    </div>\n    <div class="card w-100">\n        <div class="card-body">\n            <form name="userLoginForm" ng-submit="$ctrl.signIn($ctrl.credential)" ng-if="$ctrl.stage == 1">\n                <div class="form-group">\n                    <label for="">Username</label>\n                    <input type="text" class="form-control" ng-model="$ctrl.credential.username"\n                        placeholder="Enter username" required />\n                </div>\n                <div class="form-group">\n                    <label for="">Password</label>\n                    <input type="password" class="form-control" ng-model="$ctrl.credential.password"\n                        placeholder="Password" required />\n                </div>\n                <div class="form-group text-center">\n                    <button type="submit" class="btn btn-primary" ng-disabled="userLoginForm.$invalid">Sign In</button>\n                </div>\n            </form>\n            <form name="passwordResetForm" ng-submit="$ctrl.setPassword($ctrl.pass)" ng-if="$ctrl.stage == 2">\n                <p>Set New Password</p>\n                <div class="form-group">\n                    <label for="">Password</label>\n                    <div class="input-group mb-3">\n                        <input type="password" class="form-control" ng-model="$ctrl.pass.password"\n                            placeholder="Password" ng-attr-type="{{ $ctrl.showPassword ? \'text\' : \'password\' }}"\n                            pattern="^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!^#%*?&()]{8,15}$" required />\n                        <div class="input-group-append pointer" ng-click="$ctrl.togglePassword()">\n                            <span class="input-group-text"><i class="fas fa-eye-slash"\n                                    ng-if="!$ctrl.showPassword"></i><i class="fas fa-eye"\n                                    ng-if="$ctrl.showPassword"></i></span>\n                        </div>\n                    </div>\n                    <span>Your password must be at least 8 characters, include a symbol, a capital letter and a number.</span>\n                </div>\n                <div class="form-group text-center">\n                    <button type="submit" class="btn btn-primary" ng-disabled="passwordResetForm.$invalid">Set\n                        Password</button>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>');
+$templateCache.put('/admin/dashboard/view.html','<div class="biomark-admin-wrapper">\n    <div class="row no-gutters">\n        <div class="col-auto">\n            <dashboard-sidemenu services="$ctrl.services" ng-if="!$ctrl.loading"></dashboard-sidemenu>\n        </div>\n        <div class="col" style="width: calc(100vw - 240px);">\n            <header class="dashboard-header d-flex align-items-center">\n                <button class="btn btn-danger ml-auto mr-3" ng-click="$ctrl.logout()">\n                    <i class="fas fa-sign-out-alt"></i> Sign Out\n                </button>\n            </header>\n            <div class="main-wrapper p-3 overflow-hidden" ui-view>\n                <div class="row mb-3">\n                    <div class="col-3">\n                        <div class="card p-3">\n                            <div class="d-flex flex-row align-items-center">\n                                <div style="width:80px">\n                                    <i class="fas fa-book fa-3x"></i>\n                                </div>\n                                <div>\n                                    <h2>{{$ctrl.data.todays_bookings}}</h2>\n                                    <div>Today\'s Bookings</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-3">\n                        <div class="card p-3">\n                            <div class="d-flex flex-row align-items-center">\n                                <div style="width:80px">\n                                    <i class="fas fa-clinic-medical fa-3x"></i>\n                                </div>\n                                <div>\n                                    <h2>{{$ctrl.data.clinics}}</h2>\n                                    <div>Total Clinics</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-3">\n                        <div class="card p-3">\n                            <div class="d-flex flex-row align-items-center">\n                                <div style="width:80px">\n                                    <i class="fas fa-users fa-3x"></i>\n                                </div>\n                                <div>\n                                    <h2>{{$ctrl.data.users}}</h2>\n                                    <div>Total User</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-3">\n                        <div class="card p-3">\n                            <div class="d-flex flex-row align-items-center">\n                                <div style="width:80px">\n                                    <i class="fas fa-map fa-3x"></i>\n                                </div>\n                                <div>\n                                    <h2>{{$ctrl.data.locations}}</h2>\n                                    <div>Total Locations</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n                <div class="row">\n                    <div class="col-8">\n                        <div class="card">\n                            <div class="card-body">\n                                <div ng-if="$ctrl.is_ready" dx-chart="$ctrl.chartOptions" class="w-100"></div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-4">\n                        <div class="card">\n                            <div class="card-body">\n                                <div ng-if="$ctrl.is_ready" dx-pie-chart="$ctrl.pie_chart"></div>\n                            </div>\n                        </div>\n                        \n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>');
+$templateCache.put('/admin/pagination/view.html','<div class="pagination_wrapper">\n    <p class="pagination-elements" \n        ng-if="$ctrl.btn_previous"\n        ng-click="$ctrl.previous()">\n        <i class="fa fa-angle-left"></i> &nbsp; Previous\n    </p>\n    <p \n        class="pagination-elements" \n        ng-click="$ctrl.page_click(pagi)"\n        ng-class="{active:pagi==$ctrl.pagination.page_position}" \n        ng-repeat="pagi in $ctrl.page_elements">{{pagi}}\n    </p>\n    <p class="pagination-elements-dot" \n        ng-if="$ctrl.btn_dotdot">...\n    </p>\n    <p class="pagination-elements" \n        ng-click="$ctrl.page_click($ctrl.pagination.total_pages)" \n        ng-if="$ctrl.btn_dotdot">{{$ctrl.pagination.total_pages}}\n    </p>\n    <p class="pagination-elements" \n        ng-if="$ctrl.btn_next && $ctrl.pagination.total_pages > 1"\n        ng-click="$ctrl.next()">\n        Next &nbsp; <i class="fa fa-angle-right"></i>\n    </p>\n</div>');
 $templateCache.put('/booking/booking-calendar/view.html','<div class="container" style="min-height: 80vh;">\n    <div class="row">\n        <div class="col-12">\n            <div class="py-2 py-sm-3 label-14">\n                <div class="date-time-title">Pick a Date and Time</div>\n                <b>{{::$ctrl.location.name}}</b> <br>\n                {{::$ctrl.location.address}}\n            </div>\n        </div>\n        <div class="col-12">\n            <div class="week-days-container d-flex">\n                <div ng-repeat="a in $ctrl.location.schedules" class="lfloat pointer" role="button" ng-click="$ctrl.scheduleSelected(a)">\n                    <div class="date-container d-flex align-items-center justify-content-center" ng-class="{active: $ctrl.booking.schedule.id == a.id}">\n                        {{a.schedule_date | date:"EEEE, dd MMM yyyy"}}\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    <div class="row pt-3 label-14" ng-if="!$ctrl.location.has_available_slot">\n        <div class="col-12">\n            <div class="card">\n                <div class="card-body text-center">\n                    No available slot\n                </div>\n            </div>\n        </div>\n    </div>\n  \n    <div class="row pt-3 label-14" ng-if="$ctrl.location.has_available_slot">\n        <div class="col-12 text-center">\n            <div class="schedule-time-container">\n                <!-- <p>Morning</p> -->\n                <div class="row">\n                    <div class="col-12 col-sm-6 col-lg-2 col-md-3 mb-2" ng-repeat="a in $ctrl.location.active_slot.data.AM">\n                        <div class="card text-center pointer bm-card"\n                            ng-class="!a.status ? \'disabled\': a.id == ($ctrl.booking.slot.id) ? \'selected\':\'\'">\n                            <div class="card-body p-2" ng-click="$ctrl.slotSelected(a)">\n                                {{a.slot_time_with_interval}}\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n        <!-- <div class="col-6 text-center">\n            <div class="schedule-time-container">\n                <p>Afternoon</p>\n                <div class="row no-gutters">\n                    <div class="col-12 mb-2" ng-repeat="a in $ctrl.location.active_slot.data.PM">\n                        <div class="card text-center pointer bm-card"\n                            ng-class="!a.status ? \'disabled\': a.id == ($ctrl.booking.slot.id) ? \'selected\':\'\'">\n                            <div class="card-body p-2" ng-click="$ctrl.slotSelected(a)">\n                                {{a.slot_time_with_interval}}\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div> -->\n    </div>\n</div>\n<div class="footer-controls">\n    <div class="container">\n        <div class="row">\n            <div class="col-12">\n                <div class="footer-btn-wrapper d-flex flex-row justify-content-between align-items-center">\n                    <button class="btn btn-light" ui-sref="home.booking-locations">Back</button>\n                    <button type="button"\n                            class="btn btn-success continue-button" \n                            ng-disabled="!$ctrl.location.has_available_slot"\n                            ng-click="$ctrl.continue()">Continue</button>\n                    <!-- ng-style="{\'background\': $ctrl.is_selected ? \'#21b27b\' : \'\'}" -->\n                </div>\n            </div>\n        </div>\n    </div>\n</div>');
 $templateCache.put('/booking/booking-confirmation/view.html','<div class="container" ng-if="!$ctrl.loading" >\n    <div class="row pt-3">\n        <div class="col-12 col-sm-6 mx-sm-auto">\n            <div class="card">\n                <div class="card-body">\n                    <h3 class="text-center">Booking Reserved</h3>\n                    <h4 class="text-center py-3">{{::$ctrl.booking.ref_no}}</h4>\n                    <div class="alert alert-info" role="alert">\n                        <p>Please make the payment within one hour to reserve your slot, otherwise it will be released. Once payment is received, you will receive a confirmation email from us. You are required to show your confirmation when you arrive at the testing site. Thank you. For any clarification, please do not hesitate to contact our call centre at 1 800 22 6843 for further assistance.</p>\n                    </div>\n                    <div>\n                        <form method="post" name="ePayment" action="https://payment.ipay88.com.my/ePayment/entry.asp">\n                            <input type="hidden" name="MerchantCode" ng-value="$ctrl.booking.merchant_code"/>\n                            <input type="hidden" name="PaymentId" ng-value="$ctrl.booking.payment_id"/>\n                            <input type="hidden" name="RefNo" ng-value="$ctrl.booking.ref_no"/>\n                            <input type="hidden" name="Amount" ng-value="$ctrl.booking.amount"/>\n                            <input type="hidden" name="Currency" ng-value="$ctrl.booking.currency"/>\n                            <input type="hidden" name="ProdDesc" ng-value="$ctrl.booking.prod_desc"/>\n                            <input type="hidden" name="UserName" ng-value="$ctrl.booking.username"/>\n                            <input type="hidden" name="UserEmail" ng-value="$ctrl.booking.user_email"/>\n                            <input type="hidden" name="UserContact" ng-value="$ctrl.booking.user_contact"/> \n                            <input type="hidden" name="Remark" ng-value="$ctrl.booking.remark"/>\n                            <input type="hidden" name="Lang" ng-value="$ctrl.booking.lang"/>\n                            <input type="hidden" name="SignatureType" ng-value="$ctrl.booking.signature_type"/>\n                            <input type="hidden" name="Signature" ng-value="$ctrl.booking.signature"/>\n                            <input type="hidden" name="ResponseURL" value="https://my.biomarking.com/v1/guest/payment/status" />\n                            <input type="hidden" name="BackendURL" value="https://my.biomarking.com/v1/guest/payment/confirmation"/>\n                            <button  type="submit" value="Proceed with Payment" name="Submit" class="btn btn-lg btn-success btn-block">PAY NOW</button>\n                            <button  type="button" value="Proceed with Manual Payment" ng-click="$ctrl.proceedPayLater()" class="btn btn-lg btn-payment btn-block">PAY LATER</button>\n                        </form>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n<div class="modal-container d-flex align-items-center justify-content-center" ng-if="$ctrl.loading" >\n    <div class="card">\n        <div class="card-body">\n            <h4>PROCESSING YOUR BOOKING...</h4>\n        </div>\n    </div>\n</div>');
 $templateCache.put('/booking/booking-locations/view.html','<div class="container" style="min-height: 80vh;">\n    <div class="row">\n        <div class="col-12 pt-5 col-sm-6 mx-sm-auto">\n            <div class="sticky mb-2">\n                <p>Where would you like to do your test?</p>\n                <!-- <div>\n                    <input type="text" placeholder="Search Location" class="form-control"> -->\n                    <!-- <div class="label-12 py-2 pointer">Sort by nearest me <i class="fas fa-caret-down"></i></div> -->\n                <!-- </div> -->\n            </div>\n            <div class="location-card">\n                <div class="card mb-2 pointer" ng-repeat="loc in $ctrl.locations | orderBy:\'name\'" ng-click="$ctrl.locationClicked(loc)">\n                    <div class="card-body p-2 label-14">\n                        <b>{{::loc.name}}</b> <br>\n                        {{::loc.address}}\n                    </div>\n                </div>\n            </div>\n            \n            \n            <!-- <div class="card"></div> -->\n            <!-- <div class="card mb-3">\n                <div class="card-body pointer" ng-click="$ctrl.showLocationDropDown()">\n                    <div class="d-flex flex-row justify-content-between align-items-center">\n                        <div>Which drive thru would you like to be swab at?</div> \n                        <div class="ml-3"><i class="fas fa-angle-down"></i></div>\n                    </div>\n                </div>\n            </div>\n            <div style="position: relative;">\n                <div class="drop-down-container" ng-if="$ctrl.locationDropDown" click-outside="$ctrl.closeLocationDropDown()">\n                    <div class="dp-item px-3 py-2 pointer" ng-click="$ctrl.locationSelected(a)" ng-repeat="a in [1,2,3,4,5,6,7]">3A-09, Plaza 138, 138, Jalan Ampang, 50450 Kuala Lumpur, Wilayah Persekutuan Kuala Lumpur, Malaysia</div>\n                </div>\n            </div>\n            <div class="card mb-3">\n                <div class="card-body">\n                    <div class="d-flex flex-row justify-content-between align-items-center">\n                        <div>Select Date and Time</div> \n                        <div class="ml-3"><i class="fas fa-angle-down"></i></div>\n                    </div>\n                </div>\n            </div> -->\n        </div>\n    </div>\n</div>');
@@ -56491,9 +56535,6 @@ $templateCache.put('/booking/booking-reservation-email/view.html','<div class="c
 $templateCache.put('/booking/booking-review/view.html','<div style="padding-bottom: 200px; background: white; overflow-x: hidden">\n    <div class="row pt-3">\n        <div class="col-12 col-sm-6 mx-sm-auto">\n            <div class="card">\n                <div class="card-body">\n                    <div>\n                        <h6>Test Location:</h6>\n                        <b>{{::$ctrl.booking.location.name}}</b> <br>\n                        <p>{{::$ctrl.booking.location.address}}</p> \n                    </div>\n                    <hr>\n                    <div class="row">\n                        <div class="col-6">\n                            <h6>Date:</h6>\n                            <p>{{::$ctrl.booking.schedule.schedule_date | date:"MMM dd, yyyy"}}</p>\n                        </div>\n                        <div class="col-6">\n                            <h6>Time:</h6>\n                            <p>{{$ctrl.booking.slot.slot_time_with_interval}}</p>\n                        </div>\n                    </div>\n                    <hr>\n                    <div class="row label-14">\n                        <div class="col-6 label-14">\n                            <div>\n                                <h6>Full Name:</h6>\n                                <p style="text-transform: capitalize;">{{$ctrl.booking.patient.full_name}}</p>\n                            </div>\n                            <div>\n                                <h6>IC/Passport Number:</h6>\n                                <p>{{$ctrl.booking.patient.id_number}}</p>\n                            </div>\n                            <div>\n                                <h6>Gender:</h6>\n                                <p>{{$ctrl.booking.patient.gender_id == 1 ? "Male":"Female"}}</p>\n                            </div>\n                        </div>\n                        <div class="col-6">\n                            <div>\n                                <h6>Date of Birth:</h6>\n                                <p>{{$ctrl.booking.patient.date_of_birth | date:\'dd MMM yyyy\'}}</p>\n                            </div>\n                            <div>\n                                <h6>Contact Number:</h6>\n                                <p>{{$ctrl.booking.patient.contact_number}}</p>\n                            </div>\n                            <div>\n                                <h6>Email Address</h6>\n                                <p>{{$ctrl.booking.patient.email_address}}</p>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="row label-14">\n                        <div class="col-6 label-14">\n                            <div>\n                                <h6>Clinic</h6>\n                                <p>{{$ctrl.booking.active_clinic.name}}</p>\n                            </div>\n                        </div>\n                        <div class="col-6">\n                            <div>\n                                <h6>Clinic Address</h6>\n                                <p>{{$ctrl.booking.active_clinic.address}}</p>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="row label-14">\n                        <div class="col-6 label-14">\n                            <div>\n                                <h6>Price</h6>\n                                <p>MYR  {{$ctrl.setting.setting.covid_price}}</p>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n               \n            </div>\n\n            <div class="form-group card mt-3">\n                <div class="row card-body">\n                    <div class="col-sm" style="width: 10px !important; flex-grow: 0;">\n                        <input type="checkbox" ng-model="$ctrl.booking.patient.terms">\n                    </div>\n                    <div class="col-sm">\n                        Gribbles Pathology (M) Sdn Bhd, Quantum Diagnostics Sdn Bhd and Clinipath (M) Sdn Bhd respects and is committed to the protection of your personal information and your privacy. All personal data is collected and handled in accordance with the Malaysian Personal Data Protection Act 2010 (\u201CPDPA\u201D). Our Personal Data Protection Notice can be viewed at this <a href="https://pdpa.gribbles.com.my/" target="_blank">link</a> here.\n                        <br><br>By submitting this form, I hereby give consent to Gribbles Pathology (M) Sdn Bhd, Quantum Diagnostics Sdn Bhd and Clinipath (M) Sdn Bhd to collect or process the Patient\u2019s personal data in accordance with the Personal Data Protection Notice. I hereby undertake that the information provided here is true and correct.<br> \n                    </div>\n                    \n                </div>\n            </div>\n            \n        </div>\n    </div>\n</div>\n<div class="footer-controls">\n    <div class="container">\n        <div class="row">\n            <div class="col-12">\n                <div class="footer-btn-wrapper d-flex flex-row justify-content-between align-items-center">\n                    <button class="btn btn-light" ui-sref="home.booking-profile">Back</button>\n                    <button type="button" class="btn btn-success" ng-click="$ctrl.continue()">Confirm Appointment</button>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>');
 $templateCache.put('/components/loader/view.html','<div class="lds-ellipsis"><div></div><div></div><div></div><div></div></div>');
 $templateCache.put('/components/mobile/view.html','<div class="input-group" ng-class="{\'is-invalid\':$ctrl.invalid}"> \t\n\t<div class="input-group-prepend" ng-click="$ctrl.select_dialcode()"> \n        <span class="input-group-text ng-binding" style="background: transparent;position: relative">\n             <span class="flag-icon flag-icon-{{$ctrl.code.toLowerCase()}}"> </span> &nbsp; {{$ctrl.dial_code}} &nbsp;&nbsp;\n             <i class="fa fa-angle-down"></i>\n            </span> \n\t\t<ul click-outside="$ctrl.closeDropDown()" ng-if="$ctrl.is_visible">\n\t\t\t<li ng-repeat="country in $ctrl.countries" ng-click="$ctrl.onValueChanged(country)"><span class="flag-icon flag-icon-{{country.code.toLowerCase()}}"> </span> &nbsp; {{country.dial_code}} - {{country.name}}</li>\n\t\t</ul>\n\t</div> \n    <input name="mobileNumber" \n           type="text" \n           class="form-control bio-custom-input" \n           minlength="{{$ctrl.mobile_min}}"  \n           maxlength="{{$ctrl.mobile_max}}" \n           ng-change="$ctrl.mobile_change($ctrl.mobile)"\n           ng-model="$ctrl.mobile" \n           width="240px" \n           ng-pattern="$ctrl.mobile_regex"\n           numbers-only> \n</div>\n\n<div class="invalid-feedback" style="display: block" ng-if="$ctrl.invalid"> Please enter a valid mobile number</div>');
-$templateCache.put('/admin/dashboard/view.html','<div class="biomark-admin-wrapper">\n    <div class="row no-gutters">\n        <div class="col-auto">\n            <dashboard-sidemenu services="$ctrl.services" ng-if="!$ctrl.loading"></dashboard-sidemenu>\n        </div>\n        <div class="col" style="width: calc(100vw - 240px);">\n            <header class="dashboard-header d-flex align-items-center">\n                <button class="btn btn-danger ml-auto mr-3" ng-click="$ctrl.logout()">\n                    <i class="fas fa-sign-out-alt"></i> Sign Out\n                </button>\n            </header>\n            <div class="main-wrapper p-3 overflow-hidden" ui-view>\n                <div class="row mb-3">\n                    <div class="col-3">\n                        <div class="card p-3">\n                            <div class="d-flex flex-row align-items-center">\n                                <div style="width:80px">\n                                    <i class="fas fa-book fa-3x"></i>\n                                </div>\n                                <div>\n                                    <h2>{{$ctrl.data.todays_bookings}}</h2>\n                                    <div>Today\'s Bookings</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-3">\n                        <div class="card p-3">\n                            <div class="d-flex flex-row align-items-center">\n                                <div style="width:80px">\n                                    <i class="fas fa-clinic-medical fa-3x"></i>\n                                </div>\n                                <div>\n                                    <h2>{{$ctrl.data.clinics}}</h2>\n                                    <div>Total Clinics</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-3">\n                        <div class="card p-3">\n                            <div class="d-flex flex-row align-items-center">\n                                <div style="width:80px">\n                                    <i class="fas fa-users fa-3x"></i>\n                                </div>\n                                <div>\n                                    <h2>{{$ctrl.data.users}}</h2>\n                                    <div>Total User</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-3">\n                        <div class="card p-3">\n                            <div class="d-flex flex-row align-items-center">\n                                <div style="width:80px">\n                                    <i class="fas fa-map fa-3x"></i>\n                                </div>\n                                <div>\n                                    <h2>{{$ctrl.data.locations}}</h2>\n                                    <div>Total Locations</div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n                <div class="row">\n                    <div class="col-12">\n                        <div class="card">\n                            <div class="card-body">\n                                <div ng-if="$ctrl.is_ready" dx-chart="$ctrl.chartOptions" class="w-100"></div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>');
-$templateCache.put('/admin/login/view.html','<div ng-if="$ctrl.state">\n    <div class="text-center">\n        <div class="title">Biomark<span style="font-weight: lighter;">ADMIN</span></div>\n    </div>\n    <div class="card w-100">\n        <div class="card-body">\n            <form name="userLoginForm" ng-submit="$ctrl.signIn($ctrl.credential)" ng-if="$ctrl.stage == 1">\n                <div class="form-group">\n                    <label for="">Username</label>\n                    <input type="text" class="form-control" ng-model="$ctrl.credential.username"\n                        placeholder="Enter username" required />\n                </div>\n                <div class="form-group">\n                    <label for="">Password</label>\n                    <input type="password" class="form-control" ng-model="$ctrl.credential.password"\n                        placeholder="Password" required />\n                </div>\n                <div class="form-group text-center">\n                    <button type="submit" class="btn btn-primary" ng-disabled="userLoginForm.$invalid">Sign In</button>\n                </div>\n            </form>\n            <form name="passwordResetForm" ng-submit="$ctrl.setPassword($ctrl.pass)" ng-if="$ctrl.stage == 2">\n                <p>Set New Password</p>\n                <div class="form-group">\n                    <label for="">Password</label>\n                    <div class="input-group mb-3">\n                        <input type="password" class="form-control" ng-model="$ctrl.pass.password"\n                            placeholder="Password" ng-attr-type="{{ $ctrl.showPassword ? \'text\' : \'password\' }}"\n                            pattern="^(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!^#%*?&()]{8,15}$" required />\n                        <div class="input-group-append pointer" ng-click="$ctrl.togglePassword()">\n                            <span class="input-group-text"><i class="fas fa-eye-slash"\n                                    ng-if="!$ctrl.showPassword"></i><i class="fas fa-eye"\n                                    ng-if="$ctrl.showPassword"></i></span>\n                        </div>\n                    </div>\n                    <span>Your password must be at least 8 characters, include a symbol, a capital letter and a number.</span>\n                </div>\n                <div class="form-group text-center">\n                    <button type="submit" class="btn btn-primary" ng-disabled="passwordResetForm.$invalid">Set\n                        Password</button>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>');
-$templateCache.put('/admin/pagination/view.html','<div class="pagination_wrapper">\n    <p class="pagination-elements" \n        ng-if="$ctrl.btn_previous"\n        ng-click="$ctrl.previous()">\n        <i class="fa fa-angle-left"></i> &nbsp; Previous\n    </p>\n    <p \n        class="pagination-elements" \n        ng-click="$ctrl.page_click(pagi)"\n        ng-class="{active:pagi==$ctrl.pagination.page_position}" \n        ng-repeat="pagi in $ctrl.page_elements">{{pagi}}\n    </p>\n    <p class="pagination-elements-dot" \n        ng-if="$ctrl.btn_dotdot">...\n    </p>\n    <p class="pagination-elements" \n        ng-click="$ctrl.page_click($ctrl.pagination.total_pages)" \n        ng-if="$ctrl.btn_dotdot">{{$ctrl.pagination.total_pages}}\n    </p>\n    <p class="pagination-elements" \n        ng-if="$ctrl.btn_next && $ctrl.pagination.total_pages > 1"\n        ng-click="$ctrl.next()">\n        Next &nbsp; <i class="fa fa-angle-right"></i>\n    </p>\n</div>');
 $templateCache.put('/admin/dashboard/audit/view.html','<div class="row">\n    <div class="col-12" ui-view>\n        <div class="row">\n            <div class="col-12">\n                <div class="row">\n                    <div class="col-6">\n                        <div class="row">\n                            <div class="col-6">\n                                <div class="form-group">\n                                    <div class="w-100" dx-date-box="$ctrl.widget.audit_date_start"></div>\n                                </div>       \n                            </div>\n                            <div class="col-6">\n                                <div class="form-group">\n                                    <div class="form-group">\n                                        <div class="w-100" dx-date-box="$ctrl.widget.audit_date_end"></div>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-6">\n                        <div class="row">\n                            <div class="col-4">\n                                <div class="form-group">\n                                    <select class="form-control" \n                                        ng-change="$ctrl.filterChanged()"\n                                        ng-model="$ctrl.filter.module_type"\n                                        ng-options="module.id as module.name for module in $ctrl.module_types">\n                                    </select>\n                                </div>\n                            </div>\n                            <div class="col-4">\n                                <div class="form-group">\n                                    <select class="form-control" \n                                        ng-change="$ctrl.filterChanged()"\n                                        ng-model="$ctrl.filter.user_id"\n                                    ng-options="user.id as user.username for user in $ctrl.user_list"></select>\n                                </div>\n                            </div>\n                            <div class="col-4">\n                                <div class="form-group">\n                                    <button class="btn btn-secondary btn-block" ng-click="$ctrl.reset_filters()">Reset Filters</button>\n                                </div>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="col-12">\n                <div class="card">\n                    <div class="card-header d-flex flex-row justify-content-between">\n                        <div> <b>Audit Log</b></div>\n                        <button ng-click="$ctrl.exportToCSV()">Export to csv</button>\n                    </div>\n                    <div class="card-body">\n                        <table class="table table-bordered table-condensed">\n                            <tr>\n                                <td>Date Time</td>\n                                <td>Module Name</td>\n                                <td>Action</td>\n                                <td>Log</td>\n                                <td>Modified by</td>   \n                            </tr>\n                            <tr ng-repeat="a in $ctrl.data.audit_logs" ng-if="$ctrl.data.audit_logs.length > 0">\n                                <td>{{a.created_at | date : \'medium\'}}</td>\n                                <td>{{a.model}}</td>\n                                <td>{{a.action}}</td>\n                                <td>{{a.log_text}}</td>\n                                <td>{{a.modified_by}}</td>\n                            </tr>\n                            <tr class="text-center" ng-if="$ctrl.data.audit_logs.length == 0">\n                                <td colspan="5">No data</td>\n                            </tr>\n                        </table>\n                    </div>\n                    <pagination config="$ctrl.pagination_config" paginate="$ctrl.paginate" ng-if="$ctrl.is_ready">\n                    </pagination>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n<div class="modal-container d-flex align-items-center justify-content-center" ng-if="$ctrl.location_modal">\n    <div class="card" style="width:400px">\n        <div class="card-body" click-outside="$ctrl.cancel()">\n            <form name="location" ng-submit="$ctrl.save_or_update($ctrl.location)">\n                <div class="form-group">\n                    <label for="name">Name</label>\n                    <input type="text" ng-model="$ctrl.location.name" class="form-control" required>\n                </div>\n                <div class="form-group">\n                    <label for="address">Address</label>\n                    <textarea rows="3" ng-model="$ctrl.location.address" class="form-control" required></textarea>\n                </div>\n                <div class="form-group">\n                    <label for="test_code">Code</label>\n                    <input type="text" ng-model="$ctrl.location.code" class="form-control">\n                </div>\n                <!-- <div class="form-group">\n                    <label for="longitude">Longitude</label>\n                    <input type="text" ng-model="$ctrl.location.longitude" class="form-control">\n                </div>\n                <div class="form-group">\n                    <label for="latitude">Latitude</label>\n                    <input type="text" ng-model="$ctrl.location.latitude" class="form-control">\n                </div> -->\n\n                <div class="form-group text-right">\n                    <div class="d-flex flex-row justify-content-between">\n                        <button type="button" class="btn btn-danger" ng-click="$ctrl.cancel()">Cancel</button>\n                        <button type="submit" class="btn btn-primary" ng-if="$ctrl.mode==\'add\'">ADD</button>\n                        <button type="submit" class="btn btn-primary" ng-if="$ctrl.mode==\'edit\'">UPDATE</button>\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>');
 $templateCache.put('/admin/dashboard/bookings/view.html','<div class="row">\n    <div class="col-12" ui-view>\n        <div class="row">\n            <div class="col-12">\n                <div class="row">\n                    <div class="col-7">\n                        <div class="form-group">\n                            <input type="text" class="form-control" \n                                placeholder="Search Patient Name | IC | Booking Reference"\n                                ng-change="$ctrl.searchFor()" \n                                ng-model-options="{debounce:500}"\n                                ng-model="$ctrl.filter.search_string">\n                        </div>\n                        <div class="row">\n                            <div class="col-6">\n                                <div class="form-group">\n                                    <div class="w-100" dx-date-box="$ctrl.widget.registration_date_start"></div>\n                                </div>       \n                            </div>\n                            <div class="col-6">\n                                <div class="form-group">\n                                    <div class="form-group">\n                                        <div class="w-100" dx-date-box="$ctrl.widget.registration_date_end"></div>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                        <div class="row">\n                            <div class="col-6">\n                                <div class="form-group">\n                                    <div class="w-100" dx-date-box="$ctrl.widget.booking_date_start"></div>\n                                </div>       \n                            </div>\n                            <div class="col-6">\n                                <div class="form-group">\n                                    <div class="form-group">\n                                        <div class="w-100" dx-date-box="$ctrl.widget.booking_date_end"></div>\n                                    </div>\n                                </div>\n                            </div>\n                        </div>\n                        <div class="row mb-3">\n                            <div class="col-12">\n                                <input ng-change="$ctrl.setToReservedStatus()" type="checkbox" ng-model="$ctrl.filter.only_expired_booking">\n                                Show only bookings with reserved duration more than 60 minutes\n                            </div>\n                        </div>\n                    </div>\n                    <div class="col-5">\n                        <div class="row">\n                            <div class="col-8">\n                                <div class="form-group">\n                                    <select class="form-control" \n                                        ng-change="$ctrl.filterChanged()"\n                                        ng-model="$ctrl.filter.location_id"\n                                        ng-options="location.id as location.name for location in $ctrl.location_list">\n                                    </select>\n                                </div>\n                                <div class="form-group">\n                                    <select class="form-control" \n                                        ng-change="$ctrl.filterChanged()"\n                                        ng-model="$ctrl.filter.status"\n                                    ng-options="status.index as status.name for status in $ctrl.status_list"></select>\n                                </div>\n                            </div>\n                            <div class="col-4">\n                                <div class="form-group">\n                                    <button class="btn btn-secondary btn-block" ng-click="$ctrl.reset_filters()">Reset Filters</button>\n                                </div>\n                                <div class="form-group">\n                                    <button class="btn btn-primary btn-block" ng-click="$ctrl.refreshList()">Refresh</button>\n                                </div>\n                            </div>\n                        </div>\n                        <div class="row">\n                            <div class="col-8">\n                                <select class="form-control" \n                                    ng-change="$ctrl.filterChanged()" \n                                    ng-model="$ctrl.filter.booking_type" \n                                    ng-options="a.id as a.name for a in $ctrl.booking_types">\n                                </select>\n                            </div>\n                        </div>\n                    </div>\n                </div>\n            </div>\n            <div class="col-12 label-12" >\n                <div class="card">\n                    <div class="card-header">\n                        <div class="d-flex justify-content-between">\n                            <b>Patient Bookings ({{$ctrl.data.total_count}})</b>\n                            <button ng-click="$ctrl.exportToCSV()">Export to csv</button>\n                        </div>\n                    </div>\n                    <div class="card-body p-2">\n                        <div class="table-responsive">\n                        <table class="table table-bordered table-condensed mb-0">\n                            <tr>\n                                <td>#</td>\n                                <td>Ref No.</td>\n                                <td>Registration Datetime</td>\n                                <td>Reserved Duration</td>\n                                <td>Appointment Date</td>\n                                <td>Appointment Time</td>\n                                <td>Status</td>\n                                <td>Full name</td>\n                                <td>IC / Passport Number</td>\n                                <td>Test Site</td>\n                                <td>Actions</td>\n                                <!-- <td>Amount</td>\n                                <td>Location</td> -->\n                            </tr>\n                            <tr ng-repeat="a in $ctrl.data.bookings" ng-if="$ctrl.data.bookings.length > 0">\n                                <td>{{::a.id}}</td>\n                                <td><a ui-sref="admin.dashboard.bookings.view({id:a.id})">{{::a.reference_code}}</a></td>\n                                <td>{{::a.created_at | date:\'dd MMM yyyy hh:mm a\'}}</td>\n                                <td>\n                                    <span ng-class="{redflag:a.is_time_exceed_60}" ng-if="a.payment_status == \'reserved\'">{{::a.reserved_duration}}</span>\n                                </td>\n                                <td>{{::a.date | date:\'dd MMM yyyy\'}}</td>\n                                <td>{{::a.slot_time_with_interval | date:\'hh:mm a\':\'UTC\'}}</td>\n                                <td>{{::a.payment_status}}</td>\n                                <td style="text-transform: capitalize;">{{::a.name}}</td>\n                                <td>{{::a.id_number}}</td>\n                                <td>{{::a.location_name}}</td>\n                                <td><a ui-sref="admin.dashboard.bookings.view({id:a.id})">View</a></td>\n                                <!-- <td>{{::a.amount | currency    :\'\'}}</td>\n                                <td>{{::a.location_name}}</td> -->\n                            </tr>\n                            <tr class="text-center" ng-if="$ctrl.data.bookings.length == 0">\n                                <td colspan="11">No data</td>\n                            </tr>\n                        </table>\n                        </div>\n                        <pagination config="$ctrl.pagination_config" paginate="$ctrl.paginate" ng-if="$ctrl.is_ready">\n                        </pagination>\n                    </div>\n                </div>\n            </div>\n        </div>\n    </div>\n    \n</div>');
 $templateCache.put('/admin/dashboard/clinics/view.html','<div class="row">\n    <div class="col-12" ui-view>\n        <div class="card">\n            <div class="card-header d-flex flex-row justify-content-between">\n                <div> <b>Clinics</b></div>\n                <button class="pointer" ng-click="$ctrl.openModal()">Add new clinic</button>  \n            </div>\n            <div class="card-body p-2">\n                <table class="table table-bordered table-condensed">\n                    <tr>    \n                        <td>#</td>\n                        <td>Clinic Name</td>\n                        <td>Clinic Code</td>\n                        <td>Email Address</td>\n                        <!-- <td>Contact Number</td> -->\n                        <!-- <td>Clinic Address</td> -->\n                        <!-- <td>Area</td> -->\n                        <!-- <td>Contact Person</td> -->\n                        <td>Billing Code</td>\n                        <td>Status</td>\n                        <td>Actions</td>\n                    </tr>\n                    <tr ng-repeat="a in $ctrl.clinics">\n                        <td>{{a.id}}</td>\n                        <td><a ui-sref="admin.dashboard.clinics.view({id:a.id})">{{a.name}}</a></td>\n                        <td>{{a.code}}</td>\n                        <td>{{a.email_address}}</td>\n                        <!-- <td>{{a.contact_number}}</td> -->\n                        <!-- <td>{{a.address}}</td> -->\n                        <!-- <td>{{a.clinic_area_name}}</td> -->\n                        <!-- <td>{{a.contact_person}}</td> -->\n                        <td>{{a.billing_code}}</td>\n                        <td>{{a.status ? \'Active\':\'In active\'}}</td>\n                        <td style="width: 70px;">\n                            <a ui-sref="admin.dashboard.clinics.view({id:a.id})">View</a>\n                        </td>\n                    </tr>\n                </table>\n                <pagination config="$ctrl.pagination_config" paginate="$ctrl.paginate" ng-if="$ctrl.is_ready"></pagination>\n            </div>\n        </div>\n    </div>\n</div>\n<div class="modal-container d-flex align-items-center justify-content-center" ng-if="$ctrl.clinic_modal">\n    <div class="card" style="width: 400px;" click-outside="$ctrl.cancel()">\n        <div class="card-body">\n            <form ng-submit="$ctrl.addClinic($ctrl.clinic,\'add\')" name="addClinicForm">\n                <h5>Add New Clinic</h5>\n                <div class="form-group">\n                    <label for="name">Clinic Name</label>\n                    <input type="text" limit-to="50" class="form-control" ng-model="$ctrl.clinic.name" required />\n                </div>\n                <div class="form-group">\n                    <label for="name">Clinic Email</label>\n                    <input type="email" name="email" class="form-control" ng-model="$ctrl.clinic.email_address" required />\n                    <div class="error-message" ng-show="!addClinicForm.email.$valid"> Please enter a valid email address.</div>\n                </div>\n                <div class="form-group">\n                    <label for="name">Contact Number</label>\n                    <input type="text" limit-to="15" class="form-control" ng-model="$ctrl.clinic.contact_number" required />\n                </div>\n                <div class="form-group">\n                    <label for="name">Clinic Address</label>\n                    <textarea rows="2" limit-to="300" ng-model="$ctrl.clinic.address" class="form-control" required></textarea>\n                </div>\n                <div class="form-group">\n                    <label for="code">Contact Person</label>\n                    <input type="text" limit-to="15" class="form-control" ng-model="$ctrl.clinic.contact_person" required />\n                </div>\n                <div class="row">\n                    <div class="col-6">\n                        <div class="form-group">\n                            <label for="code">Billing Code</label>\n                            <input type="text" limit-to="10" class="form-control" ng-model="$ctrl.clinic.billing_code" required />\n                        </div>\n                    </div>\n                    <div class="col-6">\n                        <div class="form-group">\n                            <label for="code">Status</label>\n                            <select class="form-control" ng-model="$ctrl.clinic.status" required>\n                                <option value="1">Active</option>\n                                <option value="0">Inactive</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n                <div class="form-group">\n                    <div class="row">\n                        <div class="col-8">\n                            <label for="">Clinic Area</label>\n                            <add-area clinic-area="$ctrl.clinic_area"></add-area>\n                        </div>\n                        <div class="col-4">\n                            <label for="">Clinic Code</label>\n                            <input type="text" limit-to="10" class="form-control" maxlength="10" ng-model="$ctrl.clinic.code" required>\n                        </div>\n                    </div>\n                </div>\n                <div class="form-group">\n                    <div class="d-flex flex-row justify-content-between">\n                        <button type="button" class="btn btn-danger" ng-click="$ctrl.cancel()">Cancel</button>\n                        <button type="submit" class="btn btn-primary" ng-disabled="addClinicForm.$invalid">Add</button>\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>');
@@ -56506,8 +56547,8 @@ $templateCache.put('/admin/dashboard/bookings/view/view.html','<div class="d-fle
 $templateCache.put('/admin/dashboard/clinics/add-area/view.html','<div class="form-group">\n    <div class="area-container pointer"  click-outside="$ctrl.closeDropdownArea()">\n        <input type="text" ng-focus="$ctrl.openDropdownArea()" ng-click="$ctrl.openDropdownArea()" class="form-control" ng-model="$ctrl.clinicArea.name" required>\n        <div class="area-dropdown-container" ng-show="$ctrl.dropdownArea">\n            <div class="area-dp-item p-2" ng-class="{active:a.id == $ctrl.clinicArea.id}" ng-click="$ctrl.selectItem(a)" ng-repeat="a in $ctrl.areas | orderBy:\'name\'">{{a.name}}</div>\n            <div class="area-add-element">\n                <div class="area-action-control d-flex justify-content-end align-items-center" ng-show="$ctrl.addAreaValue">\n                    <i class="fas fa-times-circle" ng-click="$ctrl.cancelAddArea()"></i>\n                    <i class="fas fa-save ml-2" ng-if="$ctrl.addAreaValue.length >= 3" ng-click="$ctrl.createArea($ctrl.addAreaValue)"></i>\n                </div>\n                <input ng-model="$ctrl.addAreaValue" ng-keyup="$ctrl.onKeyUp($event, $ctrl.addAreaValue)" placeholder="+ Add new area" class="add-area-input" maxlength="20" type="text">\n            </div>\n        </div>\n    </div>\n</div>');
 $templateCache.put('/admin/dashboard/clinics/view/view.html','<div class="d-flex flex-row justify-content-between align-items-center">\n    <div>\n        <h4>{{::$ctrl.clinic.name}}</h4>\n    </div>\n    <div>\n        <button ui-sref="admin.dashboard.clinics" class="btn btn-secondary"><i class="fas fa-long-arrow-alt-left"></i> Back</button>    \n    </div>\n</div> \n\n<div class="row">\n    <div class="col-12">\n        <div class="d-flex flex-row">\n            <div class="clinic-tab-item mr-3">Clinic Details</div>\n        </div>\n    </div>\n</div>\n<hr class="mt-0 mb-3">\n<div class="row">\n    <div class="col-12">\n        <div class="card">\n            <div class="card-body p-2">\n                <table class="table table-bordered table-condensed">\n                    <thead>\n                        <tr>\n                            <th>Clinic Name</th>\n                            <th>Clinic Code</th>\n                            <th>Clinic Address</th>\n                            <th>Clinic Email</th>\n                            <th>Contact Number</th>\n                            <th>Contact Person Name</th>\n                            <th>Billing Code</th>\n                            <th>Status</th>\n                            <th>Action</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr>\n                            <td>{{::$ctrl.clinic.name}}</td>\n                            <td>{{::$ctrl.clinic.code}}</td>\n                            <td>{{::$ctrl.clinic.address}}</td>\n                            <td>{{::$ctrl.clinic.email_address}}</td>\n                            <td>{{::$ctrl.clinic.contact_number}}</td>\n                            <td>{{::$ctrl.clinic.contact_person}}</td>\n                            <td>{{::$ctrl.clinic.billing_code}}</td>\n                            <td>{{$ctrl.clinic.status == \'1\' || $ctrl.clinic.status ? \'Active\' : \'Inactive\'}}</td>\n                            <td><i class="fas fa-pencil-alt pointer" ng-click="$ctrl.openClinicModal()"></i>\n                            </td>\n                        </tr>\n                        <tr ng-if="$ctrl.clinics.length == 0">\n                            <td class="text-center" colspan="4">No data</td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div class="modal-container d-flex align-items-center justify-content-center" ng-if="$ctrl.edit_clinic_modal">\n    <div class="card" style="width: 400px;" click-outside="$ctrl.closeClinicModal()">\n        <div class="card-body">\n            <form ng-submit="$ctrl.editClinic($ctrl.clinic,\'edit\')" name="editClinicForm">\n                <h5>Edit Clinic</h5>\n                <div class="form-group">\n                    <label for="name">Clinic Name</label>\n                    <input type="text" limit-to="50" class="form-control" ng-model="$ctrl.clinic.name" required />\n                </div>\n                <div class="form-group">\n                    <label for="name">Clinic Email</label>\n                    <input type="email" name="email" class="form-control" ng-model="$ctrl.clinic.email_address" required />\n                    <div class="error-message" ng-show="!editClinicForm.email.$valid"> Please enter a valid email address.</div>\n                </div>\n                <div class="form-group">\n                    <label for="name">Contact Number</label>\n                    <input type="text" limit-to="15" class="form-control" ng-model="$ctrl.clinic.contact_number" required />\n                </div>\n                <div class="form-group">\n                    <label for="name">Clinic Address</label>\n                    <textarea rows="2" limit-to="300" ng-model="$ctrl.clinic.address" class="form-control" required></textarea>\n                </div>\n                <div class="form-group">\n                    <label for="code">Contact Person</label>\n                    <input type="text" limit-to="15" class="form-control" ng-model="$ctrl.clinic.contact_person" required />\n                </div>\n                <div class="row">\n                    <div class="col-6">\n                        <div class="form-group">\n                            <label for="code">Billing Code</label>\n                            <input type="text" limit-to="10" class="form-control" ng-model="$ctrl.clinic.billing_code" required />\n                        </div>\n                    </div>\n                    <div class="col-6">\n                        <div class="form-group">\n                            <label for="code">Status</label>\n                            <select class="form-control" ng-model="$ctrl.clinic.status" required>\n                                <option value="1">Active</option>\n                                <option value="0">Inactive</option>\n                            </select>\n                        </div>\n                    </div>\n                </div>\n                <div class="form-group">\n                    <div class="row">\n                        <div class="col-8">\n                            <label for="">Clinic Area</label>\n                            <add-area clinic-area="$ctrl.clinic_area"></add-area>\n                        </div>\n                        <div class="col-4">\n                            <label for="">Clinic Code</label>\n                            <input type="text" limit-to="10" class="form-control" maxlength="10" ng-model="$ctrl.clinic.code" required>\n                        </div>\n                    </div>\n                </div>\n                <div class="form-group">\n                    <div class="d-flex flex-row justify-content-between">\n                        <button type="button" class="btn btn-danger" ng-click="$ctrl.closeClinicModal()">Cancel</button>\n                        <button type="submit" class="btn btn-primary" ng-disabled="editClinicForm.$invalid">Edit</button>\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>\n');
 $templateCache.put('/admin/dashboard/locations/clinics/view.html','<div class="row">\n    <div class="col-12" >\n        <div class="card">\n            <div class="card-header text-right">\n                <button class="pointer" ng-click="$ctrl.open_clinic_modal()">Add Clinic</button>\n            </div>\n            <div class="card-body p-2">\n                <table class="table table-bordered table-condensed">\n                    <thead>\n                        <tr>\n                            <th>Clinic ID</th>\n                            <th>Clinic Name</th>\n                            <th>Clinic Code</th>\n                            <td>Billing Code</td>\n                            <th>Status</th>\n                            <th>Action</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr ng-repeat="a in $ctrl.clinics" ng-if="$ctrl.clinics.length > 0">\n                            <td>{{a.id}}</td>\n                            <td>{{a.name}}</td>\n                            <td>{{a.code}}</td>\n                            <td>{{a.billing_code}}</td>\n                            <td>{{a.status ? "Active":"Inactive"}}</td>\n                            <td><a class="pointer" ui-sref="" ng-click="$ctrl.unlink_clinic(a.id)">Unlink</a></td>\n                        </tr>\n                        <tr ng-if="$ctrl.clinics.length == 0">\n                            <td class="text-center" colspan="6">No data</td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div class="modal-container d-flex align-items-center justify-content-center" ng-if="$ctrl.location_clinic_modal">\n    <div class="card" style="width:400px">\n        <div class="card-body" click-outside="$ctrl.cancel()">\n            <form name="location" ng-submit="$ctrl.add_clinic($ctrl.clinic_id)">\n                <div class="form-group">\n                    <label for="name">Name</label>\n                    <select class="form-control" ng-model="$ctrl.clinic_id" ng-options="clinic.id as clinic.name for clinic in $ctrl.clinic_list"></select>\n                </div>\n              \n                <div class="form-group text-right">\n                    <div class="d-flex flex-row justify-content-between">\n                        <button type="button" class="btn btn-danger" ng-click="$ctrl.cancel()">Cancel</button>\n                        <button type="submit" class="btn btn-primary">Add</button>\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>');
-$templateCache.put('/admin/dashboard/locations/schedules/view.html','<div class="row">\n    <div class="col-12" ng-if="$ctrl.schedules.length != 0">\n        <div class="card">\n            <div class="card-header p-2">\n                <div class="d-flex justify-content-between align-items-center">\n                    <div>\n                        Schedules ({{$ctrl.total_count}})\n                    </div>\n                    <button class="pointer btn btn-sm btn-primary" ng-click="$ctrl.showGenerator()">Generate New Schedules</button>\n                </div>\n            </div>\n            <div class="card-body p-2 label-12" ng-if="!$ctrl.is_loading">\n                <table style="background: #fff;" class="table table-bordered table-sm">\n                    <tr>\n                        <td>Date</td>\n                        <td>First Session</td>\n                        <td>Second Session</td>\n                        <td>Slot Size</td>\n                        <td>Total Slots</td>\n                        <td>Available</td>\n                        <td>Booked</td>\n                        <td>Action</td>\n                    </tr>\n                    <tr ng-repeat="a in $ctrl.schedules">\n                        <td>\n                            {{a.schedule_date | date:\'dd MMM yyyy\'}}\n                        </td>\n                        <td>{{a.morning_start_time | date:\'hh:mm a\':\'UTC\'}} - {{a.morning_end_time | date:\'hh:mm a\':\'UTC\'}}</td>\n                        <td>{{a.afternoon_start_time | date:\'hh:mm a\':\'UTC\'}} - {{a.afternoon_end_time | date:\'hh:mm a\':\'UTC\'}}</td>\n                        <td>{{a.allocation_per_slot}}</td>\n                        <td>{{a.total_allocated_slot}}</td>\n                        <td>{{a.available_slot}}</td>\n                        <td>{{a.booked_slot}}</td>\n                        <td style="width: 115px;">\n                            <button class="btn btn-sm btn-secondary label-12" ng-click="$ctrl.openSchedule(a)">View</button>\n                            <button class="btn btn-sm btn-danger label-12" ng-click="$ctrl.delete(a, $index)">Delete</button>\n                        </td>\n                    </tr>\n                </table>\n                <pagination config="$ctrl.pagination_config" paginate="$ctrl.paginate" ng-if="!$ctrl.is_loading">\n                </pagination>\n            </div>\n            <div style="height:500px" class="card-body d-flex justify-content-center align-items-center" ng-if="$ctrl.is_loading">\n                <loader></loader>\n            </div>\n        </div>\n    </div>\n    <div class="col-12" ng-if="$ctrl.schedules.length == 0">\n        <div style="height: 450px;" class="d-flex justify-content-center align-items-center">\n            <div class="text-center">\n                <i class="bluey-grey fas fa-exclamation fa-3x mb-1"></i>\n                <div class="bluey-grey mb-4">No available schedules.</div>\n                <button class="pointer btn btn-sm btn-success" ng-click="$ctrl.showGenerator()">Generate New Schedules</button>\n            </div>\n        </div>\n    </div>\n</div>\n<schedule-modal ng-if="$ctrl.schedule_modal" payload="$ctrl.schedule_data"></schedule-modal>\n<generate-schedule-modal ng-if="$ctrl.generator_modal" payload="$ctrl.generate_schedule_modal"></generate-schedule-modal>\n<div class="modal-container d-flex align-items-center justify-content-center" ng-if="$ctrl.delete_warning">\n    <div class="card" style="width: 350px;">\n        <div class="card-body">\n            <p>Warning: Existing bookings reserved or confirmed will not be deleted. Reschedule the appointments if required. Delete action is immediate and irreversible.</p>\n            <div class="d-flex justify-content-between align-items-center">\n                <button class="btn btn-sm" ng-click="$ctrl.cancel_delete()">Cancel</button>\n                <button class="btn btn-success btn-sm" ng-click="$ctrl.confirm_delete()">Confirm</button>\n            </div>\n        </div>\n    </div>\n</div>');
 $templateCache.put('/admin/dashboard/locations/details/view.html','<div class="row">\n    <div class="col-12">\n        <div class="card">\n            <div class="card-body p-2">\n                <table class="table table-bordered table-condensed">\n                    <thead>\n                        <tr>\n                            <th>Site Name</th>\n                            <th>Site Code</th>\n                            <th>Address</th>\n                            <!-- <th>Longitude</th>\n                            <th>Latitude</th> -->\n                            <th>Referral Type</th>\n                            <th>Status</th>\n                            <th>Action</th>\n                        </tr>\n                    </thead>\n                    <tbody>\n                        <tr>\n                            <td>{{$ctrl.locationDetails.name}}</td>\n                            <td>{{$ctrl.locationDetails.code}}</td>\n                            <td>{{$ctrl.locationDetails.address}}</td>\n                            <!-- <td>{{$ctrl.locationDetails.longitude}}</td>\n                            <td>{{$ctrl.locationDetails.latitude}}</td> -->\n                            <td>{{$ctrl.locationDetails.referral_type}}</td>\n                            <td>{{$ctrl.locationDetails.status_text}}</td>\n                            <td><i class="fas fa-pencil-alt pointer" ng-click="$ctrl.openEditModal(a, $index)"></i>\n                            </td>\n                        </tr>\n                        <tr ng-if="$ctrl.clinics.length == 0">\n                            <td class="text-center" colspan="4">No data</td>\n                        </tr>\n                    </tbody>\n                </table>\n            </div>\n        </div>\n    </div>\n</div>\n\n<div class="modal-container d-flex align-items-center justify-content-center" ng-if="$ctrl.edit_location_modal">\n    <div class="card" style="width:400px">\n        <div class="card-body" click-outside="$ctrl.closeModal()">\n            <form name="location">\n                <h5>New Test Site</h5>\n                <div class="form-group">\n                    <label for="name">Site Name</label>\n                    <input type="text" ng-model="$ctrl.locationDetails.name" class="form-control" required>\n                </div>\n                <div class="form-group">\n                    <label for="address">Address</label>\n                    <textarea rows="3" ng-model="$ctrl.locationDetails.address" class="form-control" required></textarea>\n                </div>\n                <div class="form-group">\n                    <label for="test_code">Site Code</label>\n                    <input type="text" ng-model="$ctrl.locationDetails.code" class="form-control">\n                </div>\n                <div class="form-group">\n                    <label for="code">Status</label>\n                    <select class="form-control" ng-model="$ctrl.locationDetails.status_id">\n                        <option value="1">Active</option>\n                        <option value="0">Inactive</option>\n                    </select>\n                </div>\n                <div class="form-group">\n                    <label for="code">Referral Type</label>\n                    <select class="form-control" ng-model="$ctrl.locationDetails.referral_id">\n                        <option value="0">Clinic</option>\n                        <option value="1">Hospital</option>\n                    </select>\n                </div>\n                <!-- <div class="form-group">\n                    <label for="longitude">Longitude</label>\n                    <input type="text" ng-model="$ctrl.locationDetails.longitude" class="form-control">\n                </div>\n                <div class="form-group">\n                    <label for="latitude">Latitude</label>\n                    <input type="text" ng-model="$ctrl.locationDetails.latitude" class="form-control">\n                </div> -->\n\n                <div class="form-group text-right">\n                    <div class="d-flex flex-row justify-content-between">\n                        <button type="button" class="btn btn-danger" ng-click="$ctrl.closeModal()">Cancel</button>\n                        <button type="submit" class="btn btn-primary" ng-click="$ctrl.updateLocation($ctrl.locationDetails)">Update</button>\n                    </div>\n                </div>\n            </form>\n        </div>\n    </div>\n</div>');
+$templateCache.put('/admin/dashboard/locations/schedules/view.html','<div class="row">\n    <div class="col-12" ng-if="$ctrl.schedules.length != 0">\n        <div class="card">\n            <div class="card-header p-2">\n                <div class="d-flex justify-content-between align-items-center">\n                    <div>\n                        Schedules ({{$ctrl.total_count}})\n                    </div>\n                    <button class="pointer btn btn-sm btn-primary" ng-click="$ctrl.showGenerator()">Generate New Schedules</button>\n                </div>\n            </div>\n            <div class="card-body p-2 label-12" ng-if="!$ctrl.is_loading">\n                <table style="background: #fff;" class="table table-bordered table-sm">\n                    <tr>\n                        <td>Date</td>\n                        <td>First Session</td>\n                        <td>Second Session</td>\n                        <td>Slot Size</td>\n                        <td>Total Slots</td>\n                        <td>Available</td>\n                        <td>Booked</td>\n                        <td>Action</td>\n                    </tr>\n                    <tr ng-repeat="a in $ctrl.schedules">\n                        <td>\n                            {{a.schedule_date | date:\'dd MMM yyyy\'}}\n                        </td>\n                        <td>{{a.morning_start_time | date:\'hh:mm a\':\'UTC\'}} - {{a.morning_end_time | date:\'hh:mm a\':\'UTC\'}}</td>\n                        <td>{{a.afternoon_start_time | date:\'hh:mm a\':\'UTC\'}} - {{a.afternoon_end_time | date:\'hh:mm a\':\'UTC\'}}</td>\n                        <td>{{a.allocation_per_slot}}</td>\n                        <td>{{a.total_allocated_slot}}</td>\n                        <td>{{a.available_slot}}</td>\n                        <td>{{a.booked_slot}}</td>\n                        <td style="width: 115px;">\n                            <button class="btn btn-sm btn-secondary label-12" ng-click="$ctrl.openSchedule(a)">View</button>\n                            <button class="btn btn-sm btn-danger label-12" ng-click="$ctrl.delete(a, $index)">Delete</button>\n                        </td>\n                    </tr>\n                </table>\n                <pagination config="$ctrl.pagination_config" paginate="$ctrl.paginate" ng-if="!$ctrl.is_loading">\n                </pagination>\n            </div>\n            <div style="height:500px" class="card-body d-flex justify-content-center align-items-center" ng-if="$ctrl.is_loading">\n                <loader></loader>\n            </div>\n        </div>\n    </div>\n    <div class="col-12" ng-if="$ctrl.schedules.length == 0">\n        <div style="height: 450px;" class="d-flex justify-content-center align-items-center">\n            <div class="text-center">\n                <i class="bluey-grey fas fa-exclamation fa-3x mb-1"></i>\n                <div class="bluey-grey mb-4">No available schedules.</div>\n                <button class="pointer btn btn-sm btn-success" ng-click="$ctrl.showGenerator()">Generate New Schedules</button>\n            </div>\n        </div>\n    </div>\n</div>\n<schedule-modal ng-if="$ctrl.schedule_modal" payload="$ctrl.schedule_data"></schedule-modal>\n<generate-schedule-modal ng-if="$ctrl.generator_modal" payload="$ctrl.generate_schedule_modal"></generate-schedule-modal>\n<div class="modal-container d-flex align-items-center justify-content-center" ng-if="$ctrl.delete_warning">\n    <div class="card" style="width: 350px;">\n        <div class="card-body">\n            <p>Warning: Existing bookings reserved or confirmed will not be deleted. Reschedule the appointments if required. Delete action is immediate and irreversible.</p>\n            <div class="d-flex justify-content-between align-items-center">\n                <button class="btn btn-sm" ng-click="$ctrl.cancel_delete()">Cancel</button>\n                <button class="btn btn-success btn-sm" ng-click="$ctrl.confirm_delete()">Confirm</button>\n            </div>\n        </div>\n    </div>\n</div>');
 $templateCache.put('/admin/dashboard/locations/users/view.html','<div class="row">\n    <div class="col-8">\n        <div class="card">\n            <div class="card-body">\n                location users\n            </div>\n        </div>\n    </div>\n    <div class="col-4">\n        <div class="card">\n            <div class="card-body">\n                location users\n            </div>\n        </div>\n    </div>\n</div>\n');
 $templateCache.put('/admin/dashboard/locations/view/view.html','<div class="d-flex flex-row justify-content-between align-items-center">\n    <div>\n        <h4>{{::$ctrl.location.name}}</h4>\n        <p><i class="fas fa-compass"></i> {{::$ctrl.location.address}}</p>\n    </div>\n    <div>\n        <button ui-sref="admin.dashboard.locations" class="btn btn-secondary"><i class="fas fa-long-arrow-alt-left"></i> Back</button>    \n    </div>\n</div> \n\n<div class="row">\n    <div class="col-12">\n        <div class="d-flex flex-row">\n            <div class="location-tab-item mr-3" ng-click="$ctrl.tabClicked(f.id)" ng-class="{active:f.id== $ctrl.default_index}" ng-repeat="f in $ctrl.tabs">{{::f.name}}</div>\n        </div>\n    </div>\n</div>\n<hr class="mt-0 mb-3">\n<location-details ng-if="$ctrl.default_index == 0" location-details="$ctrl.location"></location-details>\n<location-schedules ng-if="$ctrl.default_index == 1"></location-schedules>\n<location-clinics ng-if="$ctrl.default_index == 2"></location-clinics>\n\n<!-- <location-users ng-if="$ctrl.default_index == 0"></location-users> -->\n\n<!-- <div class="card">\n    <div class="card-header d-flex flex-row justify-content-between">\n        <div>\n            <b>{{::$ctrl.location.name}}</b>\n        </div>\n        <div class="pointer" ui-sref="admin.dashboard.locations">\n            \n        </div>\n    </div>\n    <div class="card-body">\n        <h1>asds</h1>\n    </div>\n</div> -->');
 $templateCache.put('/admin/dashboard/bookings/view/confirm-booking/view.html','<div class="modal-container d-flex align-items-center justify-content-center">\n    <div class="card" style="width: 400px;">\n        <div class="card-body">\n            <div class="row">\n                <div class="col-12">\n                    <form name="manualConfirm" ng-submit="$ctrl.confirmPayment()">\n                        <div class="form-group">\n                            <label for="payment type">Payment Type</label>\n                            <input type="text" ng-model="$ctrl.confirm.type" class="form-control" disabled>\n                        </div>\n                        <div class="form-group">\n                            <label for="payment type">Payment Received Date</label>\n                            <div dx-date-box="$ctrl.widget.received_date"></div>\n                        </div>\n                        <div class="form-group">\n                            <label for="">Payment Mode</label>\n                            <select class="form-control" ng-model="$ctrl.confirm.payment_mode"  ng-options="a.id as a.name for a in $ctrl.payment_modes" required>\n                                <option value="" selected hidden selected>-Select payment mode-</option>\n                            </select>\n                        </div>\n                        <div class="form-group">\n                            <label for="">Payment Reference</label>\n                            <input type="text" ng-model="$ctrl.confirm.payment_reference" minlength="5" maxlength="50" class="form-control" required/>\n                        </div>\n                        <div class="form-group">\n                            <label for="">Price (RM)</label>\n                            <div dx-number-box="$ctrl.widget.price"></div>\n                        </div>  \n                        <div class="form-group">\n                            <label for="">Upload Document</label>\n                            <div class="dx-fileuploader" dx-file-uploader="$ctrl.widget.document_uploader"></div>\n                        </div>\n                        <div class="form-group d-flex justify-content-between">\n                            <button type="button" class="btn" ng-click="$ctrl.payload.cancel_modal()">Cancel</button>\n                            <button class="btn btn-primary" ng-disabled="manualConfirm.$invalid || !$ctrl.document_valid">Confirm Booking Payment</button>\n                        </div>\n                    </form>\n                </div>\n            </div>\n        </div>\n    </div>\n</div>\n');
