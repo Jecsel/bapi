@@ -10,10 +10,15 @@ class V1::DashboardController < ApplicationController
         locations = Location.count
         today_bookings = Booking.joins(:schedule).where("bookings.created_at >= ?",today.beginning_of_day).count
         graph_data = []
+        p "#####"
+        p "#####"
+        p bookings
+        p "#####"
+        p "#####"
         bookings.each do |e|
             status  = Payment.where(booking_id:e.last.pluck(:id)).group(:payment_status).count
             graph_data << {
-                booking_date: e.last.first.schedule.created_at.strftime("%^b %e"),
+                booking_date: e.last.first.created_at.strftime("%^b %e"),
                 reserved: status["reserved"] || 0,
                 confirmed: status["confirmed"] || 0,
                 missed: status["missed"] || 0,
