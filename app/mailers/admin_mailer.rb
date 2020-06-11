@@ -5,7 +5,7 @@ class AdminMailer < ApplicationMailer
         @user = user
         @temp_pass = temp_pass
         mail(
-            to: "zubiri.jem@gmail.com", 
+            to: @user.email, 
             cc: ENV["CC_MAIL"].split("|"),
             subject: "Drive-Through Admin - Set Password")
     end
