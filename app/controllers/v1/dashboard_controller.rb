@@ -3,8 +3,7 @@ class V1::DashboardController < ApplicationController
 
     def booking_graph
         today = DateTime.now.in_time_zone
-        bookings = Booking.all.order(:id).group_by(&:schedule_id)
-        
+        bookings = Booking.select(:id, :created_at).group_by { |c| c.created_at.strftime("%^b %e") }
         clinics = Clinic.count
         users = User.count
         locations = Location.count
