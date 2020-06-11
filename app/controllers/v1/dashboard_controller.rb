@@ -2,26 +2,29 @@ class V1::DashboardController < ApplicationController
     before_action :must_be_authenticated
 
     def booking_graph
-        today = DateTime.now.in_time_zone
-        bookings = Booking.select(:id, :created_at).group_by { |c| c.created_at.strftime("%^b %e") }
         clinics = Clinic.count
         users = User.count
         locations = Location.count
+
+        today = DateTime.now.in_time_zone.to_date
+        seven_day_ago = today - 7.days
         today_bookings = Booking.joins(:schedule).where("bookings.created_at >= ?",today.beginning_of_day).count
+
         graph_data = []
-       
-        bookings.each do |e|
-            status  = Payment.where(booking_id:e.last.pluck(:id)).group(:payment_status).count
+
+        (seven_day_ago..today).to_a.each do |date|
+            status = Booking.joins(:payment).where(bookings:{created_at:[date.beginning_of_day..date.end_of_day]}).group("payments.payment_status").count
             graph_data << {
-                booking_date: e.last.first.created_at.strftime("%^b %e"),
-                reserved: status["reserved"] || 0,
-                confirmed: status["confirmed"] || 0,
-                missed: status["missed"] || 0,
-                completed: status["completed"] || 0,
-                cancelled: status["cancelled"] || 0,
-                reschedule: status["reschedule"] || 0,
+                booking_date: date.strftime("%^b %e"),
+                reserved: status[0] || 0,
+                confirmed: status[1] || 0,
+                missed: status[2] || 0,
+                completed: status[3] || 0,
+                cancelled: status[4] || 0,
+                reschedule: status[5] || 0,
             }
         end
+        
         render json: {
             users: users,
             locations: locations,
