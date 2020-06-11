@@ -39,6 +39,7 @@ class V1::LocationController < ApplicationController
 
   def show
     @location = Location.find params[:id]
+    @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ? ",2) #Test site service
   end
   
   # def destroy 
