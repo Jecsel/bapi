@@ -16,11 +16,11 @@ class V1::ClinicController < ApplicationController
     end
     def show
         clinics = Clinic.find params[:id]
-        render json: {clinic: clinics}
+        role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ? ",3).extract_associated(:service_policy) #Clinic service
+        render json: {clinic: clinics, controls: role_policy}
     end
    
     def update
-        p params
         @clinics = Clinic.find(params[:id])
         @clinics.update clinic_params
         render json: {msg: 'update success'}
