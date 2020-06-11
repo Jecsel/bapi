@@ -5,16 +5,19 @@ class V1::UserController < ApplicationController
   def sign_in
     user = User.find_by_username user_params[:username]
     if user.present?
-      p user.valid_password? user_params[:password]
       if user.valid_password? user_params[:password]
-        if user.first_login
-          set_new_pass(user)
+        if user.is_active
+          if !user.first_login
+            user.user_token = Generator.new().generate_alpha_numeric
+            user.save
+            
+            bearer_token = encode({user_id: user.id,secret: user.user_token})
+            render json: {token: bearer_token}
+          else
+            set_new_pass(user)
+          end
         else
-          user.user_token = Generator.new().generate_alpha_numeric
-          user.save
-          
-          bearer_token = encode({user_id: user.id,secret: user.user_token})
-          render json: {token: bearer_token}
+          invalid_account  
         end
       else
         invalid_account
@@ -50,6 +53,7 @@ class V1::UserController < ApplicationController
   def edit_user
     @user = User.find edit_params[:id]
     
+    @user.update(is_active: edit_params[:is_active])
     if @user.user_role.present?
       old_value = @user.user_role.user_group.name
       @user.user_role.update(user_group_id: edit_params[:user_group_id]) 
@@ -114,7 +118,7 @@ class V1::UserController < ApplicationController
   end
 
   def edit_params
-    params.require(:user).permit(:id, :username, :user_group_id)
+    params.require(:user).permit(:id, :username, :user_group_id, :is_active)
   end
 
   def create_params
