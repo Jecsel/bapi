@@ -15,7 +15,7 @@ build:
    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD registry.gitlab.com
   script:
     - docker build -t biomark-booking-api .
-    - docker tag biomark-booking-api:latest registry.gitlab.com/biomark/biomark-booking-api:MASTER_${CI_JOB_ID}
+    - docker tag biomark-booking-api:latest registry.gitlab.com/biomark/biomark-booking-api:${CI_COMMIT_REF_NAME}_${CI_JOB_ID}
     - docker push registry.gitlab.com/biomark/biomark-booking-api:${CI_COMMIT_REF_NAME}_${CI_JOB_ID}
   only:
     - master
