@@ -35,7 +35,13 @@ class Booking < ApplicationRecord
     end
 
     def self.search_filter( filter_params )
-        _sql =  get_location(filter_params[:location_id])
+        _sql =  joins(:payment , :slot, :schedule)
+        if filter_params[:location_id] != 0
+            _sql = _sql.where(location_id: id)
+        end
+        if filter_params[:location_id] != 0
+            _sql = _sql.where(location_id: id) 
+        end
         if filter_params[:status] != 32767
             _sql = _sql.payment_status(filter_params[:status])
         end
@@ -49,7 +55,6 @@ class Booking < ApplicationRecord
             elapse_time = Time.now - 60.minutes
             _sql = _sql.where("bookings.created_at <= ?",elapse_time)
         end
-
         if filter_params[:booking_date_start].present? && filter_params[:booking_date_end].present?
             _sql = _sql.where(schedules:{schedule_date:[filter_params[:booking_date_start]..filter_params[:booking_date_end]]})
         end
@@ -59,13 +64,10 @@ class Booking < ApplicationRecord
         if filter_params[:booking_date_start].nil? && filter_params[:booking_date_end].present?
             _sql =_sql.where("schedules.schedule_date <= ?",filter_params[:booking_date_end]) 
         end
+        _sql = _sql.order("schedules.schedule_date ASC, slots.slot_time ASC")
         return _sql
     end
-    
-    def self.get_location id 
-        return where(location_id: id) if id != 0
-        return self
-    end
+
     def self.payment_status status
         return where({payments:{payment_status:status}})
     end
