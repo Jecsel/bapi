@@ -35,7 +35,10 @@ class Booking < ApplicationRecord
     end
 
     def self.search_filter( filter_params )
-        _sql =  get_location(filter_params[:location_id]).payment_status(filter_params[:status])
+        _sql =  get_location(filter_params[:location_id])
+        if filter_params[:status] != 32767
+            _sql = _sql.payment_status(filter_params[:status])
+        end
         if filter_params[:booking_type] != "all"
             _sql = _sql.where("bookings.booking_type = ?",filter_params[:booking_type])
         end
