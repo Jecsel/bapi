@@ -13,9 +13,9 @@ json.array! @bookings do |booking|
     json.q2 booking.patient.q2 ? "Y": "N"
     json.test_site booking.location.name unless booking.location.nil?
     json.test_site_code booking.location.code unless booking.location.nil?
-    json.clinic_name booking.clinic.name
-    json.clinic_code booking.clinic.code
-    json.billing_code booking.clinic.billing_code
+    json.clinic_name booking.clinic.name unless booking.clinic.nil?
+    json.clinic_code booking.clinic.code unless booking.clinic.nil?
+    json.billing_code booking.clinic.billing_code unless booking.clinic.nil?
     json.payment_date booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.created_at : "N/A"
     json.payment_status booking.payment.payment_status
     json.payment booking.payment.payment_id == 0 ? "Auto": "Manual"
