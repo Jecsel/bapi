@@ -14,13 +14,13 @@ class V1::ClinicController < ApplicationController
     end
     def destroy 
     end
+    
     def show
         clinics = Clinic.find params[:id]
         render json: {clinic: clinics}
     end
    
     def update
-        p params
         @clinics = Clinic.find(params[:id])
         @clinics.update clinic_params
         render json: {msg: 'update success'}
