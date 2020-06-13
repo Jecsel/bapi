@@ -17,7 +17,18 @@ class V1::ScheduleController < ApplicationController
     def slot
         _schedule = Schedule.find params[:schedule_id]
         @_slot = _schedule.slots.find params[:slot_id]
-        @_bookings = @_slot.bookings
+        @booking_count = Booking.where("slot_id = ?",params[:slot_id]).count
+        @status = ""
+        if @_slot.status
+            @status = "Active"
+        else
+            if @_slot.allocations == 0
+                @status = "Fully Booked"
+            else
+                @status = "Deleted"
+            end
+        end
+        
     end
     def index 
     end

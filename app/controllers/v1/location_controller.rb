@@ -13,51 +13,7 @@ class V1::LocationController < ApplicationController
   end
 
   def filter
-    if params[:search_referral] != nil && params[:search_status] != nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_status(params[:search_status])
-      .get_referral(params[:search_referral])
-      .page(1)
-    elsif params[:search_referral] != nil && params[:search_status] == nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_referral(params[:search_referral])
-      .page(1)
-    elsif params[:search_referral] == nil && params[:search_status] != nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_status(params[:search_status])
-      .page(1)
-    else
-      @locations = Location
-      .search(params[:search_string]) 
-      .page(1)
-    end
-  end
-
-  def paginate
-    if params[:search_referral] != nil && params[:search_status] != nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_status(params[:search_status])
-      .get_referral(params[:search_referral])
-      .page(params[:page]).order(created_at: :desc)
-    elsif params[:search_referral] != nil && params[:search_status] == nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_referral(params[:search_referral])
-      .page(params[:page]).order(created_at: :desc)
-    elsif params[:search_referral] == nil && params[:search_status] != nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_status(params[:search_status])
-      .page(params[:page]).order(created_at: :desc)
-    else
-      @locations = Location
-      .search(params[:search_string]) 
-      .page(params[:page]).order(created_at: :desc)
-    end
+    @locations = Location.search_filter(filter_params).page(filter_params[:page])
   end
 
   def add_clinic
@@ -83,15 +39,13 @@ class V1::LocationController < ApplicationController
 
   def show
     @location = Location.find params[:id]
+    @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ? ",2) #Test site service
   end
-  def destroy 
-    Location.find(params[:id]).update(status: false)
-    render json: {message: :deleted}
-  end 
-
-  def index
-    @locations = Location.page(1).order(created_at: :desc)
-  end
+  
+  # def destroy 
+  #   Location.find(params[:id]).update(status: false)
+  #   render json: {message: :deleted}
+  # end 
   
   def create
     @location = Location.create location_params
@@ -102,7 +56,12 @@ class V1::LocationController < ApplicationController
     @location.update location_params
     @location
   end
+
   private 
+
+  def filter_params 
+    params.require(:filter).permit(:status, :referral, :page, :search_str)
+  end
   def get_location
     @location = Location.find params[:location_id]
   end

@@ -53,13 +53,12 @@ class V1::BookingController < ApplicationController
     end
 
     def export 
-        @bookings = data_search.sort_by_datetime
+        @bookings = data_search
         AuditLog.log_changes("Bookings", "booking_export", "", "", get_log_text(), 2, @current_user.username)
-        
     end
 
     def filter 
-        @bookings = data_search.page(filter_params[:page]).sort_by_datetime
+        @bookings = data_search.page(filter_params[:page])
     end
 
     def index
@@ -132,35 +131,10 @@ class V1::BookingController < ApplicationController
             payment_status: booking.payment.payment_status}
     end
 
-    
-    # def paginate
-    #     if params[:location_id] != 0
-    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(params[:page])
-    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
-    #     else
-    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page])
-    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
-    #     end
-        
-        
-    # end
-
-    # def filter_booking
-    #     if params[:location_id] != 0
-    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(1)
-    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
-    #     else
-    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1)
-    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
-    #     end
-       
-    # end
 
     private 
     def data_search
-        Booking
-            .joins(:schedule,:payment)
-            .search_filter(filter_params)
+        Booking.search_filter(filter_params)
             .search(filter_params[:search_string])
     end
     def get_log_text
