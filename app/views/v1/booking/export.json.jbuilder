@@ -12,7 +12,7 @@ json.array! @bookings do |booking|
     json.q1 booking.patient.q1 ? "Y": "N"
     json.q2 booking.patient.q2 ? "Y": "N"
     json.test_site booking.location.name unless booking.location.nil?
-    json.test_site_code booking.location.code
+    json.test_site_code booking.location.code unless booking.location.nil?
     json.clinic_name booking.clinic.name
     json.clinic_code booking.clinic.code
     json.billing_code booking.clinic.billing_code
