@@ -5,7 +5,7 @@ class V1::LocationController < ApplicationController
 
   def schedules 
     today = Date.today
-    @schedules = Schedule.where("location_id = ? && schedule_date > ?",params[:location_id], today)
+    @schedules = Schedule.where("location_id = ? && schedule_date >= ?",params[:location_id], today).available.order(schedule_date: :asc).page(params[:page])
   end
 
   def clinics
@@ -13,51 +13,7 @@ class V1::LocationController < ApplicationController
   end
 
   def filter
-    if params[:search_referral] != nil && params[:search_status] != nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_status(params[:search_status])
-      .get_referral(params[:search_referral])
-      .page(1)
-    elsif params[:search_referral] != nil && params[:search_status] == nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_referral(params[:search_referral])
-      .page(1)
-    elsif params[:search_referral] == nil && params[:search_status] != nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_status(params[:search_status])
-      .page(1)
-    else
-      @locations = Location
-      .search(params[:search_string]) 
-      .page(1)
-    end
-  end
-
-  def paginate
-    if params[:search_referral] != nil && params[:search_status] != nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_status(params[:search_status])
-      .get_referral(params[:search_referral])
-      .page(params[:page]).order(created_at: :desc)
-    elsif params[:search_referral] != nil && params[:search_status] == nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_referral(params[:search_referral])
-      .page(params[:page]).order(created_at: :desc)
-    elsif params[:search_referral] == nil && params[:search_status] != nil
-      @locations = Location
-      .search(params[:search_string])
-      .get_status(params[:search_status])
-      .page(params[:page]).order(created_at: :desc)
-    else
-      @locations = Location
-      .search(params[:search_string]) 
-      .page(params[:page]).order(created_at: :desc)
-    end
+    @locations = Location.search_filter(filter_params).page(filter_params[:page]).order('id desc')
   end
 
   def add_clinic
@@ -66,6 +22,7 @@ class V1::LocationController < ApplicationController
       render json: {message: "Clinic already associated with this location"},status:406 
     else
       @location.location_clinics.create clinic_id:params[:clinic_id]
+      AuditLog.log_changes("Locations", "location_clinic_link", @location.id, "", params[:clinic_id], 4, @current_user.username)
       render json: Clinic.find(params[:clinic_id])
     end
   end
@@ -74,8 +31,9 @@ class V1::LocationController < ApplicationController
     location = Location.find params[:location_id]
     clinic = location.location_clinics.where("clinic_id = ?",params[:clinic_id])
     if clinic.any?
+      AuditLog.log_changes("Locations", "location_clinic_link", params[:location_id], "", params[:clinic_id], 5, @current_user.username)
       clinic.last.delete
-      render json: {message: "Clinic was been unlink with this location"},status:200
+      render json: {message: "Clinic has been unlinked with this location"},status:200
     else
       render json: {message: "No Clinic associated with this location"},status:406 
     end
@@ -83,26 +41,31 @@ class V1::LocationController < ApplicationController
 
   def show
     @location = Location.find params[:id]
+    @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ? ",2) #Test site service
   end
-  def destroy 
-    Location.find(params[:id]).update(status: false)
-    render json: {message: :deleted}
-  end 
-
-  def index
-    @locations = Location.page(1).order(created_at: :desc)
-  end
+  
+  # def destroy 
+  #   Location.find(params[:id]).update(status: false)
+  #   render json: {message: :deleted}
+  # end 
   
   def create
     @location = Location.create location_params
+    AuditLog.log_changes("Locations", "location_id", @location.id, "", "", 0, @current_user.username)
   end
 
   def update
     @location = Location.find(params[:id])
+    AuditLog.log_changes("Locations", "location_id", @location.id, "", "", 1, @current_user.username)
     @location.update location_params
     @location
   end
+
   private 
+
+  def filter_params 
+    params.require(:filter).permit(:status, :referral, :page, :search_str)
+  end
   def get_location
     @location = Location.find params[:location_id]
   end

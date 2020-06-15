@@ -71,17 +71,18 @@ Rails.application.routes.draw do
         # post 'filter_booking'
       end
     end
-    resources :user, only: [:index] do
+    resources :user, only: [:index, :create] do
       collection do
         post 'sign_in'
         post 'authenticate'
         post 'get_policies'
         post 'sign_out'
         post 'edit_user'
+        post 'update_pass'
       end
     end
 
-    resources :schedule, only:[:create, :show] do 
+    resources :schedule, only:[:create, :show, :destroy] do 
       get 'slot/:slot_id', to:"schedule#slot"
       post 'close_slot/:slot_id', to:"schedule#close_slot"
       collection do 
@@ -90,6 +91,8 @@ Rails.application.routes.draw do
     end
     resources :clinic, only:[:create, :index, :update, :destroy, :show] do 
       collection do 
+        get 'list'
+        post 'paginate'
       end
     end
     resources :location, only:[:create, :index, :update, :destroy, :show] do 
@@ -97,7 +100,7 @@ Rails.application.routes.draw do
         post 'filter'
         post 'paginate'
       end
-      get 'schedules'
+      get 'schedules/:page', to:"location#schedules"
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"
       post 'unlink_clinic', to:"location#unlink_clinic"

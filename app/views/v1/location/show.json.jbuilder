@@ -4,3 +4,6 @@ json.location do
     json.status_id @location.status ? "1" : "0"
     json.status_text @location.status ? "Active": "Inactive"
 end
+json.controls @role_policy do |rol|
+    json.extract! rol.service_policy, :id, :status
+end

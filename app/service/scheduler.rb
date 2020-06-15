@@ -4,60 +4,90 @@ class Scheduler
         :location_id, 
         :allocation_per_slot, 
         :minutes_interval,
-        :afternoon,
-        :morning
-
+        :second_session,
+        :first_session,
+        :no_of_session,
+        :allowed_days
     def initialize schedule_params
-        @date_from              = schedule_params[:date_from]
-        @date_to                = schedule_params[:date_to]
-        @location_id            = schedule_params[:location_id]
-        @allocation_per_slot    = schedule_params[:allocation_per_slot].to_i
-        @minutes_interval       = schedule_params[:minutes_interval].to_i
-        @afternoon              = schedule_params[:afternoon]
-        @morning                = schedule_params[:morning]
-        
-        # validate()
+        p "*********************"
+        p "*********************"
+        p schedule_params
+        p "*********************"
+        p "*********************"
+        @allowed_days = []
+        @date_from                  = schedule_params[:date_from].to_s
+        @date_to                    = schedule_params[:date_to].to_s
+        @location_id                = schedule_params[:location_id]
+        @allocation_per_slot        = schedule_params[:allocation_per_slot].to_i
+        @minutes_interval           = schedule_params[:minutes_interval].to_i
+        @first_session              = schedule_params[:first_session]
+        @second_session             = schedule_params[:second_session]
+        @no_of_session              = schedule_params[:no_of_session]
+        schedule_params[:days].each do |dd|
+            @allowed_days << dd[:id] if dd[:is_selected]
+        end
         generate_schedule
     end
     private
     def  generate_schedule
         dates = date_to.blank? ? [date_from] : (date_from..date_to).to_a
+        if Schedule.where(location_id:location_id,schedule_date: dates).any?
+            raise "Existing slots found. Please delete or reschedule the bookings before adding new slots."
+        end
+        
         ActiveRecord::Base.transaction do
             dates.each do |_date|
-                sched = Schedule.create(
-                    location_id: location_id,
-                    schedule_date:_date, 
-                    allocation_per_slot:allocation_per_slot,
-                    minute_interval: minutes_interval,
-                    morning_start_time: "#{morning[:start]}:00".to_time,
-                    morning_end_time: "#{morning[:end]}:00".to_time,
-                    afternoon_start_time: "#{afternoon[:start]}:00".to_time,
-                    afternoon_end_time: "#{afternoon[:end]}:00".to_time)
+                next unless allowed_days.include?(_date.to_date.strftime("%u").to_i)
+                payload = {};
+                payload[:location_id]               = location_id
+                payload[:schedule_date]             = _date
+                payload[:allocation_per_slot]       = allocation_per_slot
+                payload[:minute_interval]           = minutes_interval
+                payload[:morning_start_time]        = "#{first_session[:start][:hh]}:#{first_session[:start][:mm]}".to_time
+                payload[:morning_end_time]          = "#{first_session[:end][:hh]}:#{first_session[:end][:mm]}".to_time
+                payload[:no_of_session]             = no_of_session
+                if payload[:morning_start_time] > payload[:morning_end_time] 
+                    raise "Please check your slot time settings."
+                end
+                if no_of_session == 2
+                    payload[:afternoon_start_time]   = "#{second_session[:start][:hh]}:#{second_session[:start][:mm]}".to_time
+                    payload[:afternoon_end_time]     = "#{second_session[:end][:hh]}:#{second_session[:end][:mm]}".to_time
+                    if payload[:morning_end_time] > payload[:afternoon_start_time] || payload[:afternoon_start_time] > payload[:afternoon_end_time]
+                        raise "Please check your slot time settings."
+                    end
+                end
+                sched = Schedule.create payload
                 generate_slot sched
             end
         end
     end
 
     def generate_slot sched
-        morning     = time_calculator sched.id,@morning[:start].to_i , @morning[:end].to_i, "AM"
-        afternoon   = time_calculator sched.id,@afternoon[:start].to_i,@afternoon[:end].to_i, "PM"
+        first_session_start_time = "#{first_session[:start][:hh]}:#{first_session[:start][:mm]}"
+        first_session_end_time   = "#{first_session[:end][:hh]}:#{first_session[:end][:mm]}"
+        morning     = time_calculator sched.id,first_session_start_time,first_session_end_time,"AM"
+
         Slot.create morning
-        Slot.create afternoon
+        
+        if no_of_session == 2
+            second_session_end_timestart_time = "#{second_session[:start][:hh]}:#{second_session[:start][:mm]}"
+            second_session_end_time   = "#{second_session[:end][:hh]}:#{second_session[:end][:mm]}"
+            afternoon   = time_calculator sched.id,second_session_end_timestart_time,second_session_end_time,"PM"
+            Slot.create afternoon
+        end
+    
     end
 
-    def time_calculator id,start , _end, n
+    def time_calculator id,start_time, end_time, a
         payload = []
-        while start < _end
-            ( 60 / minutes_interval ).floor.times do |a|
-                payload << {
-                    schedule_id:id,
-                    slot_time:"#{start}:#{(a * minutes_interval).to_s.rjust(2,"0")}".to_time,
-                    status:true,
-                    allocations: allocation_per_slot,
-                    meridian: n
-                }
-            end
-            start+=1
+        (start_time.to_time.to_i..(end_time.to_time - minutes_interval.minutes).to_i).step(minutes_interval.minutes) do |date|
+            payload << {
+                schedule_id:id,
+                slot_time: (Time.at(date) + 8.hours).strftime("%H:%M:00"), #compensate the timezone
+                status:true,
+                allocations: allocation_per_slot,
+                meridian: a
+            }
         end
         return payload
     end
