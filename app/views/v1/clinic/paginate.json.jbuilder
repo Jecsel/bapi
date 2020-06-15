@@ -1,4 +1,3 @@
-p @clinics_page
 json.clinic_list @clinics_page do |clinic|
     p clinic
     json.extract! clinic, :id , :name, :code, :email_address, :contact_number, :contact_person, :address, :billing_code, :status
