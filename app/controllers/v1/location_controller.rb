@@ -13,7 +13,7 @@ class V1::LocationController < ApplicationController
   end
 
   def filter
-    @locations = Location.search_filter(filter_params).page(filter_params[:page])
+    @locations = Location.search_filter(filter_params).page(filter_params[:page]).order('id desc')
   end
 
   def add_clinic
