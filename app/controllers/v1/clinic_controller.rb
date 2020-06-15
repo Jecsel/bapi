@@ -10,6 +10,7 @@ class V1::ClinicController < ApplicationController
     
     def create
         clinic = Clinic.create clinic_params
+        AuditLog.log_changes("Clinics", "clinic_id", clinic.id, "", "", 0, @current_user.username)
         render json:{data:clinic,message: :created}
     end
     def destroy 
@@ -22,6 +23,7 @@ class V1::ClinicController < ApplicationController
    
     def update
         @clinics = Clinic.find(params[:id])
+        AuditLog.log_changes("Clinics", "clinic_id", @clinics.id, "", "", 1, @current_user.username)
         @clinics.update clinic_params
     end
 
