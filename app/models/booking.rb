@@ -37,10 +37,10 @@ class Booking < ApplicationRecord
     def self.search_filter( filter_params )
         _sql =  joins(:payment , :slot, :schedule)
         if filter_params[:location_id] != 0
-            _sql = _sql.where(location_id: id)
+            _sql = _sql.where(location_id: filter_params[:location_id])
         end
         if filter_params[:location_id] != 0
-            _sql = _sql.where(location_id: id) 
+            _sql = _sql.where(location_id: filter_params[:location_id]) 
         end
         if filter_params[:status] != 32767
             _sql = _sql.payment_status(filter_params[:status])
