@@ -18,15 +18,6 @@ class V1::Guest::LocationController < ApplicationController
         booking_date_range = Setting.last.booking_date_range
         @loc = Location.find params[:location_id]
         @schedules = @loc.schedules.where("id = ? && schedule_date > ?",params[:scheduled_id],cut_off_time).available.order(schedule_date: :asc).limit(booking_date_range)
-        render json:{
-            active_slot:{
-                status: @schedules.any?,
-                data: @schedules.first.slots.group_by(&:meridian).as_json(
-                    methods: [:slot_time_with_interval]
-                )
-            },
-            schedules: @schedules.as_json(only: [:id, :schedule_date], methods:[:has_available_slot])
-        }
     end
     
     def schedules
@@ -34,18 +25,7 @@ class V1::Guest::LocationController < ApplicationController
         @loc = Location.find params[:location_id]
         @schedules = @loc.schedules.where("schedule_date > ?",cut_off_time).available.order(schedule_date: :asc).limit(booking_date_range)
 
-        render json:{
-            id: @loc.id, 
-            name: @loc.name,
-            address: @loc.address,
-            active_slot:{
-                status: @schedules.any?,
-                data: @schedules.first.slots.group_by(&:meridian).as_json(
-                    methods: [:slot_time_with_interval]
-                )
-            },
-            schedules: @schedules.as_json(only: [:id, :schedule_date], methods:[:has_available_slot])
-        }
+       
     end
     
     def index

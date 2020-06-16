@@ -7,7 +7,7 @@ class Slot < ApplicationRecord
     scope :booked, ->{where(status:false)}
 
     def slot_time_with_interval
-        self.slot_time.utc.strftime("%I:%M") + self.meridian + " - " + (self.slot_time + self.schedule.minute_interval*60).utc.strftime("%I:%M") + self.meridian
+        self.slot_time.utc.strftime("%I:%M")+ " - " + (self.slot_time + self.schedule.minute_interval*60).utc.strftime("%I:%M")
     end
 
     def self.count_total_available_slots 
