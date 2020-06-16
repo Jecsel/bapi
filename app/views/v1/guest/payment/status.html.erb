@@ -26,6 +26,12 @@
             align-items: center;
             justify-content: center;
 		}
+
+		.btn-success {
+			color: #fff;
+			background-color: #28a745;
+			border-color: #28a745;
+		}
 		@media only screen
  
 		and (min-device-width: 375px)
@@ -72,6 +78,11 @@
 						<li>For any clarification, please do not hesitate to contact our call centre at 1800 22 6843 for further assistance.</li>
 					<ul>
 				</div>
+				<div>
+					<center>
+						<button class="btn-success" style="width: 100%; height: 30px" onclick="redirect_location()">Ok</button>
+					</center>
+				</div>
             </div>
         <% else %>
              <div>
@@ -79,6 +90,9 @@
                 <script>
                     function redirect(){
                         window.location.replace("https://my.biomarking.com/#/booking-confirmation");
+					}
+					function redirect_location(){
+                        window.location.replace("https://my.biomarking.com/#/booking-locations");
                     }
                 </script>
                 <center>
