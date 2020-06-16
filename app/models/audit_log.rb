@@ -1,6 +1,6 @@
 class AuditLog < ApplicationRecord
 
-    enum action:["Add", "Update", "Export"]
+    enum action:["Added", "Updated", "Exported", "Deleted", "Linked", "Unlinked"]
 
     def self.log_changes model, field_name, field_id, old_value, new_value, action, user
         
@@ -34,8 +34,12 @@ class AuditLog < ApplicationRecord
     end
 
     def self.get_by_module id 
-        return where(model: Service.find(id).name) if id != 0
-        return self
+        if id == 2 #For Test sites module, model/db name is Location/locations
+            return where(model: "Locations")
+        else
+            return where(model: Service.find(id).name) if id != 0
+            return self
+        end
     end
 
     def self.get_by_user id 
