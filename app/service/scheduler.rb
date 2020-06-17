@@ -52,7 +52,7 @@ class Scheduler
                 if no_of_session == 2
                     payload[:afternoon_start_time]   = "#{second_session[:start][:hh]}:#{second_session[:start][:mm]}".to_time
                     payload[:afternoon_end_time]     = "#{second_session[:end][:hh]}:#{second_session[:end][:mm]}".to_time
-                    if payload[:morning_end_time] >= payload[:afternoon_start_time] || payload[:afternoon_start_time] > payload[:afternoon_end_time]
+                    if payload[:morning_end_time] >= payload[:afternoon_start_time] || payload[:afternoon_start_time] >= payload[:afternoon_end_time]
                         raise "Please check your slot time settings."
                     end
                 end
