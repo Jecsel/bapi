@@ -1,11 +1,14 @@
 class V1::ClinicController < ApplicationController
     before_action :must_be_authenticated
 
+    def filter 
+        @clinics = Clinic.where(status:filter_params[:status]).search(filter_params[:search_str]).page(filter_params[:status]).order('id desc')
+    end
     def list 
         @clinics = Clinic.order('id desc')
     end
     def index
-        @clinics = Clinic.page(1).order('id desc')
+        
     end
     
     def create
@@ -34,6 +37,10 @@ class V1::ClinicController < ApplicationController
     private 
     def clinic_params
         params.require(:clinic).permit(:name, :code, :email_address, :contact_number, :address, :contact_person, :billing_code, :status, :clinic_area_id)
+    end
+
+    def filter_params
+        params.require(:filter).permit(:page, :status, :search_str)
     end
 
 end
