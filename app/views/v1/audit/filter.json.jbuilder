@@ -31,7 +31,7 @@ json.audit_logs @audit_log.each do |log|
         end
     when "Clinics"
         json.log_text "#{log.action} clinic ##{log.field_id}" 
-    when "Locations"
+    when "Test Sites"
         case log.field_name
         when "location_delete_day"
             json.log_text "#{log.action} test site ##{log.field_id} schedule day on #{log.new_value.to_date.strftime("%d %A %Y")}"
