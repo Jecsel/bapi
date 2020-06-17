@@ -134,8 +134,7 @@ class V1::BookingController < ApplicationController
 
     private 
     def data_search
-        Booking.search_filter(filter_params)
-            .search(filter_params[:search_string])
+        Booking.search_filter(filter_params).search(filter_params[:search_string])
     end
     def get_log_text
         header = "Exported CSV with filters "

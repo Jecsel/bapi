@@ -12,7 +12,7 @@ class V1::ScheduleController < ApplicationController
     def close_slot
         _schedule = Schedule.find params[:schedule_id]
         slot = _schedule.slots.find params[:slot_id]
-        slot.update status:false
+        slot.update is_deleted:true
         AuditLog.log_changes("Test Sites", "location_delete_slot", _schedule.id, _schedule.schedule_date, slot.slot_time.utc.strftime("%I:%M") + slot.meridian + " - " + (slot.slot_time + _schedule.minute_interval*60).utc.strftime("%I:%M") + slot.meridian, 3, @current_user.username)
         render json: :closed
     end
