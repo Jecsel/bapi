@@ -5,7 +5,7 @@ class V1::ScheduleController < ApplicationController
         schedule = Schedule.find(params[:id])
         schedule.update status:false
         schedule.slots.update_all status:false
-        AuditLog.log_changes("Locations", "location_delete_day", schedule.id, "", schedule.schedule_date, 3, @current_user.username)
+        AuditLog.log_changes("Test Sites", "location_delete_day", schedule.id, "", schedule.schedule_date, 3, @current_user.username)
         render json: :deleted
     end
 
@@ -13,7 +13,7 @@ class V1::ScheduleController < ApplicationController
         _schedule = Schedule.find params[:schedule_id]
         slot = _schedule.slots.find params[:slot_id]
         slot.update status:false
-        AuditLog.log_changes("Locations", "location_delete_slot", _schedule.id, _schedule.schedule_date, slot.slot_time.utc.strftime("%I:%M") + slot.meridian + " - " + (slot.slot_time + _schedule.minute_interval*60).utc.strftime("%I:%M") + slot.meridian, 3, @current_user.username)
+        AuditLog.log_changes("Test Sites", "location_delete_slot", _schedule.id, _schedule.schedule_date, slot.slot_time.utc.strftime("%I:%M") + slot.meridian + " - " + (slot.slot_time + _schedule.minute_interval*60).utc.strftime("%I:%M") + slot.meridian, 3, @current_user.username)
         render json: :closed
     end
     def slot
@@ -40,7 +40,7 @@ class V1::ScheduleController < ApplicationController
     def create
         begin
             Scheduler.new schedule_params 
-            AuditLog.log_changes("Locations", "location_add_schedule", "", "", get_log_text(), 0, @current_user.username)
+            AuditLog.log_changes("Test Sites", "location_add_schedule", "", "", get_log_text(), 0, @current_user.username)
             render json: {message: :generated, status:true}
         rescue=>ex
             render json: {message:ex,status:false},status:403
