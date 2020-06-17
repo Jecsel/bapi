@@ -93,6 +93,7 @@ Rails.application.routes.draw do
       collection do 
         get 'list'
         post 'paginate'
+        post 'filter'
       end
     end
     resources :location, only:[:create, :index, :update, :destroy, :show] do 
