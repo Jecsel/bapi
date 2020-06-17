@@ -34,12 +34,8 @@ class AuditLog < ApplicationRecord
     end
 
     def self.get_by_module id 
-        if id == 2 #For Test sites module, model/db name is Location/locations
-            return where(model: "Locations")
-        else
-            return where(model: Service.find(id).name) if id != 0
-            return self
-        end
+        return where(model: Service.find(id).name) if id != 0
+        return self
     end
 
     def self.get_by_user id 
