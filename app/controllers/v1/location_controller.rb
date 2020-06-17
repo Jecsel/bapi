@@ -22,7 +22,7 @@ class V1::LocationController < ApplicationController
       render json: {message: "Clinic already associated with this location"},status:406 
     else
       @location.location_clinics.create clinic_id:params[:clinic_id]
-      AuditLog.log_changes("Locations", "location_clinic_link", @location.id, "", params[:clinic_id], 4, @current_user.username)
+      AuditLog.log_changes("Test Sites", "location_clinic_link", @location.id, "", params[:clinic_id], 4, @current_user.username)
       render json: Clinic.find(params[:clinic_id])
     end
   end
@@ -31,7 +31,7 @@ class V1::LocationController < ApplicationController
     location = Location.find params[:location_id]
     clinic = location.location_clinics.where("clinic_id = ?",params[:clinic_id])
     if clinic.any?
-      AuditLog.log_changes("Locations", "location_clinic_link", params[:location_id], "", params[:clinic_id], 5, @current_user.username)
+      AuditLog.log_changes("Test Sites", "location_clinic_link", params[:location_id], "", params[:clinic_id], 5, @current_user.username)
       clinic.last.delete
       render json: {message: "Clinic has been unlinked with this location"},status:200
     else
@@ -51,12 +51,12 @@ class V1::LocationController < ApplicationController
   
   def create
     @location = Location.create location_params
-    AuditLog.log_changes("Locations", "location_id", @location.id, "", "", 0, @current_user.username)
+    AuditLog.log_changes("Test Sites", "location_id", @location.id, "", "", 0, @current_user.username)
   end
 
   def update
     @location = Location.find(params[:id])
-    AuditLog.log_changes("Locations", "location_id", @location.id, "", "", 1, @current_user.username)
+    AuditLog.log_changes("Test Sites", "location_id", @location.id, "", "", 1, @current_user.username)
     @location.update location_params
     @location
   end
