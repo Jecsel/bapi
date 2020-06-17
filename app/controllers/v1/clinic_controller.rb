@@ -2,7 +2,7 @@ class V1::ClinicController < ApplicationController
     before_action :must_be_authenticated
 
     def filter 
-        @clinics = Clinic.where(status:filter_params[:status]).search(filter_params[:search_str]).page(filter_params[:status]).order('id desc')
+        @clinics = Clinic.where(status:filter_params[:status]).search(filter_params[:search_str]).page(filter_params[:page]).order('id desc')
     end
     def list 
         @clinics = Clinic.order('id desc')
