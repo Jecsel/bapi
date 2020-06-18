@@ -139,13 +139,14 @@ class V1::BookingController < ApplicationController
     def get_log_text
         header = "Exported CSV with filters "
         test_site = "test site: #{filter_params[:location_id] == 0? "All" : Location.find(filter_params[:location_id]).name}, "
-        status = "status: #{Payment.payment_statuses.invert[filter_params[:status]]}, "
+        status = "status: #{filter_params[:status] == 32767 ? "All" : Payment.payment_statuses.invert[filter_params[:status]]}, "
+        booking_type = "booking type: #{filter_params[:booking_type] == "all"? "All" : Booking.booking_types.invert[filter_params[:booking_type]].capitalize }, "
         search = "search: #{filter_params[:search_string] == nil ? "blank" : filter_params[:search_string]}, "
         registration_date = "registration date from #{filter_params[:register_date_start] == nil ? "blank" : filter_params[:register_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:register_date_end] == nil ? "blank" : filter_params[:register_date_end].to_date.strftime("%d %A %Y")}, "
         appointment_date = "appointment date from #{filter_params[:booking_date_start] == nil ? "blank" : filter_params[:booking_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:booking_date_end] == nil ? "blank" : filter_params[:booking_date_end].to_date.strftime("%d %A %Y")}, "
         booking_reserve = "booking reserved more than 60 minutes #{filter_params[:only_expired_booking] ? "Y" : "N"}"
         
-        log_text = header + test_site + status + search + registration_date + appointment_date + booking_reserve
+        log_text = header + test_site + status + booking_type + search + registration_date + appointment_date + booking_reserve
         log_text
     end
     def filter_params
