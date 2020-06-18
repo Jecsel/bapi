@@ -50,6 +50,7 @@ Rails.application.routes.draw do
     resources :setting, only:[:index] do 
       collection do 
         patch 'update'
+        get 'get_price'
       end
     end
     
