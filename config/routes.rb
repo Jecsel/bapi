@@ -101,6 +101,8 @@ Rails.application.routes.draw do
         post 'filter'
         post 'paginate'
       end
+      get 'get_schedules', to:"location#get_schedules"
+      get 'find_schedules/:scheduled_id', to:"location#find_schedules"
       get 'schedules/:page', to:"location#schedules"
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"
