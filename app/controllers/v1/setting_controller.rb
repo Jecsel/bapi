@@ -1,5 +1,5 @@
 class V1::SettingController < ApplicationController
-    before_action :must_be_authenticated, except: []
+    before_action :must_be_authenticated, except: [:get_price]
 
     def index
         @setting = Setting.last
@@ -15,6 +15,20 @@ class V1::SettingController < ApplicationController
             render json: {setting:@setting, controls: role_policy}
         end
     end
+
+    def get_price
+        @setting = Setting.last
+        histories = @setting.setting_histories.where("setting_type = ?",1)
+        if histories.any?
+            render json: {
+                setting:@setting,
+                price_updated_by:histories.last.user.username, 
+                price_updated_date:histories.last.created_at }
+        else
+            render json: {setting:@setting}
+        end
+    end
+
     def update
         @setting = Setting.last
         if @setting.nil?
