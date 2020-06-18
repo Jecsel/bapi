@@ -22,7 +22,7 @@ class V1::AuditController < ApplicationController
         header = "Exported CSV with filters "
         log_module = "module: #{filter_params[:module_type] == 0? "All modules" : Service.find(filter_params[:module_type]).name}, "
         log_user = "username: #{filter_params[:user_id] == 0? "All users" : User.find(filter_params[:user_id]).username}, "
-        log_date = "date from #{filter_params[:audit_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:audit_date_end].to_date.strftime("%d %A %Y")}"
+        log_date = "date from #{filter_params[:audit_date_start].to_date.strftime("%d %B %Y")} to #{filter_params[:audit_date_end].to_date.strftime("%d %B %Y")}"
 
         log_text = header + log_module + log_user + log_date
         log_text
