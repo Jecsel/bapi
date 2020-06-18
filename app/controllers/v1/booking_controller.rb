@@ -40,13 +40,13 @@ class V1::BookingController < ApplicationController
         end
         render json: :uploaded
     end
-
+    
     def download_document
-        booking = Booking.find_by_id params[:id]
+        booking = Booking.find params[:id]
         if booking.payment.present?
             if booking.payment.payment_histories.present?
                     history = booking.payment.payment_histories.last
-                    url_file = url_for(booking.payment.payment_histories.last.upload_document)
+                    url_file = url_for(booking.payment.payment_histories.last.upload_document.attachment.service_url)
                     render json: {file_data: url_file}
             end
         end
