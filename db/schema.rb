@@ -136,8 +136,8 @@ ActiveRecord::Schema.define(version: 2020_06_17_045904) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "payment_reference"
     t.datetime "payment_date"
-    t.bigint "payment_mode_id"
     t.string "approved_by"
+    t.bigint "payment_mode_id"
     t.index ["payment_id"], name: "index_payment_histories_on_payment_id"
     t.index ["payment_mode_id"], name: "index_payment_histories_on_payment_mode_id"
   end
