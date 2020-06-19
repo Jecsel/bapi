@@ -7,7 +7,8 @@ class Scheduler
         :second_session,
         :first_session,
         :no_of_session,
-        :allowed_days
+        :allowed_days,
+        :_schedule
     def initialize schedule_params
         @allowed_days = []
         @date_from                  = schedule_params[:date_from].to_s
@@ -22,8 +23,6 @@ class Scheduler
             @allowed_days << dd[:id] if dd[:is_selected]
         end
         generate_schedule
-
-
     end
     private
     def  generate_schedule
@@ -53,13 +52,22 @@ class Scheduler
                         raise "Please check your slot time settings."
                     end
                 end
-                sched = Schedule.create payload
-                generate_slot sched
+                @_schedule = Schedule.create payload
+                generate_slot @_schedule
+            end
+
+            if @_schedule.nil?
+                raise "No slots created"
+            end
+            if @_schedule.slots.count == 0
+                raise "No slots created"
+                sched.destroy
             end
         end
     end
 
-    def generate_slot sched
+    def generate_slot sched 
+        
         first_session_start_time = "#{first_session[:start][:hh]}:#{first_session[:start][:mm]}"
         first_session_end_time   = "#{first_session[:end][:hh]}:#{first_session[:end][:mm]}"
         morning     = time_calculator sched.id,first_session_start_time,first_session_end_time,"AM"
@@ -73,11 +81,6 @@ class Scheduler
             Slot.create afternoon
         end
         
-        if sched.slots.count == 0 
-            raise "No slots created"
-            #destroy the schedule
-            sched.destroy
-        end
     end
 
     def time_calculator id,start_time, end_time, a
