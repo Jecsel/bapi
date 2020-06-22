@@ -50,6 +50,7 @@ Rails.application.routes.draw do
     resources :setting, only:[:index] do 
       collection do 
         patch 'update'
+        get 'get_price'
       end
     end
     
@@ -93,6 +94,7 @@ Rails.application.routes.draw do
       collection do 
         get 'list'
         post 'paginate'
+        post 'filter'
       end
     end
     resources :location, only:[:create, :index, :update, :destroy, :show] do 
@@ -100,6 +102,8 @@ Rails.application.routes.draw do
         post 'filter'
         post 'paginate'
       end
+      get 'get_schedules', to:"location#get_schedules"
+      get 'find_schedules/:scheduled_id', to:"location#find_schedules"
       get 'schedules/:page', to:"location#schedules"
       get 'clinics'
       post 'add_clinic', to:"location#add_clinic"

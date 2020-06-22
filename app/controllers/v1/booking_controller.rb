@@ -40,26 +40,25 @@ class V1::BookingController < ApplicationController
         end
         render json: :uploaded
     end
-
+    
     def download_document
-        booking = Booking.find_by_id params[:id]
+        booking = Booking.find params[:id]
         if booking.payment.present?
             if booking.payment.payment_histories.present?
                     history = booking.payment.payment_histories.last
-                    url_file = url_for(booking.payment.payment_histories.last.upload_document)
+                    url_file = url_for(booking.payment.payment_histories.last.upload_document.attachment.service_url)
                     render json: {file_data: url_file}
             end
         end
     end
 
     def export 
-        @bookings = data_search.sort_by_datetime
+        @bookings = data_search
         AuditLog.log_changes("Bookings", "booking_export", "", "", get_log_text(), 2, @current_user.username)
-        
     end
 
     def filter 
-        @bookings = data_search.page(filter_params[:page]).sort_by_datetime
+        @bookings = data_search.page(filter_params[:page])
     end
 
     def index
@@ -132,46 +131,22 @@ class V1::BookingController < ApplicationController
             payment_status: booking.payment.payment_status}
     end
 
-    
-    # def paginate
-    #     if params[:location_id] != 0
-    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(params[:page])
-    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
-    #     else
-    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(params[:page])
-    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
-    #     end
-        
-        
-    # end
-
-    # def filter_booking
-    #     if params[:location_id] != 0
-    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id]).page(1)
-    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index]).get_site(params[:location_id])
-    #     else
-    #         @bookings = Booking.search(params[:query]).get_status(params[:status_index]).page(1)
-    #         @booking_export = Booking.search(params[:query]).get_status(params[:status_index])
-    #     end
-       
-    # end
 
     private 
     def data_search
-        Booking
-            .joins(:schedule,:payment)
-            .search_filter(filter_params)
-            .search(filter_params[:search_string])
+        Booking.search_filter(filter_params).search(filter_params[:search_string])
     end
     def get_log_text
         header = "Exported CSV with filters "
         test_site = "test site: #{filter_params[:location_id] == 0? "All" : Location.find(filter_params[:location_id]).name}, "
-        status = "status: #{Payment.payment_statuses.invert[filter_params[:status]]}, "
+        status = "status: #{filter_params[:status] == 32767 ? "All" : Payment.payment_statuses.invert[filter_params[:status]]}, "
+        booking_type = "booking type: #{filter_params[:booking_type] == "all"? "All" : Booking.booking_types.invert[filter_params[:booking_type]].capitalize }, "
         search = "search: #{filter_params[:search_string] == nil ? "blank" : filter_params[:search_string]}, "
         registration_date = "registration date from #{filter_params[:register_date_start] == nil ? "blank" : filter_params[:register_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:register_date_end] == nil ? "blank" : filter_params[:register_date_end].to_date.strftime("%d %A %Y")}, "
-        appointment_date = "appointment date from #{filter_params[:booking_date_start] == nil ? "blank" : filter_params[:booking_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:booking_date_end] == nil ? "blank" : filter_params[:booking_date_end].to_date.strftime("%d %A %Y")}"
+        appointment_date = "appointment date from #{filter_params[:booking_date_start] == nil ? "blank" : filter_params[:booking_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:booking_date_end] == nil ? "blank" : filter_params[:booking_date_end].to_date.strftime("%d %A %Y")}, "
+        booking_reserve = "booking reserved more than 60 minutes #{filter_params[:only_expired_booking] ? "Y" : "N"}"
         
-        log_text = header + test_site + status + search + registration_date + appointment_date
+        log_text = header + test_site + status + booking_type + search + registration_date + appointment_date + booking_reserve
         log_text
     end
     def filter_params
