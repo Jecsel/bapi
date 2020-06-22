@@ -13,7 +13,7 @@ class V1::LocationController < ApplicationController
   end
 
   def filter
-    @locations = Location.search_filter(filter_params).page(filter_params[:page])
+    @locations = Location.search_filter(filter_params).page(filter_params[:page]).order('id desc')
   end
 
   def add_clinic
@@ -22,6 +22,7 @@ class V1::LocationController < ApplicationController
       render json: {message: "Clinic already associated with this location"},status:406 
     else
       @location.location_clinics.create clinic_id:params[:clinic_id]
+      AuditLog.log_changes("Test Sites", "location_clinic_link", @location.id, "", params[:clinic_id], 4, @current_user.username)
       render json: Clinic.find(params[:clinic_id])
     end
   end
@@ -30,8 +31,9 @@ class V1::LocationController < ApplicationController
     location = Location.find params[:location_id]
     clinic = location.location_clinics.where("clinic_id = ?",params[:clinic_id])
     if clinic.any?
+      AuditLog.log_changes("Test Sites", "location_clinic_link", params[:location_id], "", params[:clinic_id], 5, @current_user.username)
       clinic.last.delete
-      render json: {message: "Clinic was been unlink with this location"},status:200
+      render json: {message: "Clinic has been unlinked with this location"},status:200
     else
       render json: {message: "No Clinic associated with this location"},status:406 
     end
@@ -49,15 +51,35 @@ class V1::LocationController < ApplicationController
   
   def create
     @location = Location.create location_params
+    AuditLog.log_changes("Test Sites", "location_id", @location.id, "", "", 0, @current_user.username)
   end
 
   def update
     @location = Location.find(params[:id])
+    AuditLog.log_changes("Test Sites", "location_id", @location.id, "", "", 1, @current_user.username)
     @location.update location_params
     @location
   end
 
+  def find_schedules
+    booking_date_range = Setting.last.booking_date_range
+    @loc = Location.find params[:location_id]
+    @schedules = @loc.schedules.where("id = ? && schedule_date > ?",params[:scheduled_id],cut_off_time).available.order(schedule_date: :asc).limit(booking_date_range)
+  end
+
+  def get_schedules
+      booking_date_range = Setting.last.booking_date_range
+      @loc = Location.find params[:location_id]
+      @schedules = @loc.schedules.where("schedule_date > ?",cut_off_time).available.order(schedule_date: :asc).limit(booking_date_range)       
+  end
+
   private 
+
+  def cut_off_time
+    today = DateTime.now.in_time_zone
+    return today < today.beginning_of_day + 17.hours ? today : today + 1.day
+  end
+
 
   def filter_params 
     params.require(:filter).permit(:status, :referral, :page, :search_str)

@@ -1,6 +1,6 @@
 class V1::UserController < ApplicationController
   
-  before_action :must_be_authenticated, only:[:authenticate, :get_policies, :index, :edit_user]
+  before_action :must_be_authenticated, only:[:authenticate, :get_policies, :index, :edit_user, :create]
 
   def sign_in
     user = User.find_by_username user_params[:username]
@@ -43,7 +43,7 @@ class V1::UserController < ApplicationController
   def index
     if is_permitted?(1,1)
       @user = User.all
-      @user_group = UserGroup.get_by_role(@current_user.user_role.user_group.id)
+      @user_group = UserGroup.get_by_role(@current_user.user_role.user_group.id).order(name: :asc)
       @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ? ",1) #User service
     else
       render json: :forbidden, status:403
@@ -53,6 +53,10 @@ class V1::UserController < ApplicationController
   def edit_user
     @user = User.find edit_params[:id]
     
+    if @user.is_active != !edit_params[:is_active].zero?
+      AuditLog.log_changes("Users", "user_status", @user.id, @user.is_active, edit_params[:is_active], 1, @current_user.username)
+    end
+
     @user.update(is_active: edit_params[:is_active])
     if @user.user_role.present?
       old_value = @user.user_role.user_group.name
@@ -61,7 +65,10 @@ class V1::UserController < ApplicationController
       old_value = nil
       @user.user_role = UserRole.create(user_id: @user.id, user_group_id: edit_params[:user_group_id])
     end
-    AuditLog.log_changes("Users", "user_role", @user.user_role.id, old_value, @user.user_role.user_group.name, 1, @current_user.username)
+    if old_value != @user.user_role.user_group.name
+      AuditLog.log_changes("Users", "user_role", @user.user_role.id, old_value, @user.user_role.user_group.name, 1, @current_user.username)
+    end
+
     @user
   end
 
@@ -77,6 +84,7 @@ class V1::UserController < ApplicationController
   
       if @user.save!
         UserRole.create(user_id: @user.id, user_group_id: create_params[:user_group_id])
+        AuditLog.log_changes("Users", "user_add", @user.id, "", @user.username, 0, @current_user.username)
         AdminMailer.new_user(@user, request.host, temp_pass).deliver_later
       end
       render json: {user: @user}

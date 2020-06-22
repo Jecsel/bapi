@@ -11,19 +11,19 @@ json.array! @bookings do |booking|
     json.email_address booking.patient.email_address
     json.q1 booking.patient.q1 ? "Y": "N"
     json.q2 booking.patient.q2 ? "Y": "N"
-    json.test_site booking.location.name
-    json.test_site_code booking.location.code
-    json.clinic_name booking.clinic.name
-    json.clinic_code booking.clinic.code
-    json.billing_code booking.clinic.billing_code
+    json.test_site booking.location.name unless booking.location.nil?
+    json.test_site_code booking.location.code unless booking.location.nil?
+    json.clinic_name booking.clinic.name unless booking.clinic.nil?
+    json.clinic_code booking.clinic.code unless booking.clinic.nil?
+    json.billing_code booking.clinic.billing_code unless booking.clinic.nil?
     json.payment_date booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.created_at : "N/A"
     json.payment_status booking.payment.payment_status
     json.payment booking.payment.payment_id == 0 ? "Auto": "Manual"
-    json.payment_mode booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.payment_mode_id.nil? ? booking.payment.payment_histories.last.payment_mode.name : ""
+    json.payment_mode booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.payment_mode_id.nil? ? booking.payment.payment_histories.last.payment_mode.name : "" if !booking.payment.payment_histories.any?
     json.ref_no booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.payment_reference : "N/A"
     json.amount booking.payment.amount
     json.currency booking.payment.currency
-    json.file_name booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.upload_document.attachment.nil? ? booking.payment.payment_histories.last.upload_document.filename : "N/A"
+    json.file_name booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.upload_document.attachment.nil? ? booking.payment.payment_histories.last.upload_document.filename : "N/A" if !booking.payment.payment_histories.any?
     json.username booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.approved_by : "N/A"
     json.updated_at booking.payment.updated_at
 end

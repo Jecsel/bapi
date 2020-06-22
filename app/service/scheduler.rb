@@ -7,13 +7,9 @@ class Scheduler
         :second_session,
         :first_session,
         :no_of_session,
-        :allowed_days
+        :allowed_days,
+        :_schedule
     def initialize schedule_params
-        p "*********************"
-        p "*********************"
-        p schedule_params
-        p "*********************"
-        p "*********************"
         @allowed_days = []
         @date_from                  = schedule_params[:date_from].to_s
         @date_to                    = schedule_params[:date_to].to_s
@@ -31,7 +27,7 @@ class Scheduler
     private
     def  generate_schedule
         dates = date_to.blank? ? [date_from] : (date_from..date_to).to_a
-        if Schedule.where(location_id:location_id,schedule_date: dates).any?
+        if Schedule.where(location_id:location_id,schedule_date: dates,status:true).any?
             raise "Existing slots found. Please delete or reschedule the bookings before adding new slots."
         end
         
@@ -46,23 +42,32 @@ class Scheduler
                 payload[:morning_start_time]        = "#{first_session[:start][:hh]}:#{first_session[:start][:mm]}".to_time
                 payload[:morning_end_time]          = "#{first_session[:end][:hh]}:#{first_session[:end][:mm]}".to_time
                 payload[:no_of_session]             = no_of_session
-                if payload[:morning_start_time] > payload[:morning_end_time] 
+                if payload[:morning_start_time] >= payload[:morning_end_time] 
                     raise "Please check your slot time settings."
                 end
                 if no_of_session == 2
                     payload[:afternoon_start_time]   = "#{second_session[:start][:hh]}:#{second_session[:start][:mm]}".to_time
                     payload[:afternoon_end_time]     = "#{second_session[:end][:hh]}:#{second_session[:end][:mm]}".to_time
-                    if payload[:morning_end_time] > payload[:afternoon_start_time] || payload[:afternoon_start_time] > payload[:afternoon_end_time]
+                    if payload[:morning_end_time] >= payload[:afternoon_start_time] || payload[:afternoon_start_time] >= payload[:afternoon_end_time]
                         raise "Please check your slot time settings."
                     end
                 end
-                sched = Schedule.create payload
-                generate_slot sched
+                @_schedule = Schedule.create payload
+                generate_slot @_schedule
+            end
+
+            if @_schedule.nil?
+                raise "No slots created"
+            end
+            if @_schedule.slots.count == 0
+                raise "No slots created"
+                sched.destroy
             end
         end
     end
 
-    def generate_slot sched
+    def generate_slot sched 
+        
         first_session_start_time = "#{first_session[:start][:hh]}:#{first_session[:start][:mm]}"
         first_session_end_time   = "#{first_session[:end][:hh]}:#{first_session[:end][:mm]}"
         morning     = time_calculator sched.id,first_session_start_time,first_session_end_time,"AM"
@@ -75,7 +80,7 @@ class Scheduler
             afternoon   = time_calculator sched.id,second_session_end_timestart_time,second_session_end_time,"PM"
             Slot.create afternoon
         end
-    
+        
     end
 
     def time_calculator id,start_time, end_time, a
