@@ -136,8 +136,8 @@ ActiveRecord::Schema.define(version: 2020_06_17_045904) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "payment_reference"
     t.datetime "payment_date"
-    t.bigint "payment_mode_id"
     t.string "approved_by"
+    t.bigint "payment_mode_id"
     t.index ["payment_id"], name: "index_payment_histories_on_payment_id"
     t.index ["payment_mode_id"], name: "index_payment_histories_on_payment_mode_id"
   end
@@ -164,7 +164,7 @@ ActiveRecord::Schema.define(version: 2020_06_17_045904) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status", default: 0
+    t.integer "payment_status"
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false

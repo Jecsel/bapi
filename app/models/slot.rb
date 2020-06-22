@@ -16,5 +16,8 @@ class Slot < ApplicationRecord
     def self.count_total_available_slots 
         where(status:true).sum(&:allocations)
     end
-    
+
+    def self.count_total_available_slots_not_deleted
+        where(is_deleted:false).sum(&:allocations)
+    end
 end
