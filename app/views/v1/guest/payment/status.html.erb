@@ -83,7 +83,8 @@
 						<button class="btn-success" style="width: 100%; height: 30px" onclick="redirect_location()">Ok</button>
 					</center>
 				</div>
-            </div>
+			</div>
+		
         <% else %>
              <div>
                 <h4 style="text-align:center;color:red">Payment Failed </h2>
@@ -91,15 +92,18 @@
                     function redirect(){
                         window.location.replace("https://my.biomarking.com/#/booking-confirmation");
 					}
-					function redirect_location(){
-                        window.location.replace("https://my.biomarking.com/#/booking-locations");
-                    }
                 </script>
                 <center>
                     <button onclick="redirect()">TRY AGAIN</button>
-                </center>
+				</center>
             </div>
         <% end %>
 	</div>
+
+	<script>
+		function redirect_location(){
+			window.location.replace("https://my.biomarking.com/#/booking-locations");
+		}
+	</script>
 </body>
 </html>
