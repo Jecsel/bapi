@@ -106,11 +106,11 @@ IC / Passport Number: <%=@booking.patient.id_number%>
 Contact Number: <%=@booking.patient.contact_number%>
 <% if @booking.payment.payment_histories.last.amount != ""%>
   <br>
-  Price: RM<%=@booking.payment.payment_histories.last.amount%> (Paid) 
+  Price: RM <%=@booking.payment.payment_histories.last.amount%> (Paid) 
   <br>
 <% else %>
   <br>
-  Price: RM<%=@booking.amount%> (Paid)
+  Price: RM <%=@booking.amount%> (Paid)
   <br>
 <% end %>
 
