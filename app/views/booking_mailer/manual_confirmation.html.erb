@@ -104,9 +104,16 @@ Reference No: <%=@booking.reference_code%>
 IC / Passport Number: <%=@booking.patient.id_number%>
 <br>
 Contact Number: <%=@booking.patient.contact_number%>
-<br>
-Price: RM<%=@booking.amount%> (Paid)
-<br>
+<% if @booking.payment.payment_histories.last.amount != ""%>
+  <br>
+  Price: RM <%=@booking.payment.payment_histories.last.amount%> (Paid) 
+  <br>
+<% else %>
+  <br>
+  Price: RM <%=@booking.amount%> (Paid)
+  <br>
+<% end %>
+
 <br>
 Appointment Time:  <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.utc.strftime("%H:%M %p")%>
 <br>

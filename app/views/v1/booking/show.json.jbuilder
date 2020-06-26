@@ -26,6 +26,7 @@ json.payment_details do
     json.payment_status @booking.payment.payment_status
     json.ref_no @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.payment_reference : ""
     json.amount @booking.payment.amount
+    json.amount_updated @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.amount : ""
     json.currency @booking.payment.currency
     json.payment_date @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.created_at : ""
     json.payment_mode @booking.payment.payment_histories.any? && !@booking.payment.payment_histories.last.payment_mode_id.nil? ? @booking.payment.payment_histories.last.payment_mode.name : ""
