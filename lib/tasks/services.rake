@@ -30,10 +30,10 @@ namespace :services do
     def initialize_user_groups
         _groups = [
             {
-                name:"BioMark"
+                name:"Superadmin"
             },
             {
-                name:"Superadmin"
+                name:"BioMark"
             },
             {
                 name:"Admin"
@@ -227,8 +227,142 @@ namespace :services do
         p 'Service policies created'
     end
 
-    def create_biomark_policies
+    def create_super_admin_policies
         _user_group_id = 1
+        _role_policies = [
+            {
+                user_group_id: _user_group_id,
+                service_id: 1, #User service
+                service_policy_id: 1, #View user module
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 2, #Test site service
+                service_policy_id: 2, #View location module
+                status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 2, #Test site service
+                service_policy_id: 3, #Add location
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 3, #Clinic service
+                service_policy_id: 4, #View clinic module
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 3, #Clinic service
+                service_policy_id: 5, #Add clinic
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 6, #View booking module
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 7, #Export csv
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 5, #Dashboard service
+                service_policy_id: 8, #View dashboard
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 6, #Settings service
+                service_policy_id: 9, #View settings
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 1, #User service
+                service_policy_id: 10, #Edit user
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 7, #Audit log
+                service_policy_id: 11, #View audit log
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 12, #Reschedule booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 13, #Confirm booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 4, #Booking service
+                service_policy_id: 14, #Cancel booking
+                status: true
+            },
+            {
+                user_group_id: _user_group_id,
+                service_id: 1, #User service
+                service_policy_id: 17, #Add new user
+                status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 2, #Test site service
+                service_policy_id: 18, #Edit test site
+                status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 2, #Test site service
+                service_policy_id: 19, #Add test site schedule
+                status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 2, #Test site service
+                service_policy_id: 20, #Delete test site schedule
+                status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 2, #Test site service
+                service_policy_id: 21, #Link/Unlink clinics from test site
+                status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 3, #Clinic service
+                service_policy_id: 22, #Edit clinic
+                status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 6, #Settings service
+                service_policy_id: 23, #Edit settings
+                status: true
+            }
+        ]
+        RolePolicy.create _role_policies
+        p 'Super admin policies created'
+    end
+
+    def create_biomark_policies
+        _user_group_id = 2
         _role_policies = [
             {
                 user_group_id: _user_group_id,
@@ -373,139 +507,6 @@ namespace :services do
         p 'BioMark policies created'
     end
 
-    def create_super_admin_policies
-        _user_group_id = 2
-        _role_policies = [
-            {
-                user_group_id: _user_group_id,
-                service_id: 1, #User service
-                service_policy_id: 1, #View user module
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 2, #Test site service
-                service_policy_id: 2, #View location module
-                status: true
-            },
-            { 
-                user_group_id: _user_group_id,
-                service_id: 2, #Test site service
-                service_policy_id: 3, #Add location
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 3, #Clinic service
-                service_policy_id: 4, #View clinic module
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 3, #Clinic service
-                service_policy_id: 5, #Add clinic
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 4, #Booking service
-                service_policy_id: 6, #View booking module
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 4, #Booking service
-                service_policy_id: 7, #Export csv
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 5, #Dashboard service
-                service_policy_id: 8, #View dashboard
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 6, #Settings service
-                service_policy_id: 9, #View settings
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 1, #User service
-                service_policy_id: 10, #Edit user
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 7, #Audit log
-                service_policy_id: 11, #View audit log
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 4, #Booking service
-                service_policy_id: 12, #Reschedule booking
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 4, #Booking service
-                service_policy_id: 13, #Confirm booking
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 4, #Booking service
-                service_policy_id: 14, #Cancel booking
-                status: true
-            },
-            {
-                user_group_id: _user_group_id,
-                service_id: 1, #User service
-                service_policy_id: 17, #Add new user
-                status: true
-            },
-            { 
-                user_group_id: _user_group_id,
-                service_id: 2, #Test site service
-                service_policy_id: 18, #Edit test site
-                status: true
-            },
-            { 
-                user_group_id: _user_group_id,
-                service_id: 2, #Test site service
-                service_policy_id: 19, #Add test site schedule
-                status: true
-            },
-            { 
-                user_group_id: _user_group_id,
-                service_id: 2, #Test site service
-                service_policy_id: 20, #Delete test site schedule
-                status: true
-            },
-            { 
-                user_group_id: _user_group_id,
-                service_id: 2, #Test site service
-                service_policy_id: 21, #Link/Unlink clinics from test site
-                status: true
-            },
-            { 
-                user_group_id: _user_group_id,
-                service_id: 3, #Clinic service
-                service_policy_id: 22, #Edit clinic
-                status: true
-            },
-            { 
-                user_group_id: _user_group_id,
-                service_id: 6, #Settings service
-                service_policy_id: 23, #Edit settings
-                status: true
-            }
-        ]
-        RolePolicy.create _role_policies
-        p 'Super admin policies created'
-    end
 
     def create_admin_policies
         _user_group_id = 3
