@@ -98,16 +98,6 @@ class V1::BookingController < ApplicationController
         booking.update(schedule_id: params[:new_booking_details][:schedule][:id])
         # booking.payment.update(payment_status: 0)
 
-        #send reschedule email
-        if !booking.payment.nil?
-            if booking.payment.payment_status == "reserved"
-                BookingMailer.reservation(params[:past_booking_details][:id]).deliver_later
-            end
-            if booking.payment.payment_status == "confirmed"
-                BookingMailer.manual_confirmation(params[:past_booking_details][:id]).deliver_later
-            end 
-        end
-
         # Update old slod to be available
         old_slot = Slot.find params[:past_booking_details][:slot][:id]
         old_slot.increment!(:allocations, 1)
@@ -125,6 +115,16 @@ class V1::BookingController < ApplicationController
 
         AuditLog.log_changes("Bookings", "booking_schedule", booking.id, old_datetime, new_datetime, 1, @current_user.username)
        
+        #send reschedule email
+        if !booking.payment.nil?
+            if booking.payment.payment_status == "reserved"
+                BookingMailer.reservation(params[:past_booking_details][:id]).deliver_later
+            end
+            if booking.payment.payment_status == "confirmed"
+                BookingMailer.manual_confirmation(params[:past_booking_details][:id]).deliver_later
+            end 
+        end
+
         render json: {
             schedule: booking.schedule, 
             slot: booking.slot, 
