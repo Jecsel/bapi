@@ -58,6 +58,7 @@ class V1::BookingController < ApplicationController
     end
 
     def filter 
+        p data_search
         @bookings = data_search.page(filter_params[:page])
     end
 
@@ -69,7 +70,7 @@ class V1::BookingController < ApplicationController
     def show
         @booking = Booking.find params[:id]
         @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ?",4)
-        @payment_mode = PaymentMode.all
+        @payment_mode = PaymentMode.where(payment_type: "manual")
     end
 
     def cancel_booking
@@ -97,16 +98,6 @@ class V1::BookingController < ApplicationController
         booking.update(schedule_id: params[:new_booking_details][:schedule][:id])
         # booking.payment.update(payment_status: 0)
 
-        #send reschedule email
-        if !booking.payment.nil?
-            if booking.payment.payment_status == "reserved"
-                BookingMailer.reservation(params[:past_booking_details][:id]).deliver_later
-            end
-            if booking.payment.payment_status == "confirmed"
-                BookingMailer.manual_confirmation(params[:past_booking_details][:id]).deliver_later
-            end 
-        end
-
         # Update old slod to be available
         old_slot = Slot.find params[:past_booking_details][:slot][:id]
         old_slot.increment!(:allocations, 1)
@@ -124,6 +115,16 @@ class V1::BookingController < ApplicationController
 
         AuditLog.log_changes("Bookings", "booking_schedule", booking.id, old_datetime, new_datetime, 1, @current_user.username)
        
+        #send reschedule email
+        if !booking.payment.nil?
+            if booking.payment.payment_status == "reserved"
+                BookingMailer.reservation(params[:past_booking_details][:id]).deliver_later
+            end
+            if booking.payment.payment_status == "confirmed"
+                BookingMailer.manual_confirmation(params[:past_booking_details][:id]).deliver_later
+            end 
+        end
+
         render json: {
             schedule: booking.schedule, 
             slot: booking.slot, 

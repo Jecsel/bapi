@@ -22,13 +22,13 @@ json.array! @bookings do |booking|
     json.clinic_email_address booking.clinic.email_address unless booking.clinic.nil?
     json.clinic_contact_person booking.clinic.contact_person unless booking.clinic.nil?
     json.billing_code booking.clinic.billing_code unless booking.clinic.nil?
-    json.payment_date booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.created_at : "N/A"
-    json.payment booking.payment.payment_id == 0 ? "Auto": "Manual"
-    json.payment_mode booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.payment_mode_id.nil? ? booking.payment.payment_histories.last.payment_mode.name : "" if !booking.payment.payment_histories.any?
+    json.payment_date booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.created_at : ""
+    json.payment booking.payment.payment_type
+    json.payment_mode booking.payment.payment_type == "auto" ? "iPay88" : booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.payment_mode_id.nil? ? booking.payment.payment_histories.last.payment_mode.name : ""
     json.ref_no booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.payment_reference : "N/A"
     json.amount booking.payment.amount
     json.currency booking.payment.currency
-    json.file_name booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.upload_document.attachment.nil? ? booking.payment.payment_histories.last.upload_document.filename : "N/A" if !booking.payment.payment_histories.any?
+    json.file_name booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.upload_document.attachment.nil? ? booking.payment.payment_histories.last.upload_document.filename.to_s : "N/A" if booking.payment.payment_histories.any?
     json.username booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.approved_by : "N/A"
     json.updated_at booking.payment.updated_at
 end
