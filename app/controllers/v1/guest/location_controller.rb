@@ -29,7 +29,7 @@ class V1::Guest::LocationController < ApplicationController
     def web_schedules
         booking_date_range = Setting.last.booking_date_range
         @loc = Location.find params[:location_id]
-        @schedules = @loc.schedules.where("schedule_date > ?",cut_off_time).available.order(schedule_date: :asc)       
+        @schedules = @loc.schedules.where("schedule_date > ?",cut_off_time).available.order(schedule_date: :asc).limit(14) 
     end
     
     def index
