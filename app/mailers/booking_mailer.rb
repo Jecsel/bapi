@@ -13,9 +13,9 @@ class BookingMailer < ApplicationMailer
     def reservation booking_id
         @booking = Booking.find booking_id
         _bcc = ENV["CC_MAIL"].split("|")
-        if @booking.clinic.present? 
-            _bcc << @booking.clinic.email_address
-        end
+        # if @booking.clinic.present? 
+        #     _bcc << @booking.clinic.email_address
+        # end
         mail(
             to: @booking.payment.user_email, 
             bcc: _bcc,
