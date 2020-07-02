@@ -12,7 +12,7 @@ class V1::ScheduleController < ApplicationController
     def close_slot
         _schedule = Schedule.find params[:schedule_id]
         slot = _schedule.slots.find params[:slot_id]
-        AuditLog.log_changes("Test Sites", "location_delete_slot", _schedule.id, _schedule.schedule_date, slot.slot_time.utc.strftime("%I:%M") + slot.meridian + " - " + (slot.slot_time + _schedule.minute_interval*60).utc.strftime("%I:%M") + slot.meridian, 3, @current_user.username)
+        AuditLog.log_changes("Test Sites", "location_delete_slot", _schedule.id, _schedule.schedule_date, slot.slot_time_with_interval, 3, @current_user.username)
         if _schedule.slots.active.size == 1
             _schedule.update status:false
             slot.update is_deleted:true
@@ -57,7 +57,7 @@ class V1::ScheduleController < ApplicationController
 
     def get_log_text
         header = "Added new schedule "
-        date = "date from #{schedule_params[:date_from].to_date.strftime("%d %A %Y")} to #{schedule_params[:date_to].to_date.strftime("%d %A %Y")}, "
+        date = "date from #{schedule_params[:date_from].to_date.strftime("%d %B %Y")} to #{schedule_params[:date_to].to_date.strftime("%d %B %Y")}, "
         
         allowed_days = schedule_params[:days].map { |x| x[:is_selected] ? x[:name]: '' }.map(&:inspect).join(' ').gsub!('"', '').squish
         days = "day: #{allowed_days}, "
