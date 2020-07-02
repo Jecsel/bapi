@@ -1,7 +1,7 @@
 json.bookings @bookings do |booking|
     json.extract! booking, :id, :reference_code, :created_at, :booking_type
     json.location_name booking.location.name unless booking.location.nil?
-    json.slot_time_with_interval booking.slot.slot_time.utc.strftime("%I:%M") + booking.slot.meridian + " - " + (booking.slot.slot_time + booking.schedule.minute_interval*60).utc.strftime("%I:%M") + booking.slot.meridian
+    json.slot_time_with_interval booking.slot.slot_time_with_interval
     json.date booking.schedule.schedule_date
     json.name booking.patient.fullname
     json.payment_status booking.payment.payment_status

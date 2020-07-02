@@ -11,7 +11,7 @@ json.booking_details do
     json.slot @booking.slot
     json.schedule @booking.schedule
     json.location @booking.location
-    json.payment_price @booking.payment.amount
+    json.payment_price @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.amount : ""
 end
 json.patient_details do 
     json.extract! @booking.patient, :fullname, :id_number, :date_of_birth, :contact_number, :email_address
