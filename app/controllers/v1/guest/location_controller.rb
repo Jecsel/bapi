@@ -27,9 +27,10 @@ class V1::Guest::LocationController < ApplicationController
     end
 
     def web_schedules
-        booking_date_range = Setting.last.booking_date_range
+        today = DateTime.now.in_time_zone
+        two_weeks_from_now = today.beginning_of_day + 14.days
         @loc = Location.find params[:location_id]
-        @schedules = @loc.schedules.where("schedule_date > ?",cut_off_time).available.order(schedule_date: :asc).limit(14) 
+        @schedules = @loc.schedules.where(schedule_date:[cut_off_time..two_weeks_from_now]).available.order(schedule_date: :asc).limit(14) 
     end
     
     def index
