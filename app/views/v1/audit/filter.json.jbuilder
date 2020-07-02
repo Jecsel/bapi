@@ -34,9 +34,9 @@ json.audit_logs @audit_log.each do |log|
     when "Test Sites"
         case log.field_name
         when "location_delete_day"
-            json.log_text "#{log.action} test site ##{log.field_id} schedule day on #{log.new_value.to_date.strftime("%d %A %Y")}"
+            json.log_text "#{log.action} test site ##{log.field_id} schedule day on #{log.new_value.to_date.strftime("%d %B %Y")}"
         when "location_delete_slot"
-            json.log_text "#{log.action} test site ##{log.field_id} schedule day on #{log.new_value.to_date.strftime("%d %A %Y")}, #{log.new_value}"
+            json.log_text "#{log.action} test site ##{log.field_id} schedule day on #{log.new_value.to_date.strftime("%d %B %Y")}, #{log.new_value}"
         when "location_add_schedule"
             json.log_text log.new_value
         when "location_clinic_link"
