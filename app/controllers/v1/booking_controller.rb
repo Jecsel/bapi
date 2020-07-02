@@ -102,7 +102,8 @@ class V1::BookingController < ApplicationController
         old_slot = Slot.find params[:past_booking_details][:slot][:id]
         old_slot.increment!(:allocations, 1)
         old_slot.update(status: true)
-        old_datetime = old_slot.slot_time_with_interval
+        old_datetime = booking.schedule.schedule_date.strftime("%d %B %Y") + ", " + old_slot.slot_time_with_interval
+        # old_datetime = booking.schedule.schedule_date.strftime("%d %B %Y") + ", " + old_slot.slot_time.utc.strftime("%I:%M") + old_slot.meridian + " - " + (old_slot.slot_time + booking.schedule.minute_interval*60).utc.strftime("%I:%M") + old_slot.meridian
 
         # Update new slot, add allocation and modify status
         new_slot = Slot.find params[:new_booking_details][:slot][:id]
@@ -110,7 +111,7 @@ class V1::BookingController < ApplicationController
         if new_slot[:allocations] == 0
             new_slot.update(status: false)
         end
-        new_datetime = new_slot.slot_time_with_interval
+        new_datetime = booking.schedule.schedule_date.strftime("%d %B %Y") + ", " + new_slot.slot_time_with_interval
         booking.update(slot_id: new_slot.id)
 
         AuditLog.log_changes("Bookings", "booking_schedule", booking.id, old_datetime, new_datetime, 1, @current_user.username)
