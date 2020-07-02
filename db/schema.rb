@@ -165,7 +165,7 @@ ActiveRecord::Schema.define(version: 2020_06_30_030718) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status", default: 0
+    t.integer "payment_status"
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
