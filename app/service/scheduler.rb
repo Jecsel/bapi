@@ -36,9 +36,6 @@ class Scheduler
         
         ActiveRecord::Base.transaction do
             dates.each do |_date|
-                p "####"
-                p _date
-                p "####"
                 next unless allowed_days.include?(_date.to_date.strftime("%u").to_i)
                 payload = {};
                 payload[:location_id]               = location_id
