@@ -104,9 +104,16 @@ Reference No: <%=@booking.reference_code%>
 IC / Passport Number: <%=@booking.patient.id_number%>
 <br>
 Contact Number: <%=@booking.patient.contact_number%>
-<br>
-Price: RM<%=@booking.amount%> (Paid)
-<br>
+<% if @booking.payment.payment_histories.last.amount != ""%>
+  <br>
+  Price: RM <%=@booking.payment.payment_histories.last.amount%> (Paid) 
+  <br>
+<% else %>
+  <br>
+  Price: RM <%=@booking.amount%> (Paid)
+  <br>
+<% end %>
+
 <br>
 Appointment Time:  <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.utc.strftime("%H:%M %p")%>
 <br>
@@ -157,6 +164,11 @@ You are required to show your confirmation email when you arrive at the testing 
   <i><b>Note : All results will be communicated back to your requesting doctor via email and hardcopy.</b></i>
   <br>
   For any clarification, please do not hesitate to contact our call centre at 1800 22 6843 for further assistance.
+  <br>
+  <br>
+  <b>Refund Policy</b>
+  <br>
+  A refund shall be given to you for any cancellation 24 hours before an appointment. There shall be no refund for any cancellation done after that. Refunds are made via bank transfer and will take around 3-4 weeks for processing.
   <br>
   <br>
   IMPORTANT: This is a system-generated email. Please DO NOT reply to this email.

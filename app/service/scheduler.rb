@@ -11,8 +11,8 @@ class Scheduler
         :_schedule
     def initialize schedule_params
         @allowed_days = []
-        @date_from                  = schedule_params[:date_from].to_s
-        @date_to                    = schedule_params[:date_to].to_s
+        @date_from                  = schedule_params[:date_from].to_date
+        @date_to                    = schedule_params[:date_to].to_date
         @location_id                = schedule_params[:location_id]
         @allocation_per_slot        = schedule_params[:allocation_per_slot].to_i
         @minutes_interval           = schedule_params[:minutes_interval].to_i
@@ -26,7 +26,10 @@ class Scheduler
     end
     private
     def  generate_schedule
-        dates = date_to.blank? ? [date_from] : (date_from..date_to).to_a
+        # (1.month.ago.to_date..Date.today).map{ |date| date.strftime("%b %d") }
+        # dates = date_to.blank? ? [date_from] : (date_from...date_to).to_a
+        dates = (date_from..date_to).map{ |date| date.strftime("%Y-%m-%d") }
+        
         if Schedule.where(location_id:location_id,schedule_date: dates,status:true).any?
             raise "Existing slots found. Please delete or reschedule the bookings before adding new slots."
         end

@@ -58,6 +58,7 @@ class V1::BookingController < ApplicationController
     end
 
     def filter 
+        p data_search
         @bookings = data_search.page(filter_params[:page])
     end
 
@@ -69,7 +70,7 @@ class V1::BookingController < ApplicationController
     def show
         @booking = Booking.find params[:id]
         @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ?",4)
-        @payment_mode = PaymentMode.all
+        @payment_mode = PaymentMode.where(payment_type: "manual")
     end
 
     def cancel_booking
@@ -97,6 +98,24 @@ class V1::BookingController < ApplicationController
         booking.update(schedule_id: params[:new_booking_details][:schedule][:id])
         # booking.payment.update(payment_status: 0)
 
+        # Update old slod to be available
+        old_slot = Slot.find params[:past_booking_details][:slot][:id]
+        old_slot.increment!(:allocations, 1)
+        old_slot.update(status: true)
+        old_datetime = booking.schedule.schedule_date.strftime("%d %B %Y") + ", " + old_slot.slot_time_with_interval
+        # old_datetime = booking.schedule.schedule_date.strftime("%d %B %Y") + ", " + old_slot.slot_time.utc.strftime("%I:%M") + old_slot.meridian + " - " + (old_slot.slot_time + booking.schedule.minute_interval*60).utc.strftime("%I:%M") + old_slot.meridian
+
+        # Update new slot, add allocation and modify status
+        new_slot = Slot.find params[:new_booking_details][:slot][:id]
+        new_slot.decrement!(:allocations, 1)
+        if new_slot[:allocations] == 0
+            new_slot.update(status: false)
+        end
+        new_datetime = booking.schedule.schedule_date.strftime("%d %B %Y") + ", " + new_slot.slot_time_with_interval
+        booking.update(slot_id: new_slot.id)
+
+        AuditLog.log_changes("Bookings", "booking_schedule", booking.id, old_datetime, new_datetime, 1, @current_user.username)
+       
         #send reschedule email
         if !booking.payment.nil?
             if booking.payment.payment_status == "reserved"
@@ -107,27 +126,10 @@ class V1::BookingController < ApplicationController
             end 
         end
 
-        # Update old slod to be available
-        old_slot = Slot.find params[:past_booking_details][:slot][:id]
-        old_slot.increment!(:allocations, 1)
-        old_slot.update(status: true)
-        old_datetime = booking.schedule.schedule_date.strftime("%d %A %Y") + ", " + old_slot.slot_time.utc.strftime("%I:%M") + old_slot.meridian + " - " + (old_slot.slot_time + booking.schedule.minute_interval*60).utc.strftime("%I:%M") + old_slot.meridian
-
-        # Update new slot, add allocation and modify status
-        new_slot = Slot.find params[:new_booking_details][:slot][:id]
-        new_slot.decrement!(:allocations, 1)
-        if new_slot[:allocations] == 0
-            new_slot.update(status: false)
-        end
-        new_datetime = booking.schedule.schedule_date.strftime("%d %A %Y") + ", " + new_slot.slot_time.utc.strftime("%I:%M") + new_slot.meridian + " - " + (new_slot.slot_time + booking.schedule.minute_interval*60).utc.strftime("%I:%M") + new_slot.meridian
-        booking.update(slot_id: new_slot.id)
-
-        AuditLog.log_changes("Bookings", "booking_schedule", booking.id, old_datetime, new_datetime, 1, @current_user.username)
-       
         render json: {
             schedule: booking.schedule, 
             slot: booking.slot, 
-            slot_time_with_interval: booking.slot.slot_time.utc.strftime("%I:%M") + booking.slot.meridian + " - " + (booking.slot.slot_time + booking.schedule.minute_interval*60).utc.strftime("%I:%M") + booking.slot.meridian,
+            slot_time_with_interval: booking.slot.slot_time_with_interval,
             payment_status: booking.payment.payment_status}
     end
 
@@ -142,8 +144,8 @@ class V1::BookingController < ApplicationController
         status = "status: #{filter_params[:status] == 32767 ? "All" : Payment.payment_statuses.invert[filter_params[:status]]}, "
         booking_type = "booking type: #{filter_params[:booking_type] == "all"? "All" : Booking.booking_types.invert[filter_params[:booking_type]].capitalize }, "
         search = "search: #{filter_params[:search_string] == nil ? "blank" : filter_params[:search_string]}, "
-        registration_date = "registration date from #{filter_params[:register_date_start] == nil ? "blank" : filter_params[:register_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:register_date_end] == nil ? "blank" : filter_params[:register_date_end].to_date.strftime("%d %A %Y")}, "
-        appointment_date = "appointment date from #{filter_params[:booking_date_start] == nil ? "blank" : filter_params[:booking_date_start].to_date.strftime("%d %A %Y")} to #{filter_params[:booking_date_end] == nil ? "blank" : filter_params[:booking_date_end].to_date.strftime("%d %A %Y")}, "
+        registration_date = "registration date from #{filter_params[:register_date_start] == nil ? "blank" : filter_params[:register_date_start].to_date.strftime("%d %B %Y")} to #{filter_params[:register_date_end] == nil ? "blank" : filter_params[:register_date_end].to_date.strftime("%d %B %Y")}, "
+        appointment_date = "appointment date from #{filter_params[:booking_date_start] == nil ? "blank" : filter_params[:booking_date_start].to_date.strftime("%d %B %Y")} to #{filter_params[:booking_date_end] == nil ? "blank" : filter_params[:booking_date_end].to_date.strftime("%d %B %Y")}, "
         booking_reserve = "booking reserved more than 60 minutes #{filter_params[:only_expired_booking] ? "Y" : "N"}"
         
         log_text = header + test_site + status + booking_type + search + registration_date + appointment_date + booking_reserve

@@ -7,7 +7,7 @@ json.booking_details do
     json.clinic_name @booking.clinic.name
     json.clinic_code @booking.clinic.code
     json.billing_code @booking.clinic.billing_code
-    json.slot_time_with_interval @booking.slot.slot_time.utc.strftime("%I:%M") + @booking.slot.meridian + " - " + (@booking.slot.slot_time + @booking.schedule.minute_interval*60).utc.strftime("%I:%M") + @booking.slot.meridian
+    json.slot_time_with_interval @booking.slot.slot_time_with_interval 
     json.slot @booking.slot
     json.schedule @booking.schedule
     json.location @booking.location
@@ -26,6 +26,7 @@ json.payment_details do
     json.payment_status @booking.payment.payment_status
     json.ref_no @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.payment_reference : ""
     json.amount @booking.payment.amount
+    json.amount_updated @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.amount : ""
     json.currency @booking.payment.currency
     json.payment_date @booking.payment.payment_histories.any? ? @booking.payment.payment_histories.last.created_at : ""
     json.payment_mode @booking.payment.payment_histories.any? && !@booking.payment.payment_histories.last.payment_mode_id.nil? ? @booking.payment.payment_histories.last.payment_mode.name : ""

@@ -4,7 +4,7 @@ class UserGroup < ApplicationRecord
 
     def self.get_by_role role_id
         if role_id == 3
-            return self.where.not(id: [1,2])
+            return self.where.not(id: [1,2]).order(name: :asc)
         else
             return self.all
         end

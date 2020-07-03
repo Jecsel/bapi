@@ -64,7 +64,7 @@
 				<p>Date: <%=@booking.schedule.schedule_date.to_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.utc.strftime("%H:%M %p")%></p>
 				<p>Name: <%=@booking.patient.fullname%></p>
 				<p>ID Number: <%=@booking.patient.id_number%></p>
-				<p>Gender: <%=@booking.patient.gender_id%></p>
+				<p>Gender: <%=@booking.patient.gender_id == 1? "Male": "Female"%></p>
 				<p>Date of Birth: <%=@booking.patient.date_of_birth.to_date.strftime("%b %d, %Y") unless @booking.patient.date_of_birth.blank?%></p>
 				<p>Contact: <%=@booking.patient.contact_number%></p>
 				<p>Email: <%=@booking.patient.email_address%></p>
@@ -87,14 +87,15 @@
 		
         <% else %>
              <div>
-                <h4 style="text-align:center;color:red">Payment Failed </h2>
+                <h4 style="text-align:center;color:red">Payment Failure </h2>
                 <script>
                     function redirect(){
                         window.location.replace("https://my.biomarking.com/#/booking-confirmation");
 					}
                 </script>
                 <center>
-                    <button onclick="redirect()">TRY AGAIN</button>
+					<button onclick="redirect()">TRY AGAIN</button>
+					<button onclick="redirect_location()">CANCEL</button>
 				</center>
             </div>
         <% end %>
