@@ -39,6 +39,6 @@ class V1::Guest::LocationController < ApplicationController
     private
     def cut_off_time
         today = DateTime.now.in_time_zone
-        return today < today.beginning_of_day + 17.hours ? today : today + 2.day
+        return today < today.beginning_of_day + 17.hours ? today + 1.day : today + 2.day
     end
 end
