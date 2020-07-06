@@ -94,15 +94,33 @@
 					}
                 </script>
                 <center>
-					<button onclick="redirect()">TRY AGAIN</button>
-					<button onclick="redirect_location()">CANCEL</button>
+				<%= form_with(url: "https://payment.ipay88.com.my/ePayment/entry.asp", method: "post") do %>
+					<%= hidden_field_tag(:MerchantCode,@booking.payment.merchant_code) %>
+					<%= hidden_field_tag(:PaymentId,@booking.payment.payment_id) %> 
+					<%= hidden_field_tag(:RefNo,@booking.payment.ref_no) %>
+					<%= hidden_field_tag(:Amount,@booking.payment.amount) %>
+					<%= hidden_field_tag(:Currency,@booking.payment.currency) %>
+					<%= hidden_field_tag(:ProdDesc,@booking.payment.prod_desc) %>
+					<%= hidden_field_tag(:UserName,@booking.payment.username) %>
+					<%= hidden_field_tag(:UserEmail,@booking.payment.user_email) %>
+					<%= hidden_field_tag(:UserContact,@booking.payment.user_contact) %>
+					<%= hidden_field_tag(:Remark,@booking.payment.remark) %>
+					<%= hidden_field_tag(:Lang,@booking.payment.lang) %>
+					<%= hidden_field_tag(:SignatureType,@booking.payment.signature_type) %>
+					<%= hidden_field_tag(:Signature,@booking.payment.signature) %>
+					<%= hidden_field_tag(:ResponseURL,"https://my.biomarking.com/v1/guest/payment/status") %>
+					<%= hidden_field_tag(:ResponseURL,"https://my.biomarking.com/v1/guest/payment/confirmation") %>
+					<button type="button" onclick="redirect_location()">CANCEL</button>
+					<%= submit_tag("TRY AGAIN") %>
+				<% end %>
 				</center>
             </div>
         <% end %>
 	</div>
 
 	<script>
-		function redirect_location(){
+		function redirect_location(e){
+			// e.preventDefault();
 			window.location.replace("https://my.biomarking.com/#/booking-locations");
 		}
 	</script>
