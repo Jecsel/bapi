@@ -1,0 +1,47 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  event_name: MyString
+  campaign_client: one
+  campaign_company: one
+  campaign_billing: one
+  campaign_doctor: one
+  campaign_site: MyString
+  campaign_start_date: 2020-07-20
+  campaign_end_date: 2020-07-20
+  campaign_start_time: 2020-07-20 04:20:02
+  campaign_end_time: 2020-07-20 04:20:02
+  package: MyString
+  optional_test: 
+  est_pax: 1
+  need_phleb: 
+  no_of_phleb: 1
+  remarks: MyString
+  report_management: MyString
+  onsite_pic_name: MyString
+  onsite_pic_contact: MyString
+  in_charge: 1
+  status: 
+
+two:
+  event_name: MyString
+  campaign_client: two
+  campaign_company: two
+  campaign_billing: two
+  campaign_doctor: two
+  campaign_site: MyString
+  campaign_start_date: 2020-07-20
+  campaign_end_date: 2020-07-20
+  campaign_start_time: 2020-07-20 04:20:02
+  campaign_end_time: 2020-07-20 04:20:02
+  package: MyString
+  optional_test: 
+  est_pax: 1
+  need_phleb: 
+  no_of_phleb: 1
+  remarks: MyString
+  report_management: MyString
+  onsite_pic_name: MyString
+  onsite_pic_contact: MyString
+  in_charge: 1
+  status: 

@@ -12,6 +12,7 @@ namespace :services do
         create_admin_policies
         create_finance_policies
         create_call_center_policies
+        create_corporate_admin_policies
     end
 
     def clean_up
@@ -43,6 +44,9 @@ namespace :services do
             },
             {
                 name:"Call Center"
+            },
+            {
+                name:"Corporate Admin"
             }
         ]
         UserGroup.create _groups
@@ -99,6 +103,13 @@ namespace :services do
                 resource_path: "admin.dashboard.audit",
                 resource_icon: "fas fa-history",
                 resource_order: 7,
+            },
+            {
+                name:"Campaign",
+                status: true, 
+                resource_path: "admin.dashboard.campaign",
+                resource_icon: "fas fa-briefcase",
+                resource_order: 8,
             }
         ]
         Service.create _services
@@ -220,6 +231,11 @@ namespace :services do
             {
                 service_id: 6, #Settings service
                 name: "Edit settings", #service_policy_id 23
+                status: true
+            },
+            {
+                service_id: 8, #Campaign service
+                name: "View Campaign Module", #service_policy_id 24
                 status: true
             }
         ]
@@ -501,6 +517,12 @@ namespace :services do
                 service_id: 6, #Settings service
                 service_policy_id: 23, #Edit settings
                 status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 8, #Campaign service
+                service_policy_id: 24, #View Campaign module
+                status: true
             }
         ]
         RolePolicy.create _role_policies
@@ -716,6 +738,20 @@ namespace :services do
         ]
         RolePolicy.create _role_policies
         p 'Call center policies created'
+    end
+
+    def create_corporate_admin_policies
+        _user_group_id = 6
+        _role_policies = [
+            { 
+                user_group_id: _user_group_id,
+                service_id: 8, #Campaign service
+                service_policy_id: 24, #View Campaign module
+                status: true
+            }
+        ]
+        RolePolicy.create _role_policies
+        p 'Corporate admin policies created'
     end
 
 
