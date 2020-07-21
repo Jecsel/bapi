@@ -13,6 +13,12 @@ class V1::CampaignController < ApplicationController
         render json: :created
     end
 
+    def show
+        @campaign = Campaign.find params[:id]
+        p "this is campaign"
+        p @campaign
+    end
+
     def filter 
         @campaign = Campaign.page(filter_params[:page])
         # @campaign = data_search.page(filter_params[:page]).order(created_at: :desc)
