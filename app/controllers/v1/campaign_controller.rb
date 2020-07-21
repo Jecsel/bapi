@@ -15,8 +15,6 @@ class V1::CampaignController < ApplicationController
 
     def show
         @campaign = Campaign.find params[:id]
-        p "this is campaign"
-        p @campaign
     end
 
     def filter 
