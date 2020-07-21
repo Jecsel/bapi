@@ -2,6 +2,16 @@ class V1::CampaignController < ApplicationController
     before_action :must_be_authenticated
 
 
+    def index
+       in_charge = Campaign.in_charges.map{ |a| {id: a.second, name: a.first} } #Get enum values
+       render json: in_charge 
+    end
+
+    def create
+        campaign = Campaign.create create_campaign_params
+        render json: :created
+    end
+
     def filter 
         @campaign = Campaign.page(filter_params[:page])
         # @campaign = data_search.page(filter_params[:page]).order(created_at: :desc)
@@ -87,6 +97,14 @@ class V1::CampaignController < ApplicationController
     def add_doctor_params
         params.require(:doctor).permit(:code)
     end
+
+    def create_campaign_params
+        params.require(:campaign).permit(:event_name, :campaign_client_id, :campaign_company_id, :campaign_billing_id, 
+            :campaign_doctor_id, :campaign_site, :campaign_start_date, :campaign_end_date, :campaign_start_time, :campaign_end_time,
+            :package, :optional_test, :est_pax, :need_phleb, :no_of_phleb, :remarks, :report_management, :onsite_pic_name,
+            :onsite_pic_contact, :in_charge, :status)
+    end
+    
     def data_search
         AuditLog.search_filter(filter_params)
     end

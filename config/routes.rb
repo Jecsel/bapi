@@ -116,7 +116,7 @@ Rails.application.routes.draw do
         post 'export'
       end
     end
-    resources :campaign, only:[] do 
+    resources :campaign, only:[:index, :create] do 
       collection do   
         post 'filter'
 

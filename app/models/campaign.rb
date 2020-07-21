@@ -5,5 +5,5 @@ class Campaign < ApplicationRecord
   belongs_to :campaign_doctor
 
 
-  enum in_charge:["KAM", "MLO"]
+  enum in_charge:["Dummy1", "Dummy2", "Dummy3"]
 end
