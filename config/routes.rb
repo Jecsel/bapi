@@ -116,6 +116,21 @@ Rails.application.routes.draw do
         post 'export'
       end
     end
+    resources :campaign, only:[:index, :create, :show] do 
+      collection do   
+        post 'filter'
+
+        post 'add_campaign_client'
+        post 'add_campaign_company'
+        post 'add_campaign_billing'
+        post 'add_campaign_doctor'
+        get 'campaign_client'
+        get 'campaign_company'
+        get 'campaign_billing'
+        get 'campaign_doctor'
+        post 'export'
+      end
+    end
   end
 
 end

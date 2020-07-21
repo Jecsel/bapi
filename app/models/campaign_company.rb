@@ -1,0 +1,2 @@
+class CampaignCompany < ApplicationRecord
+end
