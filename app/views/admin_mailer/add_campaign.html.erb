@@ -1,0 +1,42 @@
+<html>
+    <body>
+    <h2>Hi, please find the following campaign details:<h2>
+    <br><br>
+        <p>Client Name: <%=@campaign.campaign_client.name%></p>
+        <p>Company to Issue Invoice: <%=@campaign.campaign_company.name%></p>
+        <p>Billing Code: <%=@campaign.campaign_billing.name%></p>
+        <p>Doctor Code: <%=@campaign.campaign_doctor.code%></p>
+        <br><br>
+        <p>Campaign Site: <%=@campaign.campaign_site%></p>
+        <p>Campaign Start Date: <%=@campaign.campaign_start_date.strftime("%d %B %Y")%></p>
+        <p>Campaign End Date: <%=@campaign.campaign_end_date.strftime("%d %B %Y")%></p>
+        <p>Campaign Start Time: <%=@campaign.campaign_start_time.strftime("%H:%M %p")%></p>
+        <p>Campaign End Time: <%=@campaign.campaign_end_time.strftime("%H:%M %p")%></p>
+        <br><br>
+        <p>Package / Profile Code: <%=@campaign.package%></p>
+        <p>Tag-on Profiles/ Tests: <%=@campaign.optional_test%></p>
+        <br><br>
+        <p>Estimated number of pax: <%=@campaign.est_pax%></p>
+        <p>Number of phlebotomist needed: <%=@campaign.no_of_phleb%></p>
+        <p>Additional requests or remarks: <%=@campaign.remarks%></p>
+        <br><br>
+        <p>Report Management: <%=@campaign.report_management%></p>
+        <p>Onsite PIC name: <%=@campaign.onsite_pic_name%></p>
+        <p>Onsite PIC contact: <%=@campaign.onsite_pic_contact%></p>
+        <p>KAM / MLO in charge: <%=@campaign.in_charge%></p>
+    <br><br><br>
+    <h2>IMPORTANT: This is a system-generated email. Please DO NOT reply to this email.</h2>
+    </body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

@@ -9,4 +9,11 @@ class AdminMailer < ApplicationMailer
             subject: "Drive-Through Admin - Set Password")
     end
 
+    def add_campaign campaign
+        @campaign = campaign
+        _bcc = ENV["CC_MAIL"].split("|")
+        _bcc.each do |recipient|
+            mail(to:recipient, subject: "New Campaign Details")
+        end 
+    end
 end

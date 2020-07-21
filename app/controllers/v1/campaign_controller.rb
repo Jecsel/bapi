@@ -9,6 +9,7 @@ class V1::CampaignController < ApplicationController
 
     def create
         campaign = Campaign.create create_campaign_params
+        AdminMailer.add_campaign(campaign).deliver_later
         render json: :created
     end
 
