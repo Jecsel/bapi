@@ -14,7 +14,8 @@ class V1::CampaignController < ApplicationController
     end
 
     def filter 
-        @campaign = Campaign.page(filter_params[:page])
+        @campaign = Campaign.page(filter_params[:page]).order(campaign_start_date: :asc)
+        # Campaign.page(1)
         # @campaign = data_search.page(filter_params[:page]).order(created_at: :desc)
     end
 
