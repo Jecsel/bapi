@@ -9,8 +9,13 @@ class V1::CampaignController < ApplicationController
 
     def create
         campaign = Campaign.create create_campaign_params
+        campaign.update(created_by:  @current_user.username)
         AdminMailer.add_campaign(campaign).deliver_later
         render json: :created
+    end
+
+    def show
+        @campaign = Campaign.find params[:id]
     end
 
     def filter 
@@ -104,7 +109,7 @@ class V1::CampaignController < ApplicationController
         params.require(:campaign).permit(:event_name, :campaign_client_id, :campaign_company_id, :campaign_billing_id, 
             :campaign_doctor_id, :campaign_site, :campaign_start_date, :campaign_end_date, :campaign_start_time, :campaign_end_time,
             :package, :optional_test, :est_pax, :need_phleb, :no_of_phleb, :remarks, :report_management, :onsite_pic_name,
-            :onsite_pic_contact, :in_charge, :status)
+            :onsite_pic_contact, :in_charge, :status, :created_by)
     end
     
     def data_search
