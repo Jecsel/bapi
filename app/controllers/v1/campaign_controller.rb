@@ -30,9 +30,9 @@ class V1::CampaignController < ApplicationController
     end
 
     def filter 
-        @campaign = Campaign.page(filter_params[:page]).order(campaign_start_date: :asc)
-        # Campaign.page(1)
-        # @campaign = data_search.page(filter_params[:page]).order(created_at: :desc)
+        # @campaign = Campaign.page(filter_params[:page]).order(campaign_start_date: :asc)
+        # # Campaign.page(1)
+        @campaign = data_search.page(filter_params[:page]).order(created_at: :desc)
     end
 
     def upload_participant
@@ -177,6 +177,13 @@ class V1::CampaignController < ApplicationController
     end
     
     def data_search
-        AuditLog.search_filter(filter_params)
+        # AuditLog.search_filter(filter_params)
+        Campaign.search_filter(filter_params).search(filter_params[:search_string])
+    end
+
+    def filter_params
+        params
+            .require(:filter)
+            .permit(:page , :search_string, :status, :campaign_date_start, :campaign_date_end )
     end
 end
