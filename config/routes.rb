@@ -119,7 +119,7 @@ Rails.application.routes.draw do
     resources :campaign, only:[:index, :create, :show] do 
       collection do   
         post 'filter'
-
+        post 'upload_participant'
         post 'add_campaign_client'
         post 'add_campaign_company'
         post 'add_campaign_billing'

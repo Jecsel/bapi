@@ -8,3 +8,6 @@ json.campaigns_data do
     json.campaign_client @campaign.campaign_client.name
     json.optional_test @campaign.optional_test ? "Yes" : 'No'
 end
+json.campaign_participants @campaign.campaign_participants.each do |part|
+    json.extract! part, :id, :fullname, :date_of_birth, :gender, :id_number, :mobile, :email, :staff_id, :department, :barcode
+end

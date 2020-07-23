@@ -1,0 +1,25 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  fullname: MyString
+  date_of_birth: 2020-07-22
+  gender: 1
+  id_number: MyString
+  mobile: MyString
+  email: MyString
+  staff_id: MyString
+  department: MyString
+  barcode: MyString
+  status: false
+
+two:
+  fullname: MyString
+  date_of_birth: 2020-07-22
+  gender: 1
+  id_number: MyString
+  mobile: MyString
+  email: MyString
+  staff_id: MyString
+  department: MyString
+  barcode: MyString
+  status: false
