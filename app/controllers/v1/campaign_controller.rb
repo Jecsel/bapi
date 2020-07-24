@@ -27,6 +27,7 @@ class V1::CampaignController < ApplicationController
 
     def show
         @campaign = Campaign.find params[:id]
+        @campaign_participants = @campaign.campaign_participants.active.includes(:participant).order('participants.fullname ASC, participants.id ASC').page(1)
     end
 
     def filter 
@@ -37,38 +38,69 @@ class V1::CampaignController < ApplicationController
 
     def upload_participant
         campaign = Campaign.find request.headers['x-campaign-id'].to_i
+        campaign.upload_document.attach(params[:files][0])
+        campaign.save
+
+        records_added = 0
+        not_added_names = []
         
         valid_headers = ["Full Name", "DOB (yyyymmdd)", "Gender", "IC/Passport Number",	"Mobile Number", "Email Address", "Staff ID", "Department",	"Barcode"]
 
         xlsx = Roo::Spreadsheet.open(params[:files][0].tempfile)
-        participants = xlsx.sheet(0).parse(fullname: "Full Name", date_of_birth: "DOB (ddmmyyyy)", 
-            gender: "Gender", id_number: "IC/Passport Number", mobile: "Mobile Number", 
-            email: "Email Address", staff_id: "Staff ID", department: "Department", barcode: "Barcode", clean: true) #Removes whitespaces
+        begin 
+            participants = xlsx.sheet(0).parse(fullname: "Full Name", date_of_birth: "DOB (yyyymmdd)", 
+                gender: "Gender", id_number: "IC/Passport Number", mobile: "Mobile Number", 
+                email: "Email Address", staff_id: "Staff ID", department: "Department", barcode: "Barcode", clean: true) #Removes whitespaces
 
-        participants.each do |participant|
-            next if participant[:fullname] == nil || participant[:date_of_birth] == nil || #If either are nil, skip record
-            participant[:date_of_birth].to_s.length != 8 #Skip records that doesn't have fullname / odb
-            if check_date(participant[:date_of_birth].to_s)
-                p 'pasok'
-                # p participant[:date_of_birth]
-            else
-                p "INVALID DATE"
+            participants.each do |participant|
+                participant[:date_of_birth] = participant[:date_of_birth].to_s.gsub(/\s+/, "") #Remove all whitespaces from dob
+                participant[:fullname] = participant[:fullname].to_s
+
+                if participant[:fullname] != nil || participant[:date_of_birth] != nil || #If either are nil, skip record
+                        participant[:date_of_birth].length == 8 #Skip records that doesn't have fullname / odb
+                    if !validate_date(participant[:date_of_birth]).nil?
+                        participant[:fullname] = validate_fullname(participant[:fullname])
+
+                        new_participant                 = Participant.new
+                        new_participant.fullname        = participant[:fullname]
+                        new_participant.date_of_birth   = validate_date(participant[:date_of_birth])
+                        new_participant.gender          = validate_gender(participant[:gender])
+                        new_participant.id_number       = validate_id_number(participant[:id_number])
+                        new_participant.mobile          = validate_mobile(participant[:mobile])
+                        new_participant.email           = validate_email(participant[:email])
+                        new_participant.staff_id        = validate_staff_id(participant[:staff_id])
+                        new_participant.department      = validate_department(participant[:department])
+                        new_participant.barcode         = validate_barcode(participant[:barcode])                   
+
+                        if new_participant.save!
+                            CampaignParticipant.create(campaign_id: campaign.id, participant_id: new_participant.id)
+                            records_added += 1
+                        end
+                    else
+                        not_added_names << participant[:fullname]
+                    end
+                else
+                    not_added_names << participant[:fullname]
+                end
             end
+        rescue => e
+            render json:{error: "Header(s) Not Found", headers: e},status: 403
+            return
         end
 
-        
-        # campaign.upload_document.attach(params[:files][0])
-        # if history.save
-        #     history.upload_document.attach(params[:files][0])
-        # end
-        render json: :uploaded
+        message = "Upload successful. #{records_added} participants added to campaign. #{not_added_names.length > 0 ? not_added_names.join(', ') + " records have been skipped." : ""} "
+
+        render json: message
     end
 
-    def export
-        # @audit_log = data_search.order(created_at: :desc)
+    def delete_participant
+        CampaignParticipant.where(campaign_id: params[:campaign_id], participant_id: params[:participant_id]).first.update(status: false)
+        render json: :deleted
     end
 
-
+    def paginate_participant
+        @campaign_participants = CampaignParticipant.includes(:participant).where(campaign_id: params[:campaign_id]).page(params[:page]).order('participants.fullname ASC, participants.id ASC').active
+    end
 
     def campaign_client
         campaign_client = CampaignClient.all
@@ -127,27 +159,92 @@ class V1::CampaignController < ApplicationController
     private
 
 
-    def check_date date_string
+    def validate_date date_string
         year = date_string[0..3].to_i 
-        day = date_string[4..5].to_i
-        month = date_string[6..7].to_i
-        
+        month = date_string[4..5].to_i
+        day = date_string[6..7].to_i
 
         if day > 31 || month > 12 || year > 2020 #Check if digits are valid
-            return false
+            return nil
         else
             date = (day.to_s + "/" + month.to_s + "/" + year.to_s)
             begin
-                parsedDate = Date.parse(date)
-                p '========='
-                p parsedDate
-                return true
+                parsedDate = Date.parse(date) #Add 1990 and current date validation
+                if ("01/01/1990".to_date.beginning_of_day..Date.today.end_of_day).cover?(parsedDate)
+                    return parsedDate
+                else
+                    return nil
+                end 
             rescue
-                return false
+                return nil
             end
-
-            
         end
+    end
+
+    def validate_fullname fullname
+        #Remove special characters from string. Cut length to 50 characters. Auto capitalize first character
+        return fullname.gsub(/[^a-zA-Z 0-9]/, '').gsub(/\s/,'-')[0..49].sub(/^./, &:upcase)
+    end
+
+    def validate_gender gender
+        gender = gender.to_s.gsub(/\s+/, "").sub(/^./, &:upcase) #Remove whitespaces. Capitalize
+        if gender.length == 1 
+            if gender == "M" || gender == "F"
+                return gender
+            else
+                return ""
+            end
+        else
+            return ""
+        end
+
+    end
+
+    def validate_id_number id_number
+        return id_number = id_number.to_s.gsub(/[^a-zA-Z 0-9]/, '').gsub(/\s/,'-') #Remove special characters
+            .gsub(/\s+/, "") #Remove whitespaces
+            .upcase[0..13] #Uppercase all letters. Limit 14 characters
+    end
+
+    def validate_mobile mobile
+        mobile = mobile.to_s.gsub(/\s+/, "") #Remove whitespaces
+
+        if mobile.length >= 8 && mobile.length <= 15
+            return mobile
+        else 
+            return ""
+        end
+    end
+
+    def validate_email email
+        return email.to_s.gsub(/\s+/, "")[0..49] #Remove whitespaces. Limit 50 characters
+    end
+
+    def validate_staff_id staff_id
+        return staff_id.to_s.gsub(/\s+/, "")[0..49] #Remove whitespaces. Limit 50 characters
+    end
+
+    def validate_department department
+        return department.to_s.gsub(/\s+/, "")[0..49] #Remove whitespaces. Limit 50 characters
+    end
+
+    def validate_barcode barcode
+        barcode_regex = "^GE[a-zA-Z]{2}[0-9]{4}$"
+        barcode = barcode.to_s.gsub(/\s+/, "") #Remove whitespaces
+
+        if barcode.match(barcode_regex) #Save if barcode is valid
+            return barcode
+        else #Auto generate barcode when barcode is null then save to biomark_db.biomark_barcodes
+            auto_gen = barcode_generate
+            while !BiomarkBarcode.exists?(code: auto_gen)
+                BiomarkBarcode.create(code: auto_gen)
+                return auto_gen
+            end
+        end
+    end
+
+    def barcode_generate
+        return 'GE'+[*('A'..'Z')].shuffle[0,2].join+[*('0'..'9')].shuffle[0,4].join
     end
 
     def filter_params

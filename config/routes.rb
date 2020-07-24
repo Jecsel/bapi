@@ -120,6 +120,8 @@ Rails.application.routes.draw do
       collection do   
         post 'filter'
         post 'upload_participant'
+        post 'delete_participant'
+        post 'paginate_participant'
         post 'add_campaign_client'
         post 'add_campaign_company'
         post 'add_campaign_billing'
@@ -128,7 +130,6 @@ Rails.application.routes.draw do
         get 'campaign_company'
         get 'campaign_billing'
         get 'campaign_doctor'
-        post 'export'
       end
     end
   end
