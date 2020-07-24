@@ -9,9 +9,9 @@ default: &default
   pool: 5
   
 development:
-  <<: *default
-  database: <%= ENV["DB_NAME"] %>
-
+  primary:
+    <<: *default
+    database: <%= ENV["DB_NAME"] %>
 test:
   <<: *default
   database: <%= ENV["DB_TEST"] %>
@@ -19,4 +19,8 @@ test:
 production:
   <<: *default
   database: <%= ENV["DB_NAME"] %>
+  
+biomark_db:
+  <<: *default
+  database: <%= ENV["BIOMARK_DB_NAME"] %>
 

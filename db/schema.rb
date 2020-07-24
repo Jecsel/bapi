@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_21_081608) do
+ActiveRecord::Schema.define(version: 2020_07_22_030352) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -93,6 +93,16 @@ ActiveRecord::Schema.define(version: 2020_07_21_081608) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "campaign_participants", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.bigint "participant_id", null: false
+    t.boolean "status", default: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["campaign_id"], name: "index_campaign_participants_on_campaign_id"
+    t.index ["participant_id"], name: "index_campaign_participants_on_participant_id"
+  end
+
   create_table "campaigns", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "event_name"
     t.bigint "campaign_client_id", null: false
@@ -167,6 +177,21 @@ ActiveRecord::Schema.define(version: 2020_07_21_081608) do
     t.string "code"
     t.boolean "status", default: true
     t.integer "referral_type", default: 0
+  end
+
+  create_table "participants", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "fullname"
+    t.date "date_of_birth"
+    t.string "gender"
+    t.string "id_number"
+    t.string "mobile"
+    t.string "email"
+    t.string "staff_id"
+    t.string "department"
+    t.string "barcode"
+    t.boolean "status", default: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "patients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -355,6 +380,8 @@ ActiveRecord::Schema.define(version: 2020_07_21_081608) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "campaign_participants", "campaigns"
+  add_foreign_key "campaign_participants", "participants"
   add_foreign_key "campaigns", "campaign_billings"
   add_foreign_key "campaigns", "campaign_clients"
   add_foreign_key "campaigns", "campaign_companies"

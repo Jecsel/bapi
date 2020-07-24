@@ -58,7 +58,6 @@ class V1::BookingController < ApplicationController
     end
 
     def filter 
-        p data_search
         @bookings = data_search.page(filter_params[:page])
     end
 
