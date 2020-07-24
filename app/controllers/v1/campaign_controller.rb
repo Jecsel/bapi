@@ -184,6 +184,6 @@ class V1::CampaignController < ApplicationController
     def filter_params
         params
             .require(:filter)
-            .permit(:page , :search_string, :status, :campaign_date_start, :campaign_date_end )
+            .permit(:page , :search_string, :status, :campaign_date_start_from, :campaign_date_start_to )
     end
 end

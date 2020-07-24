@@ -25,24 +25,24 @@ class Campaign < ApplicationRecord
     if filter_params[:status] == 1
       _sql = _sql.where(status: true)
     end
-    if filter_params[:campaign_date_start].present? || filter_params[:campaign_date_end].present?
+    if filter_params[:campaign_date_start_from].present? || filter_params[:campaign_date_start_to].present?
       _sql = _sql.filter_by_campaign_date filter_params
     end 
     return _sql
   end
 
   def self.filter_by_campaign_date filter_params
-    if filter_params[:campaign_date_start].present? && filter_params[:campaign_date_end].present?
-        _start = filter_params[:campaign_date_start].to_date.beginning_of_day
-        _end = filter_params[:campaign_date_end].to_date.end_of_day
+    if filter_params[:campaign_date_start_from].present? && filter_params[:campaign_date_start_to].present?
+        _start = filter_params[:campaign_date_start_from].to_date.beginning_of_day
+        _end = filter_params[:campaign_date_start_to].to_date.end_of_day
         return where(campaigns:{created_at:[_start.._end]})
     end
-    if filter_params[:campaign_date_start].present? && filter_params[:campaign_date_end].nil?
-        _start = filter_params[:campaign_date_start].to_date.beginning_of_day
+    if filter_params[:campaign_date_start_from].present? && filter_params[:campaign_date_start_to].nil?
+        _start = filter_params[:campaign_date_start_from].to_date.beginning_of_day
         return where("campaigns.campaign_start_date >= ?",_start)
     end
-    if filter_params[:campaign_date_start].nil? && filter_params[:campaign_date_end].present?
-        _end = filter_params[:campaign_date_end].to_date.end_of_day
+    if filter_params[:campaign_date_start_from].nil? && filter_params[:campaign_date_start_to].present?
+        _end = filter_params[:campaign_date_start_to].to_date.end_of_day
         return where("campaigns.campaign_end_date <= ?",_end) 
     end
 end
