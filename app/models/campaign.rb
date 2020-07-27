@@ -35,10 +35,12 @@ class Campaign < ApplicationRecord
     if filter_params[:campaign_date_start_from].present? && filter_params[:campaign_date_start_to].present?
         _start = filter_params[:campaign_date_start_from].to_date.beginning_of_day
         _end = filter_params[:campaign_date_start_to].to_date.end_of_day
-        return where(campaigns:{created_at:[_start.._end]})
+        return where(campaign_start_date:[_start.._end])
     end
     if filter_params[:campaign_date_start_from].present? && filter_params[:campaign_date_start_to].nil?
         _start = filter_params[:campaign_date_start_from].to_date.beginning_of_day
+        p "_start"
+        p _start
         return where("campaigns.campaign_start_date >= ?",_start)
     end
     if filter_params[:campaign_date_start_from].nil? && filter_params[:campaign_date_start_to].present?
