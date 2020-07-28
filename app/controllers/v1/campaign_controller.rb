@@ -55,7 +55,7 @@ class V1::CampaignController < ApplicationController
                 participant[:date_of_birth] = participant[:date_of_birth].to_s.gsub(/\s+/, "") #Remove all whitespaces from dob
                 participant[:fullname] = participant[:fullname].to_s
 
-                if participant[:fullname] != nil && participant[:date_of_birth] != nil && #If either are nil, skip record
+                if participant[:fullname] != nil && participant[:fullname] != "" && participant[:date_of_birth] != nil && participant[:date_of_birth] != "" && #If either are nil, skip record
                         participant[:date_of_birth].length == 8 #Skip records that doesn't have fullname / odb
                     if !validate_date(participant[:date_of_birth]).nil?
                         participant[:fullname] = validate_fullname(participant[:fullname])
