@@ -172,10 +172,8 @@ class V1::CampaignController < ApplicationController
     def generate_request_forms
         @template = FormGenerator.new(params).generate_gribbles_forms
 
-        p @template
         @encoded_string = Base64.encode64(@template.render)
         render json: {pdf_string: @encoded_string}
-
     end
 
     private
