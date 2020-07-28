@@ -56,7 +56,7 @@ class V1::CampaignController < ApplicationController
                 participant[:date_of_birth] = participant[:date_of_birth].to_s.gsub(/\s+/, "") #Remove all whitespaces from dob
                 participant[:fullname] = participant[:fullname].to_s
 
-                if participant[:fullname] != nil || participant[:date_of_birth] != nil || #If either are nil, skip record
+                if participant[:fullname] != nil && participant[:date_of_birth] != nil && #If either are nil, skip record
                         participant[:date_of_birth].length == 8 #Skip records that doesn't have fullname / odb
                     if !validate_date(participant[:date_of_birth]).nil?
                         participant[:fullname] = validate_fullname(participant[:fullname])
@@ -154,6 +154,15 @@ class V1::CampaignController < ApplicationController
             code = CampaignDoctor.create add_doctor_params
             render json: code
         end
+    end
+
+    def generate_request_forms
+        @template = FormGenerator.new(params).generate_gribbles_forms
+
+        p @template
+        @encoded_string = Base64.encode64(@template.render)
+        render json: {pdf_string: @encoded_string}
+
     end
 
     private

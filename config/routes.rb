@@ -122,6 +122,7 @@ Rails.application.routes.draw do
         post 'upload_participant'
         post 'delete_participant'
         post 'paginate_participant'
+        post 'generate_request_forms'
         post 'add_campaign_client'
         post 'add_campaign_company'
         post 'add_campaign_billing'

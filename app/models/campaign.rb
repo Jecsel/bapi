@@ -9,7 +9,7 @@ class Campaign < ApplicationRecord
 
   has_many :campaign_participants
 
-  enum in_charge:["Dummy1", "Dummy2", "Dummy3"]
+  enum in_charge:["None"]
 
   search_scope :search do
     attributes :id, :event_name
