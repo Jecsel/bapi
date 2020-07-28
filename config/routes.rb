@@ -127,10 +127,12 @@ Rails.application.routes.draw do
         post 'add_campaign_company'
         post 'add_campaign_billing'
         post 'add_campaign_doctor'
+        post 'add_campaign_incharge'
         get 'campaign_client'
         get 'campaign_company'
         get 'campaign_billing'
         get 'campaign_doctor'
+        get 'campaign_incharge'
       end
     end
   end

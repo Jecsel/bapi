@@ -6,10 +6,9 @@ class Campaign < ApplicationRecord
   belongs_to :campaign_company
   belongs_to :campaign_billing
   belongs_to :campaign_doctor
+  belongs_to :in_charge_person
 
   has_many :campaign_participants
-
-  enum in_charge:["None"]
 
   search_scope :search do
     attributes :id, :event_name
