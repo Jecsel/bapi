@@ -3,8 +3,7 @@ class V1::CampaignController < ApplicationController
 
 
     def index
-       in_charge = Campaign.in_charges.map{ |a| {id: a.second, name: a.first} } #Get enum values
-       render json: in_charge 
+       
     end
 
     def create
@@ -56,7 +55,7 @@ class V1::CampaignController < ApplicationController
                 participant[:date_of_birth] = participant[:date_of_birth].to_s.gsub(/\s+/, "") #Remove all whitespaces from dob
                 participant[:fullname] = participant[:fullname].to_s
 
-                if participant[:fullname] != nil || participant[:date_of_birth] != nil || #If either are nil, skip record
+                if participant[:fullname] != nil && participant[:date_of_birth] != nil && #If either are nil, skip record
                         participant[:date_of_birth].length == 8 #Skip records that doesn't have fullname / odb
                     if !validate_date(participant[:date_of_birth]).nil?
                         participant[:fullname] = validate_fullname(participant[:fullname])
@@ -118,6 +117,10 @@ class V1::CampaignController < ApplicationController
         campaign_doctor = CampaignDoctor.all
         render json: campaign_doctor.as_json(only: [:id, :code])
     end
+    def campaign_incharge
+        in_charge = InChargePerson.all
+        render json: in_charge.as_json(only: [:id, :name])
+    end
 
     def add_campaign_client
         client = CampaignClient.where("name = ?", add_client_params[:name])
@@ -154,6 +157,25 @@ class V1::CampaignController < ApplicationController
             code = CampaignDoctor.create add_doctor_params
             render json: code
         end
+    end
+
+    def add_campaign_incharge
+        in_charge = InChargePerson.where("name = ?", add_incharge_params[:name])
+        if in_charge.any?
+            render json: {message:"In charge person already exists in the dropdown list."},status:403
+        else
+            in_charge = InChargePerson.create add_incharge_params
+            render json: in_charge
+        end
+    end
+
+    def generate_request_forms
+        @template = FormGenerator.new(params).generate_gribbles_forms
+
+        p @template
+        @encoded_string = Base64.encode64(@template.render)
+        render json: {pdf_string: @encoded_string}
+
     end
 
     private
@@ -265,12 +287,15 @@ class V1::CampaignController < ApplicationController
     def add_doctor_params
         params.require(:doctor).permit(:code)
     end
+    def add_incharge_params
+        params.require(:incharge).permit(:name)
+    end
 
     def create_campaign_params
         params.require(:campaign).permit(:event_name, :campaign_client_id, :campaign_company_id, :campaign_billing_id, 
             :campaign_doctor_id, :campaign_site, :campaign_start_date, :campaign_end_date, :campaign_start_time, :campaign_end_time,
             :package, :optional_test, :est_pax, :need_phleb, :no_of_phleb, :remarks, :report_management, :onsite_pic_name,
-            :onsite_pic_contact, :in_charge, :status, :created_by, :updated_by)
+            :onsite_pic_contact, :in_charge_person_id, :status, :created_by, :updated_by)
     end
     
     def data_search
