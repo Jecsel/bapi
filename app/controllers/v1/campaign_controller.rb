@@ -202,7 +202,7 @@ class V1::CampaignController < ApplicationController
 
     def validate_fullname fullname
         #Remove special characters from string. Cut length to 50 characters. Auto capitalize first character
-        return fullname.gsub(/[^a-zA-Z 0-9]/, '').gsub(/\s/,'')[0..49].sub(/^./, &:upcase)
+        return fullname.gsub(/[^a-zA-Z 0-9]/, '').strip[0..49].sub(/^./, &:upcase)
     end
 
     def validate_gender gender
