@@ -58,10 +58,9 @@ class V1::CampaignController < ApplicationController
                 if participant[:fullname] != nil && participant[:fullname] != "" && participant[:date_of_birth] != nil && participant[:date_of_birth] != "" && #If either are nil, skip record
                         participant[:date_of_birth].length == 8 #Skip records that doesn't have fullname / odb
                     if !validate_date(participant[:date_of_birth]).nil?
-                        participant[:fullname] = validate_fullname(participant[:fullname])
 
                         new_participant                 = Participant.new
-                        new_participant.fullname        = participant[:fullname]
+                        new_participant.fullname        = validate_fullname(participant[:fullname])
                         new_participant.date_of_birth   = validate_date(participant[:date_of_birth])
                         new_participant.gender          = validate_gender(participant[:gender])
                         new_participant.id_number       = validate_id_number(participant[:id_number])
@@ -203,7 +202,7 @@ class V1::CampaignController < ApplicationController
 
     def validate_fullname fullname
         #Remove special characters from string. Cut length to 50 characters. Auto capitalize first character
-        return fullname.gsub(/[^a-zA-Z 0-9]/, '').gsub(/\s/,'-')[0..49].sub(/^./, &:upcase)
+        return fullname.gsub(/[^a-zA-Z 0-9]/, '').gsub(/\s/,'')[0..49].sub(/^./, &:upcase)
     end
 
     def validate_gender gender
