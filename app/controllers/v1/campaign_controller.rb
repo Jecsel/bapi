@@ -9,7 +9,7 @@ class V1::CampaignController < ApplicationController
     def create
         campaign = Campaign.new(create_campaign_params.merge(created_by: @current_user.username))
         if campaign.save
-            AdminMailer.add_campaign(campaign).deliver_later
+            AdminMailer.add_campaign(campaign)
             render json: :created
         else
             render json: campaign.errors.full_messages.first
