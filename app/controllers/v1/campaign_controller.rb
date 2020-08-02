@@ -36,7 +36,8 @@ class V1::CampaignController < ApplicationController
     end
 
     def upload_participant
-        campaign = Campaign.find request.headers['x-campaign-id'].to_i
+        campaign_id = request.headers['x-campaign-id'].to_i
+        campaign = Campaign.find campaign_id
         campaign.upload_document.attach(params[:files][0])
         campaign.save
 
@@ -68,7 +69,7 @@ class V1::CampaignController < ApplicationController
                         new_participant.email           = validate_email(participant[:email])
                         new_participant.staff_id        = validate_staff_id(participant[:staff_id])
                         new_participant.department      = validate_department(participant[:department])
-                        new_participant.barcode         = validate_barcode(participant[:barcode])                   
+                        new_participant.barcode         = validate_barcode(participant[:barcode], campaign_id)                   
 
                         if new_participant.save!
                             CampaignParticipant.create(campaign_id: campaign.id, participant_id: new_participant.id)
@@ -247,7 +248,7 @@ class V1::CampaignController < ApplicationController
         return department.to_s.gsub(/\s+/, "")[0..49] #Remove whitespaces. Limit 50 characters
     end
 
-    def validate_barcode barcode
+    def validate_barcode barcode, campaign_id
         barcode_regex = "^GE[a-zA-Z]{2}[0-9]{4}$"
         barcode = barcode.to_s.gsub(/\s+/, "") #Remove whitespaces
 
@@ -257,6 +258,7 @@ class V1::CampaignController < ApplicationController
             auto_gen = barcode_generate
             while !BiomarkBarcode.exists?(code: auto_gen)
                 BiomarkBarcode.create(code: auto_gen)
+                CampaignBarcode.create(campaign_id: campaign_id, barcode: auto_gen)
                 return auto_gen
             end
         end

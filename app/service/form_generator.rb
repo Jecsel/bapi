@@ -20,7 +20,6 @@ class FormGenerator
         case @has_instructions
         when true 
             unfilled_template = "#{Rails.root}/public/images/gribbles-request-form-template-with-instructions.jpg" 
-            unfilled_template_copy = "#{Rails.root}/public/images/gribbles-request-form-template-with-instructions copy.jpg" 
             #Render forms for participants
             @campaign.campaign_participants.includes(:participant).order('participants.fullname ASC, participants.id ASC').active.each do |campaign_participant| 
                 participant = campaign_participant.participant
@@ -83,18 +82,23 @@ class FormGenerator
                 end
 
                 #Barcode section
+                #Form
                 barcode = Barby::Code39.new(participant.barcode)
                 outputter = Barby::PrawnOutputter.new(barcode)
 
                 outputter.annotate_pdf(@document, :x => 205, :y => 595, :xdim => 0.7, :height => 10)
                 @document.text_box "#{participant.barcode}", :at => [240,595], :width => 130, :height=>20, :size => 4
 
+                #Instruction
+                outputter.annotate_pdf(@document, :x => 465, :y => 22, :xdim => 0.7, :height => 10)
+                @document.text_box "#{participant.barcode}", :at => [502,22], :width => 130, :height=>20, :size => 4
+
 
                 #Mobile number section
                 @document.text_box "#{participant.mobile}", :at => [47,588], :width => 100, :height=>25, :valign => :center, :overflow => :shrink_to_fit 
 
                 
-                #Doctor's details section
+                #Campaign's details section
                 @document.text_box "Doctor code: #{campaign_participant.campaign.campaign_doctor.code}", :at => [341,695], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
                 @document.text_box "Client name: #{campaign_participant.campaign.campaign_client.name}", :at => [341,680], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
                 @document.text_box "Billing code: #{campaign_participant.campaign.campaign_billing.name}", :at => [341,665], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
@@ -115,13 +119,27 @@ class FormGenerator
                         fill_color '000000'
                     end 
                 end
-                @document.text_box "#{participant.fullname}", :at => [253,127], :width => 250, :height=>30, :size => 10
+                @document.text_box "#{participant.fullname}", :at => [255,129], :width => 250, :height=>30, :size => 10
             end
             (1..@no_of_blank_forms).each do |blank_forms|
+                
                 @document.start_new_page
-                @document.image unfilled_template_copy,
+                @document.image unfilled_template,
                     :at     => [25, [595.28, 791.89][1]],
                     :fit    => [595.28, 791.89]
+
+                #Campaign's details section
+                @document.text_box "Doctor code: #{@campaign.campaign_doctor.code}", :at => [341,695], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
+                @document.text_box "Client name: #{@campaign.campaign_client.name}", :at => [341,680], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
+                @document.text_box "Billing code: #{@campaign.campaign_billing.name}", :at => [341,665], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
+
+                auto_barcode  = blank_form_barcode
+                barcode = Barby::Code39.new(auto_barcode)
+                outputter = Barby::PrawnOutputter.new(barcode)
+
+                outputter.annotate_pdf(@document, :x => 465, :y => 22, :xdim => 0.7, :height => 10)
+                @document.text_box "#{barcode}", :at => [502,22], :width => 130, :height=>20, :size => 4
+
             end 
         else
             unfilled_template = "#{Rails.root}/public/images/gribbles-request-form-template-without-instructions.jpg" 
@@ -198,7 +216,7 @@ class FormGenerator
                 @document.text_box "#{participant.mobile}", :at => [43,530], :width => 100, :height=>25, :valign => :center, :overflow => :shrink_to_fit 
 
                 
-                #Doctor's details section
+                #Campaign's details section
                 @document.text_box "Doctor code: #{campaign_participant.campaign.campaign_doctor.code}", :at => [340,695], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
                 @document.text_box "Client name: #{campaign_participant.campaign.campaign_client.name}", :at => [340,670], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
                 @document.text_box "Billing code: #{campaign_participant.campaign.campaign_billing.name}", :at => [340,645], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
@@ -213,11 +231,36 @@ class FormGenerator
                 @document.image unfilled_template,
                     :at     => [25, [595.28, 791.89][1]],
                     :fit    => [595.28, 791.89]
+
+                #Campaign's details section
+                @document.text_box "Doctor code: #{@campaign.campaign_doctor.code}", :at => [340,695], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
+                @document.text_box "Client name: #{@campaign.campaign_client.name}", :at => [340,670], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
+                @document.text_box "Billing code: #{@campaign.campaign_billing.name}", :at => [340,645], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
+
+                auto_barcode = blank_form_barcode
+                barcode = Barby::Code39.new(auto_barcode)
+                outputter = Barby::PrawnOutputter.new(barcode)
+
+                outputter.annotate_pdf(@document, :x => 205, :y => 551, :xdim => 0.7, :height => 30)
+                @document.text_box "#{barcode}", :at => [231,553], :width => 130, :height=>20, :size => 9
             end 
         end
         
         
 
         @document
+    end
+
+    def blank_form_barcode
+        auto_gen = barcode_generate
+        while !BiomarkBarcode.exists?(code: auto_gen)
+            CampaignBarcode.create(campaign_id: @campaign.id, barcode: auto_gen)
+            BiomarkBarcode.create(code: auto_gen)
+            return auto_gen
+        end
+    end
+
+    def barcode_generate
+        return 'GE'+[*('A'..'Z')].shuffle[0,2].join+[*('0'..'9')].shuffle[0,4].join
     end
 end

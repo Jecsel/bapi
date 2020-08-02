@@ -9,6 +9,7 @@ class Campaign < ApplicationRecord
   belongs_to :in_charge_person
 
   has_many :campaign_participants
+  has_many :campaign_barcodes
 
   search_scope :search do
     attributes :id, :event_name
