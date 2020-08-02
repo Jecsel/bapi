@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_07_28_070635) do
+ActiveRecord::Schema.define(version: 2020_08_02_115644) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -63,6 +63,14 @@ ActiveRecord::Schema.define(version: 2020_07_28_070635) do
     t.index ["patient_id"], name: "index_bookings_on_patient_id"
     t.index ["schedule_id"], name: "index_bookings_on_schedule_id"
     t.index ["slot_id"], name: "index_bookings_on_slot_id"
+  end
+
+  create_table "campaign_barcodes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.string "barcode"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["campaign_id"], name: "index_campaign_barcodes_on_campaign_id"
   end
 
   create_table "campaign_billings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -386,6 +394,7 @@ ActiveRecord::Schema.define(version: 2020_07_28_070635) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "campaign_barcodes", "campaigns"
   add_foreign_key "campaign_participants", "campaigns"
   add_foreign_key "campaign_participants", "participants"
   add_foreign_key "campaigns", "campaign_billings"
