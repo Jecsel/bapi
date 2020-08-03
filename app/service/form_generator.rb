@@ -58,7 +58,7 @@ class FormGenerator
                         fill_color '000000'
                     end 
                 end
-                @document.text_box "#{participant.date_of_birth.strftime("%d/%m/%y")}", :at => [43,630], :leading => -5, :width => 130, :height=>25, :valign => :center, :overflow => :shrink_to_fit 
+                @document.text_box "#{participant.date_of_birth.strftime("%d/%m/%Y")}", :at => [43,630], :leading => -5, :width => 130, :height=>25, :valign => :center, :overflow => :shrink_to_fit 
 
                 #IC/Passport section. Validate if participant has an ID
                 if participant.id_number != ""
@@ -185,7 +185,7 @@ class FormGenerator
                         fill_color '000000'
                     end 
                 end
-                @document.text_box "#{participant.date_of_birth.strftime("%d/%m/%y")}", :at => [38,615], :leading => -5, :width => 130, :height=>25, :valign => :center, :overflow => :shrink_to_fit 
+                @document.text_box "#{participant.date_of_birth.strftime("%d/%m/%Y")}", :at => [38,615], :leading => -5, :width => 130, :height=>25, :valign => :center, :overflow => :shrink_to_fit 
 
                 #IC/Passport section. Validate if participant has an ID
                 if participant.id_number != ""
