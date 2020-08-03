@@ -109,7 +109,7 @@ class FormGenerator
                 @document.text_box "Add on allowed? #{campaign_participant.campaign.optional_test ? "Y" : "N"}", :at => [140,186], :width => 100, :height=>30, :size => 10
 
                 #Patient name for tearaway
-                @document.bounding_box([275,127], :width => 130, :height=>10) do 
+                @document.bounding_box([303,127], :width => 130, :height=>10) do 
                     stroke_color 'FFFFFF'
                     stroke_bounds
                     stroke do
@@ -119,7 +119,7 @@ class FormGenerator
                         fill_color '000000'
                     end 
                 end
-                @document.text_box "#{participant.fullname}", :at => [255,129], :width => 250, :height=>30, :size => 10
+                @document.text_box "#{participant.fullname}", :at => [281,137], :width => 200, :height=>30, :size => 9, :leading => -8, :valign => :center, :overflow => :shrink_to_fit 
             end
             (1..@no_of_blank_forms).each do |blank_forms|
                 
@@ -137,9 +137,13 @@ class FormGenerator
                 barcode = Barby::Code39.new(auto_barcode)
                 outputter = Barby::PrawnOutputter.new(barcode)
 
+                #Form
                 outputter.annotate_pdf(@document, :x => 465, :y => 22, :xdim => 0.7, :height => 10)
                 @document.text_box "#{barcode}", :at => [502,22], :width => 130, :height=>20, :size => 4
 
+                #Instruction
+                outputter.annotate_pdf(@document, :x => 205, :y => 595, :xdim => 0.7, :height => 10)
+                @document.text_box "#{barcode}", :at => [240,595], :width => 130, :height=>20, :size => 4
             end 
         else
             unfilled_template = "#{Rails.root}/public/images/gribbles-request-form-template-without-instructions.jpg" 
