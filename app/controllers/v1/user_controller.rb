@@ -42,7 +42,7 @@ class V1::UserController < ApplicationController
 
   def index
     if is_permitted?(1,1)
-      @user = User.all
+      @user = User.get_list_by_role(@current_user.user_role.user_group.id)
       @user_group = UserGroup.get_by_role(@current_user.user_role.user_group.id)
       @role_policy = @current_user.user_role.user_group.role_policies.where("role_policies.service_id = ? ",1) #User service
     else

@@ -1,0 +1,2 @@
+class CampaignDoctor < ApplicationRecord
+end

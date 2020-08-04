@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_06_30_030718) do
+ActiveRecord::Schema.define(version: 2020_08_02_115644) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -65,6 +65,84 @@ ActiveRecord::Schema.define(version: 2020_06_30_030718) do
     t.index ["slot_id"], name: "index_bookings_on_slot_id"
   end
 
+  create_table "campaign_barcodes", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.string "barcode"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["campaign_id"], name: "index_campaign_barcodes_on_campaign_id"
+  end
+
+  create_table "campaign_billings", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.boolean "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "campaign_clients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.boolean "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "campaign_companies", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.boolean "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "campaign_doctors", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "code"
+    t.boolean "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "campaign_participants", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.bigint "campaign_id", null: false
+    t.bigint "participant_id", null: false
+    t.boolean "status", default: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["campaign_id"], name: "index_campaign_participants_on_campaign_id"
+    t.index ["participant_id"], name: "index_campaign_participants_on_participant_id"
+  end
+
+  create_table "campaigns", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "event_name"
+    t.bigint "campaign_client_id", null: false
+    t.bigint "campaign_company_id", null: false
+    t.bigint "campaign_billing_id", null: false
+    t.bigint "campaign_doctor_id", null: false
+    t.string "campaign_site", limit: 300
+    t.date "campaign_start_date"
+    t.date "campaign_end_date"
+    t.time "campaign_start_time"
+    t.time "campaign_end_time"
+    t.string "package"
+    t.boolean "optional_test"
+    t.integer "est_pax"
+    t.boolean "need_phleb"
+    t.integer "no_of_phleb"
+    t.string "remarks", limit: 300
+    t.string "report_management", limit: 300
+    t.string "onsite_pic_name"
+    t.string "onsite_pic_contact"
+    t.boolean "status"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.string "created_by"
+    t.string "updated_by"
+    t.integer "in_charge_person_id"
+    t.index ["campaign_billing_id"], name: "index_campaigns_on_campaign_billing_id"
+    t.index ["campaign_client_id"], name: "index_campaigns_on_campaign_client_id"
+    t.index ["campaign_company_id"], name: "index_campaigns_on_campaign_company_id"
+    t.index ["campaign_doctor_id"], name: "index_campaigns_on_campaign_doctor_id"
+  end
+
   create_table "clinic_areas", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name"
     t.boolean "status", default: true
@@ -88,6 +166,12 @@ ActiveRecord::Schema.define(version: 2020_06_30_030718) do
     t.index ["code"], name: "index_clinics_on_code", unique: true
   end
 
+  create_table "in_charge_people", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "location_clinics", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.bigint "location_id"
     t.bigint "clinic_id"
@@ -107,6 +191,21 @@ ActiveRecord::Schema.define(version: 2020_06_30_030718) do
     t.string "code"
     t.boolean "status", default: true
     t.integer "referral_type", default: 0
+  end
+
+  create_table "participants", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "fullname"
+    t.date "date_of_birth"
+    t.string "gender"
+    t.string "id_number"
+    t.string "mobile"
+    t.string "email"
+    t.string "staff_id"
+    t.string "department"
+    t.string "barcode"
+    t.boolean "status", default: true
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
   end
 
   create_table "patients", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
@@ -136,8 +235,8 @@ ActiveRecord::Schema.define(version: 2020_06_30_030718) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "payment_reference"
     t.datetime "payment_date"
-    t.string "approved_by"
     t.bigint "payment_mode_id"
+    t.string "approved_by"
     t.index ["payment_id"], name: "index_payment_histories_on_payment_id"
     t.index ["payment_mode_id"], name: "index_payment_histories_on_payment_mode_id"
   end
@@ -165,7 +264,7 @@ ActiveRecord::Schema.define(version: 2020_06_30_030718) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status"
+    t.integer "payment_status", default: 0
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -295,6 +394,13 @@ ActiveRecord::Schema.define(version: 2020_06_30_030718) do
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "campaign_barcodes", "campaigns"
+  add_foreign_key "campaign_participants", "campaigns"
+  add_foreign_key "campaign_participants", "participants"
+  add_foreign_key "campaigns", "campaign_billings"
+  add_foreign_key "campaigns", "campaign_clients"
+  add_foreign_key "campaigns", "campaign_companies"
+  add_foreign_key "campaigns", "campaign_doctors"
   add_foreign_key "role_policies", "service_policies"
   add_foreign_key "role_policies", "services"
   add_foreign_key "role_policies", "user_groups"
