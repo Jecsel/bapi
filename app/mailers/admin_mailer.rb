@@ -11,7 +11,7 @@ class AdminMailer < ApplicationMailer
 
     def self.add_campaign campaign
         # @campaign = campaign
-        _bcc = ENV["CC_MAIL"].split("|")
+        _bcc = ENV["CAMPAIGN_CONTACT"].split("|")
         _bcc.each do |recipient|
             send_campaign_details(recipient, campaign).deliver_later
         end 
