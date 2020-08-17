@@ -221,7 +221,7 @@ class V1::CampaignController < ApplicationController
     end
 
     def validate_id_number id_number
-        return id_number = id_number.to_s.gsub(/[^a-zA-Z 0-9]/, '').gsub(/\s/,'-') #Remove special characters
+        return id_number = id_number.to_s.gsub(/[^a-zA-Z 0-9]/, '').gsub(/\s/,'') #Remove special characters
             .gsub(/\s+/, "") #Remove whitespaces
             .upcase[0..13] #Uppercase all letters. Limit 14 characters
     end
