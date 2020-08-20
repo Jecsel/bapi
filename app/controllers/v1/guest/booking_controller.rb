@@ -6,7 +6,12 @@ class V1::Guest::BookingController < ApplicationController
             # SlotWorker.perform_in(1.hour, data.payment.booking_id )
             # BookingMailer.itinerary(data.payment.booking_id).deliver_later
             BookingMailer.reservation(data.payment.booking_id).deliver_later
-            render json: {status:true, data:data.payment}
+            render json: {
+                status:true, 
+                data:data.payment,
+                response_url:ENV["MERCHANT_RESPONSE_URL"],
+                backend_url:ENV["MERCHANT_BACKEND_URL"]
+            }
         rescue => ex
             render json: {message:ex,status:false},status:403
         end
