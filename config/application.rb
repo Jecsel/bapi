@@ -24,7 +24,11 @@ module Rails6Api
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 6.0
     config.time_zone = 'Asia/Manila'
-    
+    if Rails.env.production?
+      Raven.configure do |config|
+        config.dsn = 'https://942f3fe8660e419b99b08f2b8812e164:8c26182466df4f5a807f97baf1909c02@o417435.ingest.sentry.io/5397725'
+      end
+    end
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
