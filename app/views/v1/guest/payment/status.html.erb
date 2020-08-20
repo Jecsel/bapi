@@ -109,7 +109,7 @@
 					<%= hidden_field_tag(:SignatureType,@booking.payment.signature_type) %>
 					<%= hidden_field_tag(:Signature,@booking.payment.signature) %>
 					<%= hidden_field_tag(:ResponseURL,"https://my.biomarking.com/v1/guest/payment/status") %>
-					<%= hidden_field_tag(:ResponseURL,"https://my.biomarking.com/v1/guest/payment/confirmation") %>
+					<%= hidden_field_tag(:BackendURL,"https://my.biomarking.com/v1/guest/payment/confirmation") %>
 					<button type="button" onclick="redirect_location()">CANCEL</button>
 					<%= submit_tag("TRY AGAIN") %>
 				<% end %>
