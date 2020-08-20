@@ -105,7 +105,7 @@ class FormGenerator
 
 
                 #Other test requests section
-                @document.text_box "Package / Profile Code: #{campaign_participant.campaign.package}", :at => [140,198], :width => 200, :height=>30, :size => 10
+                @document.text_box "Package / Profile Code: #{campaign_participant.campaign.package}", :at => [140,198], :width => 400, :height=>30, :size => 10
                 @document.text_box "Add on allowed? #{campaign_participant.campaign.optional_test ? "Y" : "N"}", :at => [140,186], :width => 100, :height=>30, :size => 10
 
                 #Patient name for tearaway
@@ -134,7 +134,7 @@ class FormGenerator
                 @document.text_box "Billing code: #{@campaign.campaign_billing.name}", :at => [341,665], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
 
                 #Other test requests section
-                @document.text_box "Package / Profile Code: #{@campaign.package}", :at => [140,198], :width => 200, :height=>30, :size => 10
+                @document.text_box "Package / Profile Code: #{@campaign.package}", :at => [140,198], :width => 400, :height=>30, :size => 10
                 @document.text_box "Add on allowed? #{@campaign.optional_test ? "Y" : "N"}", :at => [140,186], :width => 100, :height=>30, :size => 10
 
                 auto_barcode  = blank_form_barcode
@@ -231,7 +231,7 @@ class FormGenerator
 
 
                 #Other test requests section
-                @document.text_box "Package / Profile Code: #{campaign_participant.campaign.package}", :at => [128,116], :width => 200, :height=>30, :size => 10
+                @document.text_box "Package / Profile Code: #{campaign_participant.campaign.package}", :at => [128,116], :width => 400, :height=>30, :size => 10
                 @document.text_box "Add on allowed? #{campaign_participant.campaign.optional_test ? "Y" : "N"}", :at => [128,104], :width => 100, :height=>30, :size => 10
             end
             (1..@no_of_blank_forms).each do |blank_forms|
@@ -246,7 +246,7 @@ class FormGenerator
                 @document.text_box "Billing code: #{@campaign.campaign_billing.name}", :at => [340,645], :width => 100, :height=>20, :size => 10, :valign => :center, :overflow => :shrink_to_fit 
 
                 #Other test requests section
-                @document.text_box "Package / Profile Code: #{@campaign.package}", :at => [130,115], :width => 200, :height=>30, :size => 10
+                @document.text_box "Package / Profile Code: #{@campaign.package}", :at => [130,115], :width => 400, :height=>30, :size => 10
                 @document.text_box "Add on allowed? #{@campaign.optional_test ? "Y" : "N"}", :at => [130,103], :width => 100, :height=>30, :size => 10
 
                 auto_barcode = blank_form_barcode
