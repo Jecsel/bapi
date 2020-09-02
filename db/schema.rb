@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_08_02_115644) do
+ActiveRecord::Schema.define(version: 2020_09_02_080141) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -297,6 +297,21 @@ ActiveRecord::Schema.define(version: 2020_08_02_115644) do
     t.index ["service_id"], name: "index_role_policies_on_service_id"
     t.index ["service_policy_id"], name: "index_role_policies_on_service_policy_id"
     t.index ["user_group_id"], name: "index_role_policies_on_user_group_id"
+  end
+
+  create_table "scheduler_log_forms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
+    t.string "date_from"
+    t.string "date_to"
+    t.text "days"
+    t.integer "allocation_per_slot"
+    t.integer "minute_interval"
+    t.integer "no_of_session"
+    t.text "first_session"
+    t.text "second_session"
+    t.bigint "location_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["location_id"], name: "index_scheduler_log_forms_on_location_id"
   end
 
   create_table "schedules", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|

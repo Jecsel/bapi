@@ -88,7 +88,7 @@ Rails.application.routes.draw do
       get 'slot/:slot_id', to:"schedule#slot"
       post 'close_slot/:slot_id', to:"schedule#close_slot"
       collection do 
-        
+        post 'log'
       end
     end
     resources :clinic, only:[:create, :index, :update, :destroy, :show] do 

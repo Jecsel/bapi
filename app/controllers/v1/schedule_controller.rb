@@ -1,6 +1,14 @@
 class V1::ScheduleController < ApplicationController
     before_action :must_be_authenticated
 
+    def log 
+        _logs = SchedulerLogForm.where("location_id = ?",params[:location_id]).last
+        _last_sched = Schedule.where("location_id = ?",params[:location_id]).order(schedule_date: :desc).first
+        render json: {
+            _last_sched:_last_sched,
+            _logs:_logs
+        }
+    end
     def destroy 
         schedule = Schedule.find(params[:id])
         schedule.update status:false
@@ -47,6 +55,25 @@ class V1::ScheduleController < ApplicationController
         begin
             Scheduler.new schedule_params 
             AuditLog.log_changes("Test Sites", "location_add_schedule", "", "", get_log_text(), 0, @current_user.username)
+            
+            #implement logs
+            _logs = SchedulerLogForm.where("location_id = ?",schedule_params[:location_id])
+            payload = {
+                location_id: schedule_params[:location_id],
+                date_from: schedule_params[:date_from],
+                date_to: schedule_params[:date_to],
+                days: schedule_params[:days].to_json,
+                allocation_per_slot: schedule_params[:allocation_per_slot],
+                minute_interval: schedule_params[:minutes_interval],
+                no_of_session: schedule_params[:no_of_session],
+                first_session: schedule_params[:first_session].to_json,
+                second_session: schedule_params[:second_session].to_json
+            }
+            if _logs.any?
+                _logs.first.update payload
+            else
+                SchedulerLogForm.create payload
+            end
             render json: {message: :generated, status:true}
         rescue=>ex
             render json: {message:ex,status:false},status:403
