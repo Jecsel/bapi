@@ -3,7 +3,7 @@ class V1::ScheduleController < ApplicationController
 
     def log 
         _logs = SchedulerLogForm.where("location_id = ?",params[:location_id]).last
-        _last_sched = Schedule.where("location_id = ?",params[:location_id]).order(schedule_date: :desc).first
+        _last_sched = Schedule.where("location_id = ? && status = ?",params[:location_id],true).order(schedule_date: :desc).first
         render json: {
             _last_sched:_last_sched,
             _logs:_logs
