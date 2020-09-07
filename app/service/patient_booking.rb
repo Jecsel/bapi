@@ -63,6 +63,7 @@
     end
 
     def generate_payment_info booking
+        filename = "pre_payment_#{Time.now.to_i}"
         pay = booking.build_payment
         pay.patient_id = booking.id
         pay.merchant_code = ENV["MERCHANT_CODE"]
@@ -79,10 +80,13 @@
         pay.lang = "ISO-8859-1"
         pay.signature_type = "SHA256"
         pay.signature = calculate_hash_key pay
+        pay.s3_artifact = filename
         pay.save
         @payment = pay
-        
+        _s3 = S3bucket.new 
+        _s3.upload @payment, filename
     end
+    
     def calculate_hash_key pay
         __code = "#{ENV["MERCHANT_KEY"]}#{ENV["MERCHANT_CODE"]}#{pay.ref_no}#{pay.amount.gsub('.', "")}#{pay.currency}"
         return Digest::SHA256.hexdigest __code
