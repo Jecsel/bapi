@@ -85,7 +85,7 @@
         @payment = pay
         pay.update s3_artifact:filename
         _s3 = S3Bucket.new 
-        _s3.upload @payment, filename
+        _s3.upload @payment.to_json, filename
     end
 
     def calculate_hash_key pay
