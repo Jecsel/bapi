@@ -14,7 +14,7 @@ gem 'kaminari'
 gem 'jwt'
 gem 'search_cop'
 gem 'sidekiq'
-gem "aws-sdk-s3", require: false
+gem "aws-sdk-s3"
 gem 'roo'
 gem 'prawn'
 gem 'prawn-templates', '~> 0.1.2'
