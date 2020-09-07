@@ -84,7 +84,7 @@
         pay.save
         @payment = pay
         pay.update s3_artifact:filename
-        _s3 = S3bucket.new 
+        _s3 = S3Bucket.new 
         _s3.upload @payment, filename
     end
 
