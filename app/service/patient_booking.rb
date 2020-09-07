@@ -83,10 +83,11 @@
         pay.s3_artifact = filename
         pay.save
         @payment = pay
+        pay.update s3_artifact:filename
         _s3 = S3bucket.new 
         _s3.upload @payment, filename
     end
-    
+
     def calculate_hash_key pay
         __code = "#{ENV["MERCHANT_KEY"]}#{ENV["MERCHANT_CODE"]}#{pay.ref_no}#{pay.amount.gsub('.', "")}#{pay.currency}"
         return Digest::SHA256.hexdigest __code
