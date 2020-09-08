@@ -766,6 +766,24 @@ namespace :services do
                 service_id: 2, #Test site service
                 service_policy_id: 18, #Edit test site
                 status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 2, #Test site service
+                service_policy_id: 19, #Add test site schedule
+                status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 2, #Test site service
+                service_policy_id: 20, #Delete test site schedule
+                status: true
+            },
+            { 
+                user_group_id: _user_group_id,
+                service_id: 2, #Test site service
+                service_policy_id: 21, #Link/Unlink clinics from test site
+                status: true
             }
         ]
         RolePolicy.create _role_policies
