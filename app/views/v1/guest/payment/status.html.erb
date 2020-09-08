@@ -120,8 +120,7 @@
 
 	<script>
 		function redirect_location(e){
-			// e.preventDefault();
-			window.location.replace("https://my.biomarking.com/#/booking-locations");
+			window.location.replace("<%=ENV["ROOT_URL"]%>/#/booking-locations");
 		}
 	</script>
 </body>
