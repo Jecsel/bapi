@@ -14,7 +14,7 @@
         <p>Campaign End Time: <%=@campaign.campaign_end_time.strftime("%H:%M %p")%></p>
         <br><br>
         <p>Package / Profile Code: <%=@campaign.package%></p>
-        <p>Tag-on Profiles/ Tests: <%=@campaign.optional_test%></p>
+        <p>Tag-on Profiles/ Tests: <%=@campaign.optional_test ? "Yes" : 'No'%></p>
         <br><br>
         <p>Estimated number of pax: <%=@campaign.est_pax%></p>
         <p>Number of phlebotomist needed: <%=@campaign.no_of_phleb%></p>
