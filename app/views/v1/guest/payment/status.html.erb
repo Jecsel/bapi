@@ -108,8 +108,8 @@
 					<%= hidden_field_tag(:Lang,@booking.payment.lang) %>
 					<%= hidden_field_tag(:SignatureType,@booking.payment.signature_type) %>
 					<%= hidden_field_tag(:Signature,@booking.payment.signature) %>
-					<%= hidden_field_tag(:ResponseURL,"https://my.biomarking.com/v1/guest/payment/status") %>
-					<%= hidden_field_tag(:BackendURL,"https://my.biomarking.com/v1/guest/payment/confirmation") %>
+					<%= hidden_field_tag(:ResponseURL,ENV["MERCHANT_RESPONSE_URL"]) %>
+					<%= hidden_field_tag(:BackendURL,ENV["MERCHANT_BACKEND_URL"]) %>
 					<button type="button" onclick="redirect_location()">CANCEL</button>
 					<%= submit_tag("TRY AGAIN") %>
 				<% end %>
@@ -120,8 +120,7 @@
 
 	<script>
 		function redirect_location(e){
-			// e.preventDefault();
-			window.location.replace("https://my.biomarking.com/#/booking-locations");
+			window.location.replace("<%=ENV["ROOT_URL"]%>/#/booking-locations");
 		}
 	</script>
 </body>

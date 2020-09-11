@@ -1,0 +1,2 @@
+class SchedulerLogForm < ApplicationRecord
+end

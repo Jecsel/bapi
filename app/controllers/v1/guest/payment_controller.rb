@@ -1,6 +1,10 @@
 class V1::Guest::PaymentController < ApplicationController
     
     def confirmation
+        filename = "post_payload_#{Time.now.to_i}"
+        _s3 = S3Bucket.new 
+        _s3.upload request.body,filename
+
         ref_no  = params[:RefNo]
         pay     = Payment.find_by_ref_no ref_no
 
@@ -14,6 +18,7 @@ class V1::Guest::PaymentController < ApplicationController
         hist.s_country  = payment_params[:S_country]
         hist.amount     = payment_params[:Amount]
         hist.payment_reference = payment_params[:TransId]
+        hist.s3_artifact = filename
         hist.save
         PaymentWorker.perform_async pay.id,hist.id, payment_params[:PaymentId]
         render html: :RECEIVEOK,status:200
