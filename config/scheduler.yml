@@ -1,0 +1,14 @@
+#NOTE: After production deployment please remove your schedule from internal environments
+#leaving your scheduler in internal will keep running
+
+#Make entry for your local dev environment
+INTERNAL:
+    payment-gmail-reader:
+        cron: "0 * * * *"
+        class: "GmailWorker"
+        queue: default
+
+PRODUCTION:
+    
+
+
