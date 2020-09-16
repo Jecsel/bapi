@@ -10,3 +10,10 @@ end
 Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
     [user, password] == [ ENV['SIDEKIQ_USERNAME'], ENV['SIDEKIQ_PASSWORD']]
 end
+schedule_file = "config/scheduler.yml" #Rails.root.join("config","scheduler.yml") #
+
+if File.exist?(schedule_file) && Sidekiq.server?
+    schedules = YAML.load_file(schedule_file)
+    assign_schedules = schedules[ENV["APL_ENV"]] || schedules["INTERNAL"]
+    Sidekiq::Cron::Job.load_from_hash assign_schedules
+end

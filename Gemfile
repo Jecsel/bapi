@@ -24,6 +24,8 @@ gem "sentry-raven"
 
 #added for gmail inbox reading (ramel)
 gem 'gmail'
+#added for sidekiq-cron-job (ramel)
+gem "sidekiq-cron", "~> 1.1"
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
