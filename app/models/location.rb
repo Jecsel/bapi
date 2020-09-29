@@ -2,6 +2,7 @@ class Location < ApplicationRecord
     include SearchCop
 
     has_many :schedules
+    has_many :bookings
     has_many :location_clinics
     has_many :clinics, through: :location_clinics
 
@@ -32,5 +33,5 @@ class Location < ApplicationRecord
     end
 
     scope :active, -> { where(:status => true)}
-    scope :inactive, -> { where(:status => true)}
+    scope :inactive, -> { where(:status => false)}
 end

@@ -9,6 +9,15 @@ Rails.application.routes.draw do
 
   #BOOKING
   namespace :v1 do
+    namespace :testing do 
+      resources :helper do 
+        collection do 
+          post 'update_biomark_test_site'
+          post 'verify_biomark_schedule_presence'
+          post 'biomark_booking_cleanup'
+        end
+      end
+    end
     namespace :guest do 
       resources :location, only:[:index] do 
         get 'areas', to:"location#areas"
