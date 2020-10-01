@@ -6,14 +6,11 @@ class V1::Testing::HelperController < ApplicationController
         @test_site.bookings.destroy_all
         render json: :cleared
     end
+    
     def update_biomark_test_site
         test_site = Location.where("name = ?","BioMark")
-        if params[:state].present?
-            @test_site.update status: params[:state]
-            render json: {message: :updated},status: :ok
-        else
-            render json: {message: :parameters_not_found},status: :bad_request
-        end
+        @test_site.update status: params[:state]
+        render json: {message: :updated},status: :ok
     end
 
     def verify_biomark_schedule_presence
