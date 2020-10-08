@@ -8,9 +8,14 @@ class V1::Testing::HelperController < ApplicationController
     end
     
     def update_biomark_test_site
-        test_site = Location.where("name = ?","BioMark")
-        @test_site.update status: params[:state]
-        render json: {message: :updated},status: :ok
+        clinic = Clinic.where("name = ?","BioMark Test")
+        if clinic.any?
+            @test_site.update status: params[:state]
+            clinic.last.update status: params[:state]
+            render json: {message: :updated},status: :ok
+        else
+            render json: {message: :clinic_not_found},status: :not_found
+        end
     end
 
     def verify_biomark_schedule_presence
@@ -24,7 +29,6 @@ class V1::Testing::HelperController < ApplicationController
             #TODO generate schedules
             render json: {message: "schedule generated"},status: :ok
         end
-        
     end
 
     private
