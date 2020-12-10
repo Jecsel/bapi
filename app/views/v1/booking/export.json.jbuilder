@@ -31,6 +31,11 @@ json.array! @bookings do |booking|
     json.file_name booking.payment.payment_histories.any? && !booking.payment.payment_histories.last.upload_document.attachment.nil? ? booking.payment.payment_histories.last.upload_document.filename.to_s : "N/A" if booking.payment.payment_histories.any?
     json.username booking.payment.payment_histories.any? ? booking.payment.payment_histories.last.approved_by : "N/A"
     json.updated_at booking.payment.updated_at
+    json.line_1 booking.patient.line_1
+    json.line_2 booking.patient.line_2
+    json.post booking.patient.post
+    json.state_id booking.patient.state_id
+    json.state_name booking.patient.state_name
 end
 
 

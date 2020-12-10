@@ -72,6 +72,15 @@ IC / Passport Number: <%=@booking.patient.id_number%>
 Contact Number: <%=@booking.patient.contact_number%>
 <br>
 <br>
+Address:
+<br>
+<%=@booking.patient.line_1%>
+<br>
+<%=@booking.patient.line_2%>
+<br>
+<%=@booking.patient.post%>, <%=@booking.patient.state_name%>
+<br>
+<br>
 Appointment Time:  <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.utc.strftime("%H:%M %p")%>
 <br>
 Testing Location:
