@@ -14,7 +14,7 @@ json.booking_details do
     json.payment_price @booking.payment.amount
 end
 json.patient_details do 
-    json.extract! @booking.patient, :fullname, :id_number, :date_of_birth, :contact_number, :email_address
+    json.extract! @booking.patient, :fullname, :id_number, :date_of_birth, :contact_number, :email_address, :line_1, :line_2, :post, :state_id, :state_name
     json.gender @booking.patient.gender_id == 1? "Male": "Female"
 end
 json.question_details do

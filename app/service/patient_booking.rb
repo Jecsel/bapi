@@ -44,6 +44,11 @@
                 email_address: patient[:email_address],
                 q1: patient[:q1],
                 q2: patient[:q2],
+                line_1: patient[:line_1],
+                line_2: patient[:line_2],
+                post: patient[:post],
+                state_id: patient[:state_id],
+                state_name: patient[:state_name]
             })
             generate_guest_booking _patient
         end
