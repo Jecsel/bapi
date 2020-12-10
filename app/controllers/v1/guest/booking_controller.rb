@@ -41,7 +41,12 @@ class V1::Guest::BookingController < ApplicationController
                     :q1,
                     :q2,
                     :clinic_id,
-                    :booking_type
+                    :booking_type,
+                    :line_1,
+                    :line_2,
+                    :post,
+                    :state_id,
+                    :state_name
                 ]
             )
     end
