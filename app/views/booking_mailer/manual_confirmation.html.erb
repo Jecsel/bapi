@@ -104,6 +104,14 @@ Reference No: <%=@booking.reference_code%>
 IC / Passport Number: <%=@booking.patient.id_number%>
 <br>
 Contact Number: <%=@booking.patient.contact_number%>
+Address:
+<br>
+<%=@booking.patient.line_1%>
+<br>
+<%=@booking.patient.line_2%>
+<br>
+<%=@booking.patient.post%>, <%=@booking.patient.state_name%>
+<br>
 <% if @booking.payment.payment_histories.last.amount != ""%>
   <br>
   Price: RM <%=@booking.payment.payment_histories.last.amount%> (Paid) 
