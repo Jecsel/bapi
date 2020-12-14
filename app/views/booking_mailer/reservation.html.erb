@@ -23,6 +23,7 @@
   .footer {padding: 20px 30px 15px 30px;}
   .footercopy {font-family: sans-serif; font-size: 14px; color: #ffffff;}
   .footercopy a {color: #ffffff; text-decoration: underline;}
+  .sub-label {font-size: 13px;}
   @media only screen and (max-width: 550px), screen and (max-device-width: 550px) {
   body[biomark] .hide {display: none!important;}
   body[biomark] .buttonwrapper {background-color: transparent!important;}
@@ -79,6 +80,7 @@ Address:
 <%=@booking.patient.line_2%>
 <br>
 <%=@booking.patient.post%>, <%=@booking.patient.state_name%>
+<p class="sub-label">Your address is collected for contact tracing purposes as required by Ministry of Health.</p>
 <br>
 <br>
 Appointment Time:  <%=@booking.schedule.schedule_date.strftime("%b %d, %Y")%> <%=@booking.slot.slot_time.to_time.utc.strftime("%H:%M %p")%>
