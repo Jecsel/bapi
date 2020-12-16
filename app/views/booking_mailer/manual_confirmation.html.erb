@@ -105,6 +105,7 @@ Reference No: <%=@booking.reference_code%>
 IC / Passport Number: <%=@booking.patient.id_number%>
 <br>
 Contact Number: <%=@booking.patient.contact_number%>
+<br>
 Address:
 <br>
 <%=@booking.patient.line_1%>
@@ -112,7 +113,7 @@ Address:
 <%=@booking.patient.line_2%>
 <br>
 <%=@booking.patient.post%>, <%=@booking.patient.state_name%>
-<p class="sub-label">Your address is collected for contact tracing purposes as required by Ministry of Health.</p>
+Your address is collected for contact tracing purposes as required by Ministry of Health.
 <br>
 <% if @booking.payment.payment_histories.last.amount != ""%>
   <br>
