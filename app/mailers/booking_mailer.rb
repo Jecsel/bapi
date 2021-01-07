@@ -28,9 +28,22 @@ class BookingMailer < ApplicationMailer
         if @booking.clinic.present? 
             _bcc << @booking.clinic.email_address
         end
+        attachments['confirmation_receipt.pdf'] = generate_pdf_content(booking_id)
+        Setting.last.increment!(:receipt_count) 
         mail(
             to: @booking.payment.user_email, 
             bcc: _bcc,
             subject: "COVID-19 Drive-Thru Booking Confirmation  | REF: #{@booking.reference_code}")
     end
+
+    private
+    
+    def generate_pdf_content booking_id
+        pdf = ReceiptGenerator.new(booking_id).generate_booking_receipt
+        Tempfile.create do |f|
+          pdf.render_file f
+          f.flush
+          File.read(f)
+        end
+      end
 end
