@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_12_10_033302) do
+ActiveRecord::Schema.define(version: 2021_01_05_191244) do
 
   create_table "active_storage_attachments", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
     t.string "name", null: false
@@ -240,8 +240,8 @@ ActiveRecord::Schema.define(version: 2020_12_10_033302) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "payment_reference"
     t.datetime "payment_date"
-    t.string "approved_by"
     t.bigint "payment_mode_id"
+    t.string "approved_by"
     t.string "s3_artifact"
     t.index ["payment_id"], name: "index_payment_histories_on_payment_id"
     t.index ["payment_mode_id"], name: "index_payment_histories_on_payment_mode_id"
@@ -270,7 +270,7 @@ ActiveRecord::Schema.define(version: 2020_12_10_033302) do
     t.string "lang"
     t.string "signature_type"
     t.string "signature"
-    t.integer "payment_status"
+    t.integer "payment_status", default: 0
     t.integer "payment_type"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -373,6 +373,7 @@ ActiveRecord::Schema.define(version: 2020_12_10_033302) do
     t.integer "booking_date_range"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "receipt_count", default: 1
   end
 
   create_table "slots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8", force: :cascade do |t|
