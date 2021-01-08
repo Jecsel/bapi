@@ -5,6 +5,7 @@ class BookingMailer < ApplicationMailer
         if @booking.clinic.present? 
             _bcc << @booking.clinic.email_address
         end
+        attachments['confirmation_receipt.pdf'] = generate_pdf_content(booking_id)
         mail(
             to: @booking.payment.user_email, 
             bcc: _bcc,
