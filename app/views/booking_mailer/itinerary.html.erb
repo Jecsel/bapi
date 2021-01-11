@@ -69,7 +69,7 @@
           <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
               <td class="h3">
-                Hi <%=@booking.payment.username%>,
+                Hi <%=@booking.payment.username.titlecase%>,
               </td>
             </tr>
             <tr>
@@ -99,7 +99,7 @@ Booking details:
 <br>
 Reference No: <%=@booking.reference_code%>
 <br>
-<div style="text-transform: capitalize;">Full Name: <%=@booking.patient.fullname%></div>
+<div style="text-transform: capitalize;">Full Name: <%=@booking.patient.fullname.titlecase%></div>
 <br>
 IC / Passport Number: <%=@booking.patient.id_number%>
 <br>
