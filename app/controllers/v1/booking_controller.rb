@@ -26,7 +26,7 @@ class V1::BookingController < ApplicationController
             #Log update of payment status
             AuditLog.log_changes("Bookings", "booking_status", payment.booking_id, "", "", 1, @current_user.username)
         end
-        BookingMailer.manual_confirmation(payment.booking_id).deliver_later
+        BookingMailer.manual_confirmation(payment.booking_id, false).deliver_later
         # BookingMailer.reservation(payment.booking_id).deliver_later
         render json: :confirmed
     end
@@ -121,7 +121,7 @@ class V1::BookingController < ApplicationController
                 BookingMailer.reservation(params[:past_booking_details][:id]).deliver_later
             end
             if booking.payment.payment_status == "confirmed"
-                BookingMailer.manual_confirmation(params[:past_booking_details][:id]).deliver_later
+                BookingMailer.manual_confirmation(params[:past_booking_details][:id], true).deliver_later
             end 
         end
 

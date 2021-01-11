@@ -23,13 +23,13 @@ class BookingMailer < ApplicationMailer
             subject: "COVID-19 Drive-Thru Reservation | REF: #{@booking.reference_code}")
     end
     
-    def manual_confirmation booking_id
+    def manual_confirmation booking_id, reschedule
         @booking = Booking.find booking_id
         _bcc = ENV["CC_MAIL"].split("|")
         if @booking.clinic.present? 
             _bcc << @booking.clinic.email_address
         end
-        attachments['confirmation_receipt.pdf'] = generate_pdf_content(booking_id)
+        attachments['confirmation_receipt.pdf'] = generate_pdf_content(booking_id) if !reschedule
         Setting.last.increment!(:receipt_count) 
         mail(
             to: @booking.payment.user_email, 
