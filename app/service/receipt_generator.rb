@@ -20,7 +20,7 @@ class ReceiptGenerator
         @document.text_box "RECEIPT DATE", :at => [330,645], :style => :bold
         @document.text_box "TERMS", :at => [330,630], :style => :bold
 
-        @document.text_box ": ##{Time.current.year % 100}-#{sprintf '%08d', Setting.last.receipt_count}", :at => [430,660]
+        @document.text_box ": ##{Time.current.year % 100}-#{sprintf '%08d', @booking.payment.amount}", :at => [430,660]
         @document.text_box ": #{Date.current.strftime("%d/%m/%Y")}", :at => [430,645]
         @document.text_box ": Transfer", :at => [430,630]
 
@@ -38,9 +38,9 @@ class ReceiptGenerator
         @document.text_box "RM", :at => [450,575]
 
         @document.text_box "Covid 19 Testing", :at => [0,545]
-        @document.text_box "#{Setting.last.covid_price}", :at => [250,545]
+        @document.text_box "#{@booking.payment.amount}", :at => [250,545]
         @document.text_box "1", :at => [330,545]
-        @document.text_box "#{Setting.last.covid_price}", :at => [450,545]
+        @document.text_box "#{@booking.payment.amount}", :at => [450,545]
         
         stroke do
             horizontal_line(290, 525, :at => 222)
@@ -48,7 +48,7 @@ class ReceiptGenerator
         end 
 
         @document.text_box "Amount: ", :at => [330,217], :style => :bold
-        @document.text_box "#{Setting.last.covid_price}", :at => [480,217], :style => :bold, :align => :right
+        @document.text_box "#{@booking.payment.amount}", :at => [480,217], :style => :bold, :align => :right
 
         @document
     end
