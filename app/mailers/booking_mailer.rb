@@ -6,6 +6,7 @@ class BookingMailer < ApplicationMailer
             _bcc << @booking.clinic.email_address
         end
         attachments['confirmation_receipt.pdf'] = generate_pdf_content(booking_id)
+        Setting.last.increment!(:receipt_count)
         mail(
             to: @booking.payment.user_email, 
             bcc: _bcc,
