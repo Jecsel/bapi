@@ -20,7 +20,7 @@ class ReceiptGenerator
         @document.text_box "RECEIPT DATE", :at => [330,645], :style => :bold
         @document.text_box "TERMS", :at => [330,630], :style => :bold
 
-        @document.text_box ": ##{Time.current.year % 100}-#{sprintf '%08d', @booking.payment.amount}", :at => [430,660]
+        @document.text_box ": ##{Time.current.year % 100}-#{sprintf '%08d', @booking.payment.amount.to_f}", :at => [430,660]
         @document.text_box ": #{Date.current.strftime("%d/%m/%Y")}", :at => [430,645]
         @document.text_box ": Transfer", :at => [430,630]
 
