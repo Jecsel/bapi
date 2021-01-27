@@ -2,7 +2,7 @@ class ApplicationController < ActionController::API
     SECRET_KEY = Rails.application.secrets.secret_key_base.to_s
 
     def ping
-        render json: {message:"TEST V2 Build From Jenkin CI"}
+        render json: {message:"V2 Infra CI/CD"}
     end
 
     def must_be_authenticated
