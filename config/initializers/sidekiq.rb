@@ -1,11 +1,12 @@
 require 'sidekiq'
 require 'sidekiq/web'
+redis_url = URI.parse("redis://#{ENV['REDIS_URL']}:#{ENV['REDIS_PORT']}/#{ENV['REDIS_DB']}")
 Sidekiq.configure_client do |config|
-    config.redis = { url: "redis://#{ENV['REDIS_URL']}:#{ENV['REDIS_PORT']}/#{ENV['REDIS_DB']}"}
+    config.redis = { url: redis_url}
 end
     
 Sidekiq.configure_server do |config|
-    config.redis = { url: "redis://#{ENV['REDIS_URL']}:#{ENV['REDIS_PORT']}/#{ENV['REDIS_DB']}"}
+    config.redis = { url: redis_url}
 end
 Sidekiq::Web.use(Rack::Auth::Basic) do |user, password|
     [user, password] == [ ENV['SIDEKIQ_USERNAME'], ENV['SIDEKIQ_PASSWORD']]
